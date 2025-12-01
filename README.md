@@ -1,7 +1,7 @@
 # A God-Like ECampus helper
 Study project in comfortising experience of using ECampus.
 ### Description
-The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP, FleXNow etc. Webscraping from these websites using **Playwright**, defining it in modern interface with **[Insert GUI/CLI library in future]** and implementing other key libraries to render most useful info (like: **[Insert important libraries]**) delivers a powerful ... to each student.
+The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP, FleXNow etc. Webscraping from these websites using **Playwright**, defining it in modern interface with **[Insert GUI/CLI library in future]** and implementing other key libraries to render most useful info delivers a powerful instrument to each student.
 ### How To Install
 Download an .exe file and start it. Simple as that!
 ### How To Use
@@ -9,15 +9,18 @@ After starting you should once log in and for every session be ready to use your
 --- ---
 # Functionalities
 ### Data Sources
-
+- Using Webcrawler lib called Playwright these websites are analyzed: ECampusMail, FleXNow, StudIP. 
 ### Data Storage
-
+- Some data will be handled in SQL, like: local user data, grade statistics etc.
 ### User Management
-
+- User should log in so that web crawler could functionate
+- Each time user should be ready to provide 2FA Code so that the project could work
+- It is possible to switch accounts 
 ### Interface
-
+- Good-looking modern **[GUI/CLI]** interface using following libs: **[Insert interface libs]**
+- Help button is easy to find everywhere
 ### Visualizations
-
+- For some statistics will be used mathplotlib to visualize
 --- ---
 # Group Details
 - Group name: Data Sorcerers
@@ -30,3 +33,4 @@ After starting you should once log in and for every session be ready to use your
 ### Websites
 
 ### Libraries
+
