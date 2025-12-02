@@ -1,7 +1,7 @@
 # A God-Like ECampus helper
 Study project in comfortising experience of using ECampus.
 ### Description
-The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP etc. Retrieving data from these websites using their API or IMAP/SMTP protocols, defining it in modern interface with **[Insert GUI lib]** and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
+The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP etc. Retrieving data from these websites, defining it in modern interface and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
 ### How To Install
 Download an .exe file and start it. Simple as that!
 ### How To Use
@@ -17,7 +17,7 @@ After starting you should once log in and for every session be ready to use your
 - Each time user should be ready to provide 2FA Code so that the project could work.
 - It is possible to switch accounts.
 ### Interface
-- Good-looking modern GUI interface using following libs: **[Insert interface libs]**.
+- Modern GUI interface using PySide lib.
 - Help button is easy to find everywhere.
 ### Visualizations
 - For some statistics will be used mathplotlib to visualize.
