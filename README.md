@@ -1,11 +1,7 @@
 # A God-Like ECampus helper
 Study project in comfortising experience of using ECampus.
 ### Description
-<<<<<<< Updated upstream
-The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP etc. Retrieving data from these websites, defining it in modern interface and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
-=======
-The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail, StudIP etc. Retrieving data from these websites using their API or IMAP/SMTP protocols, defining it in modern GUI and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
->>>>>>> Stashed changes
+The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail and StudIP. Retrieving data from these websites using their API or IMAP/SMTP protocols, defining it in modern GUI and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
 ### How To Install
 Download an .exe file and start it. Simple as that!
 ### How To Use
@@ -14,19 +10,18 @@ After starting you should once log in and for every session be ready to use your
 # Functionalities
 ### Data Storage
 - Some data will be handled in SQL, like: local user data, calender from studip etc.
+- The login credintials are in hash-form and SQL-databases will be protected.
 ### User Management
-- User should log in with it StudIP login and password so that the program could functionate.
-- Each time user should be ready to provide 2FA Code so that the project could work.
+- Local user stores login credentials for his ECampusMail and StudIP accounts.
+- User should provide their email and password so that the program could functionate.
 - It is possible to switch accounts.
 ### Interface
-<<<<<<< Updated upstream
 - Modern GUI interface using PySide lib.
-=======
-- Good-looking modern GUI interface using following libs: PySide.
->>>>>>> Stashed changes
+- Switch dark and light themes automatically.
 - Help button is easy to find everywhere.
 ### Visualizations
 - Mathplotlib and PySide will be used to visualize some statistics, like grades from courses (if avaible).
+- It is possible to choose a period and some basic filtering options for graphs.
 --- ---
 # Group Details
 - Group name: Data Sorcerers
@@ -37,10 +32,10 @@ After starting you should once log in and for every session be ready to use your
 --- ---
 # Acknowlegdments
 ### Websites
-- StudIP Göttingen:
-- ECampusMail Göttingen: 
+- StudIP Göttingen: https://www.studip.uni-goettingen.de/dispatch.php/start
+- ECampusMail Göttingen: https://email.gwdg.de/owa/auth/logon.aspx
 ...
 ### Libraries
-- PySide6:
-- studipy:
+- PySide6: https://github.com/PySide
+- studipy: https://github.com/FrederikRichter/studipy
 ...
