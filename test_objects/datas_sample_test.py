@@ -8,10 +8,10 @@ base_url = "https://studip.uni-goettingen.de/"
 client = studipy.Client(username=username, password=password, base_url=base_url)
 
 # get a list of courses 
-courses = client.Courses.get_courses() # Course(title='...', subtitle=..., description=..., location=..., course_id='...')
+courses = client.Courses.get_courses() # format: Course(title='...', subtitle=..., description=..., location=..., course_id='...')
 clist = []
 for c in courses:
-    clist.append(c.title)
+    clist.append([c.title,c.course_id])
 print(clist)
 
 # get names of other users
@@ -35,11 +35,12 @@ print(type(calendar),type(schedule))
 print(str(calendar)[:351]+"...")
 print(schedule)
 
-#WIP: get files in user's domain
-try:
-    pass
-    #client.Files.get_folders()
-    #client.Files.get_files()
-except:
-    print("No Files/Folder are avaible")
-# simply doesn't work atm :(
+folders = client.Files.get_folders(courses[0]) # format: Folder(name="...", folder_id="...", creationd_date="yyyy-mm-ddThh:mm:ss+[timezone]",change_date="yyyy-mm-ddThh:mm:ss+[timezone]",description="...")
+files = client.Files.get_files(courses[0],folders[2]) # format: File(name="...", folder_id="...", creationd_date="yyyy-mm-ddThh:mm:ss+[timezone]",change_date="yyyy-mm-ddThh:mm:ss+[timezone]",description="...", owner_name="...", owner_id="...")
+foldl = []; fil = []
+for f in folders:
+    foldl.append(f.name)
+for ff in files:
+    fil.append(ff.name)
+print(folders)
+print(files)
