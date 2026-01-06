@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -6,6 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+#import simargl
 
 # =========================
 # THEMES
@@ -298,8 +300,16 @@ QTableView {
 
 def load_ui(path: str):
     loader = QUiLoader()
-    ui_file = QFile(path)
-    ui_file.open(QFile.ReadOnly)
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    ui_path = os.path.join(base_dir, path)
+
+    ui_file = QFile(ui_path)
+    if not ui_file.open(QFile.ReadOnly):
+        print(f"CRITICAL ERROR: Could not find or open UI file at: {ui_path}")
+        print(f"Qt Error: {ui_file.errorString()}")
+        sys.exit(-1)
+    
     window = loader.load(ui_file)
     ui_file.close()
     return window
