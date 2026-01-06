@@ -64,12 +64,12 @@ QLabel {
     font-size: 18pt;
 }
 QCalendarWidget QWidget{
-	alternate-background-color: rgb(42, 255, 84);
+	alternate-background-color: rgb(17, 148, 28);
 }
 
 /* ===== DATE GRID ===== */
 QCalendarWidget QAbstractItemView {
-    background-color: #6eff92;
+    background-color: rgb(33, 125, 60);
     color: white;
     selection-background-color: #00ff88;
     selection-color: black;
@@ -78,7 +78,7 @@ QCalendarWidget QAbstractItemView {
 
 QCalendarWidget QToolButton {
     color: white;
-    background: rgb(102, 255, 140);;
+    background: rgb(15, 59, 28);;
 }
 
 QCalendarWidget QToolButton:hover {
@@ -95,7 +95,12 @@ QCalendarWidget QAbstractItemView::item:disabled {
 }
 
 QCalendarWidget QWidget#qt_calendar_navigationbar {
-    background-color: #2b2b2b;
+    background-color: rgb(15, 59, 28);
+}
+
+QCalendarWidget QToolButton QMenu {
+     background-color: rgb(15, 59, 28);
+     color: white
 }
 
 
@@ -236,6 +241,11 @@ QCalendarWidget QAbstractItemView::item:disabled {
 
 QCalendarWidget QWidget#qt_calendar_navigationbar {
     background-color: rgb(79, 149, 255) ;
+}
+
+QCalendarWidget QToolButton QMenu {
+     background-color: rgb(79, 149, 255);
+     color: black
 }
 
 QLineEdit {
