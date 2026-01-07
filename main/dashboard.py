@@ -1,4 +1,3 @@
-import numpy as np
 from utils_time import parse_hhmm, duration_hours, hour_float
 from datetime import date, datetime
 
@@ -17,5 +16,6 @@ def subject_hours_pie(schedule):
         subjects[lesson.title] = subjects.get(lesson.title, 0) + hours
 
     return subjects
+
 
 
