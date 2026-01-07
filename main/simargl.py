@@ -1,8 +1,15 @@
 import studipy
+import imaplib
+import email
+import smtplib
+#import getpass
 
-#username = str(input("Enter your username(firstname.lastname)"))
-#password = str(input("Enter your password"))
+#username = str(input("Enter your username(firstname.lastname): "))
+#password = getpass.getpass("Enter your password: "))
 base_url = "https://studip.uni-goettingen.de/"
+SERVER = "email.stud.uni-goettingen.de"
+#USERNAME = "ug-student\\" + input("Enter your username (e.g., m.musterfrau): ")
+#PASSWORD = getpass.getpass("Enter your password: ")
 
 def create_client(usrnm,psswrd,bsrl):
     client = studipy.Client(usrnm, psswrd, bsrl)
@@ -31,3 +38,21 @@ def get_files(clnt,crss):
     for ff in range(len(crss)):
         files.append(clnt.Files.get_folders(courses[ff]))
     return files
+
+def read_email_init(imap_srvr,usrnm,psswrd):
+    mail = imaplib.IMAP4_SSL(imap_srvr, 993)
+    mail.login(usrnm, psswrd)
+    return mail
+
+...
+
+def write_email_init(smtp_srvr,usrnm,psswrd):
+    server = smtplib.SMTP(smtp_srvr, 587)
+    server.ehlo() 
+    server.starttls() 
+    server.ehlo()
+    server.login(usrnm,psswrd)
+    return server
+
+...
+
