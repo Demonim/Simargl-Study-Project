@@ -4,12 +4,8 @@ import email
 import smtplib
 #import getpass
 
-#username = str(input("Enter your username(firstname.lastname): "))
-#password = getpass.getpass("Enter your password: "))
 base_url = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
-#USERNAME = "ug-student\\" + input("Enter your username (e.g., m.musterfrau): ")
-#PASSWORD = getpass.getpass("Enter your password: ")
 
 def create_client(usrnm,psswrd,bsrl):
     client = studipy.Client(usrnm, psswrd, bsrl)

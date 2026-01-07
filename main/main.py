@@ -3,7 +3,9 @@ import os
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
-    QPushButton
+    QPushButton, 
+    QLabel,
+    QLineEdit
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
@@ -341,6 +343,18 @@ def change_theme(app: QApplication, theme: str):
 # =========================
 
 def open_menu(main_window):
+    """login_box = main_window.findChild(QLineEdit, "LoginLine")
+    login = login_box.text()
+    password_box = main_window.findChild(QLineEdit, "PasswordLine")
+    password = password_box.text()
+
+    try:
+        client = simargl.create_client(login,password,simargl.base_url)
+        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
+        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
+    except:
+        raiseError("Credentials are not correct!") """
+
     menu_window = load_ui("menu.ui")
     menu_window.show()
     main_window.close()
