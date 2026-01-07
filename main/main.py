@@ -49,6 +49,9 @@ background-color: qlineargradient(spread:pad,x1:10, y1:0, x2:0, y2:1,
 font-family: Unispace;
 }
 
+
+
+
 QLabel#Login {
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
@@ -112,6 +115,9 @@ QPushButton#Help {
 	font-size: 10pt;
 }
 
+
+
+
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(17, 148, 28);
 }
@@ -151,6 +157,9 @@ QCalendarWidget QToolButton QMenu {
      color: white
 }
 
+
+
+
 QLabel#Ecampus{
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
@@ -163,7 +172,6 @@ QTableView {
 """
 
 LIGHT_THEME = """
-
 QWidget {
 background-color:qlineargradient(spread:pad, x1:10, y1:0, x2:0, y2:1,
     stop:0.00 rgba(240, 247, 255, 255),
@@ -196,6 +204,8 @@ background-color:qlineargradient(spread:pad, x1:10, y1:0, x2:0, y2:1,
 );
 font-family: Unispace;
 }
+
+
 
 QLabel#Login {
     color: rgb(79, 149, 255);
@@ -259,6 +269,9 @@ QPushButton#Help {
 	font-size: 10pt;
 }
 
+
+
+
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(74, 222, 252);
 }
@@ -299,6 +312,9 @@ QCalendarWidget QToolButton QMenu {
      background-color: rgb(79, 149, 255);
      color: black
 }
+
+
+
 
 QLabel#Ecampus{
     color: rgb(79, 149, 255);
@@ -364,7 +380,6 @@ def open_menu(main_window):
     menu_window.show()
     main_window.close()
 
-    # важно сохранить ссылку
     main_window.menu_window = menu_window
 
 
@@ -384,7 +399,7 @@ def main():
         lambda text: change_theme(app, text)
     )
 
-    # применяем тему при старте
+    # --- setting theme on the start ---
     change_theme(app, theme_box.currentText())
 
     # --- enter button ---
