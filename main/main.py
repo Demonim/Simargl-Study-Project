@@ -50,9 +50,15 @@ font-family: Unispace;
 }
 
 QLabel#Login {
-color: rgb(102, 255, 140);
-background-color: rgba(255, 255, 255, 0);
-font-size: 18pt;
+    color: rgb(102, 255, 140);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
+}
+
+QLabel#Password{
+    color: rgb(102, 255, 140);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
 }
 
 QCalendarWidget QComboBox {
@@ -65,11 +71,51 @@ QLabel {
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
 }
+
+QLineEdit {
+    background-color: 255, 255, 255
+}
+
+QCheckBox#CheckBox_1 {
+    color: rgb(102, 255, 140);
+    background-color: rgb(255, 255, 255, 0);
+    font-size: 10pt
+}
+
+QPushButton {
+    border: 2px solid #00ff88;
+    border-radius: 6px;
+    background-color: transparent;
+    color: rgb(102, 255, 140);
+    font-size: 15pt;
+}
+
+QComboBox#ThemeBox {
+    background-color:  #02070f;
+    color: #00ff88;        
+    border: 2px solid #00ff88;
+    padding: 5px;
+}
+
+QComboBox#ThemeBox QAbstractItemView {
+    background-color: #02070f; 
+    color: white;             
+    selection-background-color: #00ff88;
+    selection-color: black;
+}
+
+QPushButton#Help {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: transparent;
+	color: rgb(0, 0, 0);
+	font-size: 10pt;
+}
+
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(17, 148, 28);
 }
 
-/* ===== DATE GRID ===== */
 QCalendarWidget QAbstractItemView {
     background-color: rgb(33, 125, 60);
     color: white;
@@ -105,52 +151,6 @@ QCalendarWidget QToolButton QMenu {
      color: white
 }
 
-
-QLineEdit {
-background-color: 255, 255, 255
-}
-
-QLabel#Password{
-color: rgb(102, 255, 140);
-background-color: rgba(255, 255, 255, 0);
-font-size: 18pt;
-}
-
-QCheckBox#CheckBox_1 {
-color: rgb(102, 255, 140);
-background-color: rgb(255, 255, 255, 0);
-font-size: 10pt
-}
-
-QPushButton {
-    border: 2px solid #00ff88;
-    border-radius: 6px;
-    background-color: transparent;
-	color: rgb(102, 255, 140);
-	font-size: 15pt;
-}
-
-QComboBox#ThemeBox {
-    background-color:  #02070f;
-    color: #00ff88;          /* цвет текста */
-    border: 2px solid #00ff88;
-    padding: 5px;
-}
-QComboBox#ThemeBox QAbstractItemView {
-    background-color: #02070f;  /* фон списка */
-    color: white;               /* цвет текста */
-    selection-background-color: #00ff88;
-    selection-color: black;
-}
-
-QPushButton#Help {
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background-color: transparent;
-	color: rgb(0, 0, 0);
-	font-size: 10pt;
-}
-
 QLabel#Ecampus{
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
@@ -163,6 +163,7 @@ QTableView {
 """
 
 LIGHT_THEME = """
+
 QWidget {
 background-color:qlineargradient(spread:pad, x1:10, y1:0, x2:0, y2:1,
     stop:0.00 rgba(240, 247, 255, 255),
@@ -197,22 +198,71 @@ font-family: Unispace;
 }
 
 QLabel#Login {
-color: rgb(79, 149, 255);
-background-color: rgba(255, 255, 255, 0);
-font-size: 18pt;
-}
-
-QLabel {
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
+}
+
+QLabel#Password{
+    color: rgb(79, 149, 255);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
+}
+
+QCalendarWidget QComboBox {
+    background-color: #333;
+    color: white;
+}
+
+QLabel {
+    color: rgb(102, 255, 140);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
+}
+
+QLineEdit {
+    background-color: 255, 255, 255
+}
+
+QCheckBox#CheckBox_1 {
+    color: rgb(79, 149, 255);
+    background-color: rgb(255, 255, 255, 0);
+    font-size: 10pt
+}
+
+QPushButton {
+    border: 2px solid #4f95ff;
+    border-radius: 6px;
+    background-color: transparent;
+	color: rgb(79, 149, 255);
+	font-size: 15pt;
+}
+
+QComboBox#ThemeBox {
+    background-color: #f0f7ff;
+    color: #4f95ff;        
+    border: 2px solid #4f95ff;
+    padding: 5px;
+}
+QComboBox#ThemeBox QAbstractItemView {
+    background-color: rgb(114, 163, 242);
+    color: #f0f7ff;               
+    selection-background-color: #00ff88;
+    selection-color: white;
+}
+
+QPushButton#Help {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: transparent;
+	color: rgb(0, 0, 0);
+	font-size: 10pt;
 }
 
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(74, 222, 252);
 }
 
-/* ===== DATE GRID ===== */
 QCalendarWidget QAbstractItemView {
     background-color: #ffffff;
     color: black;
@@ -248,51 +298,6 @@ QCalendarWidget QWidget#qt_calendar_navigationbar {
 QCalendarWidget QToolButton QMenu {
      background-color: rgb(79, 149, 255);
      color: black
-}
-
-QLineEdit {
-background-color: 255, 255, 255
-}
-
-QLabel#Password{
-color: rgb(79, 149, 255);
-background-color: rgba(255, 255, 255, 0);
-font-size: 18pt;
-}
-
-QCheckBox#CheckBox_1 {
-color: rgb(79, 149, 255);
-background-color: rgb(255, 255, 255, 0);
-font-size: 10pt
-}
-
-QPushButton {
-    border: 2px solid #4f95ff;
-    border-radius: 6px;
-    background-color: transparent;
-	color: rgb(79, 149, 255);
-	font-size: 15pt;
-}
-
-QComboBox#ThemeBox {
-    background-color: #f0f7ff;
-    color: #4f95ff;          /* цвет текста */
-    border: 2px solid #4f95ff;
-    padding: 5px;
-}
-QComboBox#ThemeBox QAbstractItemView {
-    background-color: rgb(114, 163, 242);  /* фон списка */
-    color: #f0f7ff;               /* цвет текста */
-    selection-background-color: #00ff88;
-    selection-color: white;
-}
-
-QPushButton#Help {
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background-color: transparent;
-	color: rgb(0, 0, 0);
-	font-size: 10pt;
 }
 
 QLabel#Ecampus{

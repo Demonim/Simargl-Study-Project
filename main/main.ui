@@ -30,10 +30,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">
-
-
-</string>
+    <string notr="true"/>
    </property>
    <widget class="QLineEdit" name="LoginLine">
     <property name="geometry">
