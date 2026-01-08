@@ -405,7 +405,7 @@ def open_courses(menu_window):
     # кнопка выхода обратно в menu
     exit_button = courses_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
-        lambda: back_to_menu(courses_window)
+        lambda: open_menu(courses_window)
     )
 
     courses_window.show()
@@ -413,6 +413,19 @@ def open_courses(menu_window):
 
     menu_window.courses_window = courses_window
 
+def open_calendar(menu_window):
+    calendar_window = load_ui("calendar.ui")
+
+    # кнопка выхода обратно в menu
+    exit_button = calendar_window.findChild(QPushButton, "Exit_Button1")
+    exit_button.clicked.connect(
+        lambda: open_menu(calendar_window)
+    )
+
+    calendar_window.show()
+    menu_window.close()
+
+    menu_window.courses_window = calendar_window
 
 def open_StudIP(menu_window):
     StudIP_window = load_ui("StudIP.ui")
@@ -420,7 +433,7 @@ def open_StudIP(menu_window):
     # кнопка выхода обратно в menu
     exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
-        lambda: back_to_menu1(StudIP_window)
+        lambda: open_menu(StudIP_window)
     )
 
     StudIP_window.show()
@@ -428,54 +441,47 @@ def open_StudIP(menu_window):
 
     menu_window.courses_window = StudIP_window
 
+def open_Email(menu_window):
+    Email_window = load_ui("Email.ui")
 
-
-def back_to_menu1(StudIP_window):
-    menu_window = load_ui("menu.ui")
-
-    # кнопка Courses снова открывает courses
-    courses_button = menu_window.findChild(QPushButton, "Courses")
-    courses_button.clicked.connect(
-        lambda: open_courses(menu_window)
-    )
-
-    StudIP_button = menu_window.findChild(QPushButton, "Messages")
-    StudIP_button.clicked.connect(
-        lambda: open_StudIP(menu_window)
-    )
-
-    # кнопка Exit (возврат в main)
-    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    # кнопка выхода обратно в menu
+    exit_button = Email_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
-        lambda: back_to_main(menu_window)
+        lambda: open_menu(Email_window)
     )
 
-    menu_window.show()
-    StudIP_window.close()
+    Email_window.show()
+    menu_window.close()
 
-def back_to_menu(courses_window):
-    menu_window = load_ui("menu.ui")
+    menu_window.courses_window = Email_window
 
-    # кнопка Courses снова открывает courses
-    courses_button = menu_window.findChild(QPushButton, "Courses")
-    courses_button.clicked.connect(
-        lambda: open_courses(menu_window)
-    )
+def open_Dashboard(menu_window):
+    Dashboard_window = load_ui("Dashboard.ui")
 
-    StudIP_button = menu_window.findChild(QPushButton, "Messages")
-    StudIP_button.clicked.connect(
-        lambda: open_StudIP(menu_window)
-    )
-
-    # кнопка Exit (возврат в main)
-    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    # кнопка выхода обратно в menu
+    exit_button = Dashboard_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
-        lambda: back_to_main(menu_window)
+        lambda: open_menu(Dashboard_window)
     )
 
-    menu_window.show()
-    courses_window.close()
+    Dashboard_window.show()
+    menu_window.close()
 
+    menu_window.courses_window = Dashboard_window
+
+def open_Notes(menu_window):
+    Notes_window = load_ui("notes.ui")
+
+    # кнопка выхода обратно в menu
+    exit_button = Notes_window.findChild(QPushButton, "Exit_Button1")
+    exit_button.clicked.connect(
+        lambda: open_menu(Notes_window)
+    )
+
+    Notes_window.show()
+    menu_window.close()
+
+    menu_window.courses_window = Notes_window
 
 def open_menu(main_window):
     """login_box = main_window.findChild(QLineEdit, "LoginLine")
@@ -491,18 +497,37 @@ def open_menu(main_window):
         raiseError("Credentials are not correct!") """
 
     menu_window = load_ui("menu.ui")
+
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
         lambda: open_courses(menu_window)
+    )
+    calendar_button = menu_window.findChild(QPushButton, "Calendar")
+    calendar_button.clicked.connect(
+        lambda: open_calendar(menu_window)
     )
     StudIP_button = menu_window.findChild(QPushButton, "Messages")
     StudIP_button.clicked.connect(
         lambda: open_StudIP(menu_window)
     )
+    Email_button = menu_window.findChild(QPushButton, "Email")
+    Email_button.clicked.connect(
+        lambda: open_Email(menu_window)
+    )
+    Dashboard_button = menu_window.findChild(QPushButton, "Dashboard")
+    Dashboard_button.clicked.connect(
+        lambda: open_Dashboard(menu_window)
+    )
+    Notes_button = menu_window.findChild(QPushButton, "Notes")
+    Notes_button.clicked.connect(
+        lambda: open_Notes(menu_window)
+    )
     exit_button = menu_window.findChild(QPushButton, "Exit_Button")
     exit_button.clicked.connect(
         lambda: back_to_main(menu_window)
     )
+
+
     menu_window.show()
     main_window.close()
 

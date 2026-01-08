@@ -48,7 +48,7 @@
      <string>Courses</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="Calendar">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -137,7 +137,7 @@
      <string notr="true"/>
     </property>
    </widget>
-   <widget class="QPushButton" name="Email_2">
+   <widget class="QPushButton" name="Dashboard">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -156,7 +156,7 @@
      <string>Dashboard</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Email_3">
+   <widget class="QPushButton" name="Notes">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -175,7 +175,7 @@
      <string>Notes</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Email_4">
+   <widget class="QPushButton" name="Settings">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -194,7 +194,7 @@
      <string>Account Settings</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Email_5">
+   <widget class="QPushButton" name="Help">
     <property name="geometry">
      <rect>
       <x>10</x>
