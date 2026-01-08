@@ -169,6 +169,23 @@ QLabel#Ecampus{
 QTableView {
     background-color: rgba(255, 255, 255, 0);
 }
+
+QPushButton#Exit_Button {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: rgb(243, 70, 70);
+    color: white;
+}
+
+
+
+
+QPushButton#Exit_Button1 {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: rgb(243, 70, 70);
+    color: white;
+}
 """
 
 LIGHT_THEME = """
@@ -325,6 +342,24 @@ QLabel#Ecampus{
 QTableView {
     background-color: rgba(255, 255, 255, 0);
 }
+
+QPushButton#Exit_Button {
+    border: 2px solid #ffffff;
+    border-radius: 6px;
+    background-color: rgb(243, 70, 70);
+    color: white;
+}
+
+
+
+
+
+QPushButton#Exit_Button1 {
+    border: 2px solid #ffffff;
+    border-radius: 6px;
+    background-color: rgb(243, 70, 70);
+    color: white;
+}
 """
 
 # =========================
@@ -363,6 +398,85 @@ def change_theme(app: QApplication, theme: str):
 # WINDOW SWITCH
 # =========================
 
+
+def open_courses(menu_window):
+    courses_window = load_ui("courses.ui")
+
+    # кнопка выхода обратно в menu
+    exit_button = courses_window.findChild(QPushButton, "Exit_Button1")
+    exit_button.clicked.connect(
+        lambda: back_to_menu(courses_window)
+    )
+
+    courses_window.show()
+    menu_window.close()
+
+    menu_window.courses_window = courses_window
+
+
+def open_StudIP(menu_window):
+    StudIP_window = load_ui("StudIP.ui")
+
+    # кнопка выхода обратно в menu
+    exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
+    exit_button.clicked.connect(
+        lambda: back_to_menu1(StudIP_window)
+    )
+
+    StudIP_window.show()
+    menu_window.close()
+
+    menu_window.courses_window = StudIP_window
+
+
+
+def back_to_menu1(StudIP_window):
+    menu_window = load_ui("menu.ui")
+
+    # кнопка Courses снова открывает courses
+    courses_button = menu_window.findChild(QPushButton, "Courses")
+    courses_button.clicked.connect(
+        lambda: open_courses(menu_window)
+    )
+
+    StudIP_button = menu_window.findChild(QPushButton, "Messages")
+    StudIP_button.clicked.connect(
+        lambda: open_StudIP(menu_window)
+    )
+
+    # кнопка Exit (возврат в main)
+    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    exit_button.clicked.connect(
+        lambda: back_to_main(menu_window)
+    )
+
+    menu_window.show()
+    StudIP_window.close()
+
+def back_to_menu(courses_window):
+    menu_window = load_ui("menu.ui")
+
+    # кнопка Courses снова открывает courses
+    courses_button = menu_window.findChild(QPushButton, "Courses")
+    courses_button.clicked.connect(
+        lambda: open_courses(menu_window)
+    )
+
+    StudIP_button = menu_window.findChild(QPushButton, "Messages")
+    StudIP_button.clicked.connect(
+        lambda: open_StudIP(menu_window)
+    )
+
+    # кнопка Exit (возврат в main)
+    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    exit_button.clicked.connect(
+        lambda: back_to_main(menu_window)
+    )
+
+    menu_window.show()
+    courses_window.close()
+
+
 def open_menu(main_window):
     """login_box = main_window.findChild(QLineEdit, "LoginLine")
     login = login_box.text()
@@ -377,10 +491,46 @@ def open_menu(main_window):
         raiseError("Credentials are not correct!") """
 
     menu_window = load_ui("menu.ui")
+    courses_button = menu_window.findChild(QPushButton, "Courses")
+    courses_button.clicked.connect(
+        lambda: open_courses(menu_window)
+    )
+    StudIP_button = menu_window.findChild(QPushButton, "Messages")
+    StudIP_button.clicked.connect(
+        lambda: open_StudIP(menu_window)
+    )
+    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    exit_button.clicked.connect(
+        lambda: back_to_main(menu_window)
+    )
     menu_window.show()
     main_window.close()
 
     main_window.menu_window = menu_window
+
+
+
+
+def back_to_main(menu_window):
+    main_window = load_ui("main.ui")
+
+    # theme combobox
+    theme_box = main_window.findChild(QComboBox, "ThemeBox")
+    theme_box.currentTextChanged.connect(
+        lambda text: change_theme(QApplication.instance(), text)
+    )
+
+    # установить тему при запуске
+    change_theme(QApplication.instance(), theme_box.currentText())
+
+    # кнопка Enter снова ведёт в menu
+    enter_button = main_window.findChild(QPushButton, "Enter")
+    enter_button.clicked.connect(
+        lambda: open_menu(main_window)
+    )
+
+    main_window.show()
+    menu_window.close()
 
 
 # =========================
