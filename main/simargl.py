@@ -40,7 +40,10 @@ def read_email_init(imap_srvr,usrnm,psswrd):
     mail.login(usrnm, psswrd)
     return mail
 
-...
+def mail_notifications(mail):
+    mail.select("inbox")
+    result, data = mail.search(None, "UNSEEN")
+    return len(data[0].split())
 
 def write_email_init(smtp_srvr,usrnm,psswrd):
     server = smtplib.SMTP(smtp_srvr, 587)

@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-#import simargl
+import simargl
 
 # =========================
 # THEMES
@@ -500,19 +500,9 @@ def open_Notes(menu_window):
     menu_window.courses_window = Notes_window
 
 def open_menu(main_window):
-    """login_box = main_window.findChild(QLineEdit, "LoginLine")
-    login = login_box.text()
-    password_box = main_window.findChild(QLineEdit, "PasswordLine")
-    password = password_box.text()
-
-    try:
-        client = simargl.create_client(login,password,simargl.base_url)
-        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
-        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
-    except:
-        raiseError("Credentials are not correct!") """
-
     menu_window = load_ui("menu.ui")
+    mail_notifications = menu_window.findChild(QLabel,"label_2")
+    mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})")
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
@@ -567,11 +557,27 @@ def back_to_main(menu_window):
     # кнопка Enter снова ведёт в menu
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
-        lambda: open_menu(main_window)
+        lambda: login_from_enter(main_window)
     )
 
     main_window.show()
     menu_window.close()
+
+def login_from_enter(main_window):
+    global client, mail, server
+    login_box = main_window.findChild(QLineEdit, "LoginLine")
+    password_box = main_window.findChild(QLineEdit, "PasswordLine")
+    login = login_box.text()
+    password = password_box.text()
+
+    try:
+        client = simargl.create_client(login,password,simargl.base_url)
+        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
+        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
+    except:
+        raise ValueError("Credentials are not correct!")
+
+    open_menu(main_window)
 
 
 # =========================
@@ -596,7 +602,7 @@ def main():
     # --- enter button ---
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
-        lambda: open_menu(main_window)
+        lambda: login_from_enter(main_window)
     )
 
     main_window.show()
