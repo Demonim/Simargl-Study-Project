@@ -16,4 +16,5 @@ def hour_str(hours: float) -> str:
     total_minutes = int(round(hours * 60))
     h = total_minutes // 60
     m = total_minutes % 60
-    return f"{h} год {m} хв"
+    return f"{h} hours {m} minutes"
+
