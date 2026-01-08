@@ -194,7 +194,7 @@
      <string>Account Settings</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Help">
+   <widget class="QPushButton" name="Help1">
     <property name="geometry">
      <rect>
       <x>10</x>

@@ -93,6 +93,14 @@ QPushButton {
     font-size: 15pt;
 }
 
+QPushButton:hover {
+    border: 2px solid rgb(145, 207, 111);
+    border-radius: 6px;
+    background-color: rgb(22, 107, 31);
+	color: rgb(145, 207, 111);
+	font-size: 15pt;
+}
+
 QComboBox#ThemeBox {
     background-color:  #02070f;
     color: #00ff88;        
@@ -242,7 +250,7 @@ QCalendarWidget QComboBox {
 }
 
 QLabel {
-    color: rgb(102, 255, 140);
+    color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
 }
@@ -262,6 +270,14 @@ QPushButton {
     border-radius: 6px;
     background-color: transparent;
 	color: rgb(79, 149, 255);
+	font-size: 15pt;
+}
+
+QPushButton:hover {
+    border: 2px solid rgb(63, 72, 204);
+    border-radius: 6px;
+    background-color: rgb(0, 167, 240);
+	color: rgb(63, 72, 204);
 	font-size: 15pt;
 }
 
