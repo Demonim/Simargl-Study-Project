@@ -123,6 +123,30 @@ QPushButton#Help {
 	font-size: 10pt;
 }
 
+QDialog {
+	background-color: rgba(154, 154, 154, 180);
+}
+
+QLabel#Error {
+	color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
+}
+
+QLabel#Error_2 {
+	color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 18pt;
+}
+
+QPushButton#Error_Button {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    font-size: 15pt;
+}
+
 
 
 
@@ -563,6 +587,22 @@ def back_to_main(menu_window):
     main_window.show()
     menu_window.close()
 
+
+def error_login(menu_window):
+    error_window = load_ui("error.ui")
+
+    # кнопка выхода обратно в menu
+    exit_button = error_window.findChild(QPushButton, "Error_Button")
+    exit_button.clicked.connect(
+        lambda: back_to_main(error_window)
+    )
+
+    error_window.show()
+    menu_window.close()
+
+    menu_window.courses_window = error_window
+
+
 def login_from_enter(main_window):
     global client, mail, server
     login_box = main_window.findChild(QLineEdit, "LoginLine")
@@ -575,9 +615,9 @@ def login_from_enter(main_window):
         mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
         server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
     except:
-        raise ValueError("Credentials are not correct!")
-
-    open_menu(main_window)
+        error_login(main_window)
+    else:
+        open_menu(main_window)
 
 
 # =========================
