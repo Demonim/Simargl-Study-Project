@@ -26,29 +26,7 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QDialog {
-	background-color: rgba(154, 154, 154, 180);
-}
-
-QLabel#Error {
-	color: rgb(0, 0, 0);
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
-}
-
-QLabel#Error_2 {
-	color: rgb(0, 0, 0);
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
-}
-
-QPushButton#Error_Button {
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background-color: transparent;
-    color: rgb(0, 0, 0);
-    font-size: 15pt;
-}</string>
+   <string notr="true"/>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">

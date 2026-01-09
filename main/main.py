@@ -72,10 +72,14 @@ QCalendarWidget QComboBox {
 QLabel {
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
+    font-size: 35pt;
 }
 
-QLineEdit {
+QLineEdit#PasswordLine {
+    background-color: 255, 255, 255
+}
+
+QLineEdit#LoginLine {
     background-color: 255, 255, 255
 }
 
@@ -121,10 +125,6 @@ QPushButton#Help {
     background-color: transparent;
 	color: rgb(0, 0, 0);
 	font-size: 10pt;
-}
-
-QDialog {
-	background-color: rgba(154, 154, 154, 180);
 }
 
 QLabel#Error {
