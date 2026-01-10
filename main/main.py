@@ -72,7 +72,7 @@ QCalendarWidget QComboBox {
 QLabel {
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 35pt;
+    font-size: 20pt;
 }
 
 QLineEdit#PasswordLine {
