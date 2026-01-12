@@ -4,7 +4,7 @@ import email
 import smtplib
 #import getpass
 
-base_url = "https://studip.uni-goettingen.de/"
+BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
 
 def create_client(usrnm,psswrd,bsrl):
@@ -17,7 +17,8 @@ def get_courses(clnt):
 
 def get_my_messages(clnt):
     my_messages = clnt.Messages.get_messages()
-    return my_messages
+    new_messages = clnt.Messages.get_messages(True)
+    return my_messages, new_messages
 
 def get_schedule(clnt):
     schedule = clnt.Calendar.get_schedule()

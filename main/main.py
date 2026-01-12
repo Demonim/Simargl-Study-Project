@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from concurrent.futures import ThreadPoolExecutor
 import simargl
 
 # =========================
@@ -596,8 +597,11 @@ def open_Help(main_window):
 
 def open_menu(main_window):
     menu_window = load_ui("menu.ui")
-    mail_notifications = menu_window.findChild(QLabel,"label_2")
-    mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})")
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
+        executor.submit(mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})"), 1)
+        message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
+        executor.submit(message_notifications.setText(f"StudIP ({len(simargl.get_my_messages(client)[1])})"), 2)
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
@@ -687,7 +691,7 @@ def login_from_enter(main_window):
     password = password_box.text()
 
     try:
-        client = simargl.create_client(login,password,simargl.base_url)
+        client = simargl.create_client(login,password,simargl.BASE_URL)
         mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
         server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
     except:
