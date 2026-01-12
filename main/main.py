@@ -1,6 +1,9 @@
 import sys
 import os
+from pydoc import Helper
+
 from PySide6.QtWidgets import (
+    QTextBrowser,
     QApplication,
     QComboBox,
     QPushButton, 
@@ -149,6 +152,23 @@ QPushButton#Error_Button {
 
 
 
+QLabel#Help {
+    color: rgb(102, 255, 140);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 25pt;
+}
+
+QTextBrowser {
+    color: rgb(102, 255, 140);
+    background-color: rgb(0, 0, 0);
+    font: 25pt;
+}
+
+QLineEdit#Help_Search {
+    background-color: rgba(255, 255, 255);
+}
+
+
 
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(17, 148, 28);
@@ -276,7 +296,7 @@ QCalendarWidget QComboBox {
 QLabel {
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
+    font-size: 20pt;
 }
 
 QLineEdit {
@@ -325,6 +345,26 @@ QPushButton#Help {
 	color: rgb(0, 0, 0);
 	font-size: 10pt;
 }
+
+
+
+QLabel#Help {
+    color: rgb(79, 149, 255);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 25pt;
+}
+
+QTextBrowser {
+    color: rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
+    font: 25pt;
+}
+
+
+QLineEdit#Help_Search {
+    background-color: rgba(255, 255, 255);
+}
+
 
 
 
@@ -523,6 +563,37 @@ def open_Notes(menu_window):
 
     menu_window.courses_window = Notes_window
 
+def open_Help(main_window):
+    Help_window = load_ui("help.ui")
+
+    textBrowser = Help_window.findChild(QTextBrowser, "textBrowser")
+
+    exit_button = Help_window.findChild(QPushButton, "Back_Button")
+    exit_button.clicked.connect(
+        lambda: back_to_main(Help_window)
+    )
+    FAQ_button = Help_window.findChild(QPushButton, "FAQ")
+    FAQ_button.clicked.connect(
+        lambda: textBrowser.setText("Информация")
+    )
+    Instructions_button = Help_window.findChild(QPushButton, "Instruction")
+    Instructions_button.clicked.connect(
+        lambda: textBrowser.setText("Информация")
+    )
+    Support_button = Help_window.findChild(QPushButton, "Support")
+    Support_button.clicked.connect(
+        lambda: textBrowser.setText("Информация")
+    )
+    App_button = Help_window.findChild(QPushButton, "App")
+    App_button.clicked.connect(
+        lambda: textBrowser.setText("Информация")
+    )
+
+    Help_window.show()
+    main_window.close()
+
+    main_window.courses_window = Help_window
+
 def open_menu(main_window):
     menu_window = load_ui("menu.ui")
     mail_notifications = menu_window.findChild(QLabel,"label_2")
@@ -584,6 +655,11 @@ def back_to_main(menu_window):
         lambda: login_from_enter(main_window)
     )
 
+    help_button = main_window.findChild(QPushButton, "Help")
+    help_button.clicked.connect(
+        lambda: open_Help(main_window)
+    )
+
     main_window.show()
     menu_window.close()
 
@@ -643,6 +719,11 @@ def main():
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
         lambda: login_from_enter(main_window)
+    )
+
+    help_button = main_window.findChild(QPushButton, "Help")
+    help_button.clicked.connect(
+        lambda: open_Help(main_window)
     )
 
     main_window.show()
