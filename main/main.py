@@ -152,6 +152,23 @@ QPushButton#Error_Button {
 }
 
 
+QPushButton#Back_Button{
+    background-color: rgb(23, 130, 22);
+    border: 2px solid #000000;
+    border-radius: 6px;
+    color: rgb(0, 0, 0);
+    font-size: 15pt;
+}
+
+QPushButton#Back_Button:hover{
+    border: 2px solid rgb(145, 207, 111);
+    border-radius: 6px;
+    background-color: rgb(22, 107, 31);
+	color: rgb(145, 207, 111);
+	font-size: 15pt;
+}
+
+
 
 QLabel#Help {
     color: rgb(102, 255, 140);
@@ -162,7 +179,7 @@ QLabel#Help {
 QTextBrowser {
     color: rgb(102, 255, 140);
     background-color: rgb(0, 0, 0);
-    font: 25pt;
+    font: 15pt;
 }
 
 QLineEdit#Help_Search {
@@ -349,6 +366,22 @@ QPushButton#Help {
 
 
 
+QPushButton#Back_Button{
+	border: 2px solid rgb(63, 72, 204);
+    border-radius: 6px;
+    background-color: rgb(0, 167, 240);
+	color: rgb(63, 72, 204);
+	font-size: 15pt;
+}
+
+QPushButton#Back_Button:hover{
+    border: 2px solid rgb(0,0,0);
+    border-radius: 6px;
+    background-color: rgb(20,111,161);
+	color: rgb(79, 149, 255);
+	font-size: 15pt;
+}
+
 QLabel#Help {
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
@@ -365,6 +398,8 @@ QTextBrowser {
 QLineEdit#Help_Search {
     background-color: rgba(255, 255, 255);
 }
+
+
 
 
 
@@ -575,7 +610,7 @@ def open_Help(main_window):
     )
     FAQ_button = Help_window.findChild(QPushButton, "FAQ")
     FAQ_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("What is this app for? \n- This app is designed to help students during their university studies.\nIs my personal data saved?\n- No, the app does not store any user personal data.\nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.")
     )
     Instructions_button = Help_window.findChild(QPushButton, "Instruction")
     Instructions_button.clicked.connect(
@@ -587,7 +622,7 @@ def open_Help(main_window):
     )
     App_button = Help_window.findChild(QPushButton, "App")
     App_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("The Idea: Dmytro Kutsak.\nDesigned by: Nichita Licov and Diana Bardyk ")
     )
 
     Help_window.show()
