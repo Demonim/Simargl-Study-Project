@@ -632,11 +632,11 @@ def open_Help(main_window):
 
 def open_menu(main_window):
     menu_window = load_ui("menu.ui")
+    mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
+    message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
-        mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
         executor.submit(mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})"), 1)
-        message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
-        executor.submit(message_notifications.setText(f"StudIP ({len(simargl.get_my_messages(client)[1])})"), 2)
+        executor.submit(message_notifications.setText(f"StudIP ({simargl.new_messages_counter(client)})"), 2)
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
