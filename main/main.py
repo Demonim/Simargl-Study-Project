@@ -575,19 +575,19 @@ def open_Help(main_window):
     )
     FAQ_button = Help_window.findChild(QPushButton, "FAQ")
     FAQ_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("Infos")
     )
     Instructions_button = Help_window.findChild(QPushButton, "Instruction")
     Instructions_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("Infos")
     )
     Support_button = Help_window.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("Infos")
     )
     App_button = Help_window.findChild(QPushButton, "App")
     App_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("Infos")
     )
 
     Help_window.show()
@@ -597,11 +597,11 @@ def open_Help(main_window):
 
 def open_menu(main_window):
     menu_window = load_ui("menu.ui")
+    mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
+    message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
-        mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
         executor.submit(mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})"), 1)
-        message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
-        executor.submit(message_notifications.setText(f"StudIP ({len(simargl.get_my_messages(client)[1])})"), 2)
+        executor.submit(message_notifications.setText(f"StudIP ({simargl.new_messages_counter(client)})"), 2)
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
@@ -626,6 +626,10 @@ def open_menu(main_window):
     Notes_button = menu_window.findChild(QPushButton, "Notes")
     Notes_button.clicked.connect(
         lambda: open_Notes(menu_window)
+    )
+    Help_button = menu_window.findChild(QPushButton, "Help1")
+    Help_button.clicked.connect(
+        lambda: open_Help(menu_window)
     )
     exit_button = menu_window.findChild(QPushButton, "Exit_Button")
     exit_button.clicked.connect(
