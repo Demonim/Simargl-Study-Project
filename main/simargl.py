@@ -17,8 +17,11 @@ def get_courses(clnt):
 
 def get_my_messages(clnt):
     my_messages = clnt.Messages.get_messages()
+    return my_messages
+
+def new_messages_counter(clnt):
     new_messages = clnt.Messages.get_messages(True)
-    return my_messages, new_messages
+    return len(new_messages)
 
 def get_schedule(clnt):
     schedule = clnt.Calendar.get_schedule()
