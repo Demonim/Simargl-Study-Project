@@ -8,7 +8,11 @@ from PySide6.QtWidgets import (
     QComboBox,
     QPushButton, 
     QLabel,
-    QLineEdit
+    QLineEdit,
+    QVBoxLayout,
+    QDialog,
+    QListWidget,
+    QTextEdit
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
@@ -499,6 +503,29 @@ def load_ui(path: str):
     return window
 
 
+class AddNoteDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Add new Note")
+        self.setFixedSize(300, 120)
+        self.setModal(True)
+
+        layout = QVBoxLayout(self)
+
+        self.line_edit = QLineEdit()
+        self.line_edit.setPlaceholderText("Notes name")
+
+        self.ok_button = QPushButton("Create  ")
+        self.ok_button.clicked.connect(self.accept)
+
+        layout.addWidget(QLabel("Введите название заметки:"))
+        layout.addWidget(self.line_edit)
+        layout.addWidget(self.ok_button)
+
+    def get_name(self):
+        return self.line_edit.text().strip()
+
+
 # =========================
 # THEME HANDLING
 # =========================
@@ -588,15 +615,48 @@ def open_Dashboard(menu_window):
 def open_Notes(menu_window):
     Notes_window = load_ui("notes.ui")
 
-    # кнопка выхода обратно в menu
-    exit_button = Notes_window.findChild(QPushButton, "Exit_Button1")
+    exit_button = Notes_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(Notes_window)
     )
 
+    notes_list = Notes_window.findChild(QListWidget, "NotesList")
+    text_edit = Notes_window.findChild(QTextEdit, "NotesText")
+    add_button = Notes_window.findChild(QPushButton, "AddNoteButton")
+    save_button = Notes_window.findChild(QPushButton, "SaveNoteButton")
+
+    # хранилище заметок (живёт пока открыто окно)
+    Notes_window.notes_data = {}
+
+    # --- добавить заметку ---
+    def add_note():
+        dialog = AddNoteDialog(Notes_window)
+        if dialog.exec():
+            name = dialog.get_name()
+            if name and name not in Notes_window.notes_data:
+                Notes_window.notes_data[name] = ""
+                notes_list.addItem(name)
+
+    # --- загрузить заметку ---
+    def load_note(item):
+        name = item.text()
+        text_edit.setPlainText(
+            Notes_window.notes_data.get(name, "")
+        )
+
+    # --- сохранить заметку ---
+    def save_note():
+        item = notes_list.currentItem()
+        if item:
+            name = item.text()
+            Notes_window.notes_data[name] = text_edit.toPlainText()
+
+    add_button.clicked.connect(add_note)
+    notes_list.itemClicked.connect(load_note)
+    save_button.clicked.connect(save_note)
+
     Notes_window.show()
     menu_window.close()
-
     menu_window.courses_window = Notes_window
 
 def open_Help(main_window):
@@ -740,6 +800,7 @@ def login_from_enter(main_window):
 # =========================
 
 def main():
+
     app = QApplication(sys.argv)
 
     # --- load main window ---
