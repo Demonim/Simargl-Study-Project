@@ -2,20 +2,10 @@ import sys
 import os
 from pydoc import Helper
 
-from PySide6.QtWidgets import (
-    QTextBrowser,
-    QApplication,
-    QComboBox,
-    QPushButton, 
-    QLabel,
-    QLineEdit,
-    QVBoxLayout,
-    QDialog,
-    QListWidget,
-    QTextEdit
-)
+import PySide6.QtWidgets
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+
 from concurrent.futures import ThreadPoolExecutor
 import simargl
 
@@ -545,7 +535,7 @@ def change_theme(app: QApplication, theme: str):
 def open_courses(menu_window):
     courses_window = load_ui("courses.ui")
 
-    # кнопка выхода обратно в menu
+    # Button to exit the menu
     exit_button = courses_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
@@ -559,7 +549,7 @@ def open_courses(menu_window):
 def open_calendar(menu_window):
     calendar_window = load_ui("calendar.ui")
 
-    # кнопка выхода обратно в menu
+    # Button to exit the menu
     exit_button = calendar_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
@@ -573,7 +563,7 @@ def open_calendar(menu_window):
 def open_StudIP(menu_window):
     StudIP_window = load_ui("StudIP.ui")
 
-    # кнопка выхода обратно в menu
+    # Button to exit the menu
     exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(StudIP_window)
@@ -587,7 +577,7 @@ def open_StudIP(menu_window):
 def open_Email(menu_window):
     Email_window = load_ui("Email.ui")
 
-    # кнопка выхода обратно в menu
+    # Button to exit the menu
     exit_button = Email_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(Email_window)
@@ -601,7 +591,7 @@ def open_Email(menu_window):
 def open_Dashboard(menu_window):
     Dashboard_window = load_ui("Dashboard.ui")
 
-    # кнопка выхода обратно в menu
+    # Button to exit the menu
     exit_button = Dashboard_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(Dashboard_window)
@@ -625,10 +615,10 @@ def open_Notes(menu_window):
     add_button = Notes_window.findChild(QPushButton, "AddNoteButton")
     save_button = Notes_window.findChild(QPushButton, "SaveNoteButton")
 
-    # хранилище заметок (живёт пока открыто окно)
+    # Notes safe (saves while the window is open)
     Notes_window.notes_data = {}
 
-    # --- добавить заметку ---
+    # --- add note ---
     def add_note():
         dialog = AddNoteDialog(Notes_window)
         if dialog.exec():
@@ -637,14 +627,14 @@ def open_Notes(menu_window):
                 Notes_window.notes_data[name] = ""
                 notes_list.addItem(name)
 
-    # --- загрузить заметку ---
+    # --- load note ---
     def load_note(item):
         name = item.text()
         text_edit.setPlainText(
             Notes_window.notes_data.get(name, "")
         )
 
-    # --- сохранить заметку ---
+    # --- save note ---
     def save_note():
         item = notes_list.currentItem()
         if item:
@@ -739,16 +729,16 @@ def open_menu(main_window):
 def back_to_main(menu_window):
     main_window = load_ui("main.ui")
 
-    # theme combobox
+    # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
     theme_box.currentTextChanged.connect(
         lambda text: change_theme(QApplication.instance(), text)
     )
 
-    # установить тему при запуске
+    # Theme init
     change_theme(QApplication.instance(), theme_box.currentText())
 
-    # кнопка Enter снова ведёт в menu
+    # Press Enter to enter the menu
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
         lambda: login_from_enter(main_window)
@@ -766,7 +756,7 @@ def back_to_main(menu_window):
 def error_login(menu_window):
     error_window = load_ui("error.ui")
 
-    # кнопка выхода обратно в menu
+    # button to exit back to the main
     exit_button = error_window.findChild(QPushButton, "Error_Button")
     exit_button.clicked.connect(
         lambda: back_to_main(error_window)
