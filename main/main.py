@@ -2,7 +2,18 @@ import sys
 import os
 from pydoc import Helper
 
-import PySide6.QtWidgets
+from PySide6.QtWidgets import (
+    QTextBrowser,
+    QApplication,
+    QComboBox,
+    QPushButton, 
+    QLabel,
+    QLineEdit,
+    QVBoxLayout,
+    QDialog,
+    QListWidget,
+    QTextEdit
+)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
