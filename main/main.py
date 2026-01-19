@@ -568,42 +568,27 @@ def open_courses(menu_window):
     global user_courses
 
     courses_window = load_ui("courses.ui")
-
-<<<<<<< Updated upstream
-    # Button to exit the menu
-    exit_button = courses_window.findChild(QPushButton, "Exit_Button1")
-=======
-    # кнопка выхода обратно в menu
     exit_button = courses_window.findChild(QPushButton, "Back_Button")
->>>>>>> Stashed changes
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
     )
-
-    # ===== ВОТ ЗДЕСЬ ДОБАВЛЯЕМ ЛОГИКУ КУРСОВ =====
-
     table = courses_window.findChild(QTableWidget, "tableWidget")
 
     if table is not None:
         table.setRowCount(0)
         table.setRowCount(len(user_courses))
 
-        # колонки растягиваются под размер окна
         table.horizontalHeader().setSectionResizeMode(
             QHeaderView.Stretch
         )
 
-        # запрет редактирования
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        # заполняем первую колонку названиями курсов
         for row, course in enumerate(user_courses):
             table.setItem(
                 row, 0,
                 QTableWidgetItem(course.title or "—")
             )
-
-    # =================================================
 
     courses_window.show()
     menu_window.close()
@@ -613,7 +598,6 @@ def open_courses(menu_window):
 def open_calendar(menu_window):
     calendar_window = load_ui("calendar.ui")
 
-    # Button to exit the menu
     exit_button = calendar_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
@@ -627,7 +611,6 @@ def open_calendar(menu_window):
 def open_StudIP(menu_window):
     StudIP_window = load_ui("StudIP.ui")
 
-    # Button to exit the menu
     exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(StudIP_window)
@@ -641,7 +624,6 @@ def open_StudIP(menu_window):
 def open_Email(menu_window):
     Email_window = load_ui("Email.ui")
 
-    # Button to exit the menu
     exit_button = Email_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(Email_window)
@@ -655,7 +637,6 @@ def open_Email(menu_window):
 def open_Dashboard(menu_window):
     Dashboard_window = load_ui("Dashboard.ui")
 
-    # Button to exit the menu
     exit_button = Dashboard_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
         lambda: open_menu(Dashboard_window)
