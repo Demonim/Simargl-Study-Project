@@ -6,20 +6,24 @@ from PySide6.QtWidgets import (
     QTextBrowser,
     QApplication,
     QComboBox,
-    QPushButton, 
+    QPushButton,
     QLabel,
     QLineEdit,
     QVBoxLayout,
     QDialog,
     QListWidget,
-    QTextEdit
+    QTextEdit,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
+    QAbstractItemView
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
 from concurrent.futures import ThreadPoolExecutor
 import simargl
-
+user_courses = []
 # =========================
 # THEMES
 # =========================
@@ -129,11 +133,19 @@ QComboBox#ThemeBox QAbstractItemView {
 }
 
 QPushButton#Help {
+    background-color: rgb(23, 130, 22);
     border: 2px solid #000000;
     border-radius: 6px;
-    background-color: transparent;
-	color: rgb(0, 0, 0);
-	font-size: 10pt;
+    color: rgb(0, 0, 0);
+    font-size: 15pt;
+}
+
+QPushButton#Help:hover{
+    border: 2px solid rgb(145, 207, 111);
+    border-radius: 6px;
+    background-color: rgb(22, 107, 31);
+	color: rgb(145, 207, 111);
+	font-size: 15pt;
 }
 
 QLabel#Error {
@@ -178,11 +190,12 @@ QPushButton#Back_Button:hover{
 QLabel#Help {
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 25pt;
+    font-size: 30pt;
 }
 
 QTextBrowser {
     color: rgb(102, 255, 140);
+    border: 10px solid rgb(102, 255, 140);
     background-color: rgb(0, 0, 0);
     font: 15pt;
 }
@@ -362,11 +375,19 @@ QComboBox#ThemeBox QAbstractItemView {
 }
 
 QPushButton#Help {
-    border: 2px solid #000000;
+	border: 2px solid rgb(63, 72, 204);
     border-radius: 6px;
-    background-color: transparent;
-	color: rgb(0, 0, 0);
-	font-size: 10pt;
+    background-color: rgb(0, 167, 240);
+	color: rgb(63, 72, 204);
+	font-size: 15pt;
+}
+
+QPushButton#Help:hover{
+    border: 2px solid rgb(0,0,0);
+    border-radius: 6px;
+    background-color: rgb(20,111,161);
+	color: rgb(79, 149, 255);
+	font-size: 15pt;
 }
 
 
@@ -390,13 +411,13 @@ QPushButton#Back_Button:hover{
 QLabel#Help {
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 25pt;
+    font-size: 30pt;
 }
 
 QTextBrowser {
     color: rgb(0, 0, 0);
     background-color: rgb(255, 255, 255);
-    font: 25pt;
+    font: 15pt;
 }
 
 
@@ -516,7 +537,7 @@ class AddNoteDialog(QDialog):
         self.line_edit = QLineEdit()
         self.line_edit.setPlaceholderText("Notes name")
 
-        self.ok_button = QPushButton("Create  ")
+        self.ok_button = QPushButton("Create ")
         self.ok_button.clicked.connect(self.accept)
 
         layout.addWidget(QLabel("Введите название заметки:"))
@@ -544,13 +565,45 @@ def change_theme(app: QApplication, theme: str):
 
 
 def open_courses(menu_window):
+    global user_courses
+
     courses_window = load_ui("courses.ui")
 
+<<<<<<< Updated upstream
     # Button to exit the menu
     exit_button = courses_window.findChild(QPushButton, "Exit_Button1")
+=======
+    # кнопка выхода обратно в menu
+    exit_button = courses_window.findChild(QPushButton, "Back_Button")
+>>>>>>> Stashed changes
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
     )
+
+    # ===== ВОТ ЗДЕСЬ ДОБАВЛЯЕМ ЛОГИКУ КУРСОВ =====
+
+    table = courses_window.findChild(QTableWidget, "tableWidget")
+
+    if table is not None:
+        table.setRowCount(0)
+        table.setRowCount(len(user_courses))
+
+        # колонки растягиваются под размер окна
+        table.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
+
+        # запрет редактирования
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        # заполняем первую колонку названиями курсов
+        for row, course in enumerate(user_courses):
+            table.setItem(
+                row, 0,
+                QTableWidgetItem(course.title or "—")
+            )
+
+    # =================================================
 
     courses_window.show()
     menu_window.close()
@@ -671,15 +724,15 @@ def open_Help(main_window):
     )
     FAQ_button = Help_window.findChild(QPushButton, "FAQ")
     FAQ_button.clicked.connect(
-        lambda: textBrowser.setText("What is this app for? \n- This app is designed to help students during their university studies.\nIs my personal data saved?\n- No, the app does not store any user personal data.\nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.")
+        lambda: textBrowser.setText("What is this app for? \n- This app is designed to help students during their university studies.\nIs my personal data saved?\n- Yes, but user data is encrypted and stored in a local database.\nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.")
     )
     Instructions_button = Help_window.findChild(QPushButton, "Instruction")
     Instructions_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("1. Enter your login details for Stud.Ip. \n2. After logging in, you will have access to a menu with all the application functions. \n Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings")
     )
     Support_button = Help_window.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
-        lambda: textBrowser.setText("Информация")
+        lambda: textBrowser.setText("Contact the app owner and lead developer: \n-Dmytro Kutsak. \nIf you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk")
     )
     App_button = Help_window.findChild(QPushButton, "App")
     App_button.clicked.connect(
@@ -780,7 +833,7 @@ def error_login(menu_window):
 
 
 def login_from_enter(main_window):
-    global client, mail, server
+    global client, mail, server, user_courses
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     login = login_box.text()
@@ -794,6 +847,7 @@ def login_from_enter(main_window):
         error_login(main_window)
     else:
         open_menu(main_window)
+        user_courses = client.Courses.get_courses()
 
 
 # =========================
@@ -826,6 +880,8 @@ def main():
     help_button.clicked.connect(
         lambda: open_Help(main_window)
     )
+
+
 
     main_window.show()
     sys.exit(app.exec())
