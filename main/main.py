@@ -20,10 +20,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-
+from storage.notes_storage import NotesStorage
 from concurrent.futures import ThreadPoolExecutor
 import simargl
 user_courses = []
+notes_storage = None
+current_login = None
 # =========================
 # THEMES
 # =========================
@@ -204,6 +206,22 @@ QLineEdit#Help_Search {
     background-color: rgba(255, 255, 255);
 }
 
+
+
+QTableWidget {
+    background-color: #000000;
+    color: rgb(102, 255, 140);
+    gridline-color: rgb(102, 255, 140);
+    font-size: 10pt;
+}
+
+QHeaderView::section {
+    background-color: #02070f;
+    color: #00ff88;
+    padding: 8px;
+    border: 1px solid #00ff88;
+    font-weight: bold;
+}
 
 
 QCalendarWidget QWidget{
@@ -583,11 +601,20 @@ def open_courses(menu_window):
         )
 
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.verticalHeader().setVisible(False)
 
         for row, course in enumerate(user_courses):
             table.setItem(
                 row, 0,
                 QTableWidgetItem(course.title or "—")
+            )
+            table.setItem(
+                row, 1,
+                QTableWidgetItem(course.subtitle or "—")
+            )
+            table.setItem(
+                row, 2,
+                QTableWidgetItem("Active")
             )
 
     courses_window.show()
@@ -648,6 +675,7 @@ def open_Dashboard(menu_window):
     menu_window.courses_window = Dashboard_window
 
 def open_Notes(menu_window):
+    global notes_storage
     Notes_window = load_ui("notes.ui")
 
     exit_button = Notes_window.findChild(QPushButton, "Back_Button")
@@ -661,30 +689,44 @@ def open_Notes(menu_window):
     save_button = Notes_window.findChild(QPushButton, "SaveNoteButton")
 
     # Notes safe (saves while the window is open)
-    Notes_window.notes_data = {}
+    notes = notes_storage.load_notes()
+
+    for note in notes:
+        notes_list.addItem(note["title"])
 
     # --- add note ---
     def add_note():
         dialog = AddNoteDialog(Notes_window)
         if dialog.exec():
-            name = dialog.get_name()
-            if name and name not in Notes_window.notes_data:
-                Notes_window.notes_data[name] = ""
-                notes_list.addItem(name)
+            title = dialog.get_name()
+            if not title:
+                return
+            new_note = notes_storage.create_note(title, "")
+            notes.append(new_note)
+            notes_storage.save_notes(notes)
+
+            notes_list.addItem(title)
 
     # --- load note ---
     def load_note(item):
-        name = item.text()
-        text_edit.setPlainText(
-            Notes_window.notes_data.get(name, "")
-        )
+        title = item.text()
+        for note in notes:
+            if note["title"] == title:
+                text_edit.setPlainText(note["content"])
+                break
 
     # --- save note ---
     def save_note():
         item = notes_list.currentItem()
-        if item:
-            name = item.text()
-            Notes_window.notes_data[name] = text_edit.toPlainText()
+        if not item:
+            return
+
+        title = item.text()
+        for note in notes:
+            if note["title"] == title:
+                note["content"] = text_edit.toPlainText()
+                notes_storage.save_notes(notes)
+                break
 
     add_button.clicked.connect(add_note)
     notes_list.itemClicked.connect(load_note)
@@ -732,6 +774,10 @@ def open_menu(main_window):
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})"), 1)
         executor.submit(message_notifications.setText(f"StudIP ({simargl.new_messages_counter(client)})"), 2)
+
+    name_label = menu_window.findChild(QLabel,"Name_label")
+    if name_label:
+        name_label.setText(f"{current_login}")
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
@@ -814,10 +860,11 @@ def error_login(menu_window):
 
 
 def login_from_enter(main_window):
-    global client, mail, server, user_courses
+    global client, mail, server, user_courses, current_login
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     login = login_box.text()
+    current_login = login
     password = password_box.text()
 
     try:
@@ -827,6 +874,8 @@ def login_from_enter(main_window):
     except:
         error_login(main_window)
     else:
+        global notes_storage
+        notes_storage = NotesStorage(login)
         open_menu(main_window)
         user_courses = client.Courses.get_courses()
 
