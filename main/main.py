@@ -3,6 +3,8 @@ import os
 from pydoc import Helper
 
 from PySide6.QtWidgets import (
+    QGridLayout,
+    QWidget,
     QTextBrowser,
     QApplication,
     QComboBox,
@@ -18,6 +20,8 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QAbstractItemView
 )
+import calendar
+from datetime import date
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 from storage.notes_storage import NotesStorage
@@ -625,14 +629,65 @@ def open_courses(menu_window):
 def open_calendar(menu_window):
     calendar_window = load_ui("calendar.ui")
 
-    exit_button = calendar_window.findChild(QPushButton, "Exit_Button1")
+    # кнопка выхода обратно в menu
+    exit_button = calendar_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
     )
 
+    # ---------- КАЛЕНДАРЬ ----------
+    # находим QWidget, в котором лежит gridLayout
+    calendar_widget = calendar_window.findChild(QWidget, "calendarWidget")  # <- имя твоего виджета с gridLayout
+    grid =  calendar_widget.findChild(QGridLayout, "gridLayout_2")  # сам gridLayout
+
+    # собрать все кнопки из gridLayout
+    buttons = []
+    for i in range(grid.count()):
+        widget = grid.itemAt(i).widget()
+        if isinstance(widget, QPushButton):
+            buttons.append(widget)
+
+    # получить позиции кнопок в grid
+    buttons_with_pos = []
+    for btn in buttons:
+        index = grid.indexOf(btn)
+        row, col, _, _ = grid.getItemPosition(index)
+        buttons_with_pos.append((row, col, btn))
+
+    # сортируем по строкам и колонкам
+    buttons_with_pos.sort(key=lambda x: (x[0], x[1]))
+    buttons_sorted = [b[2] for b in buttons_with_pos]
+
+    # текущий месяц
+    today = date.today()
+    year = today.year
+    month = today.month
+    cal = calendar.Calendar(firstweekday=0)  # Понедельник
+    month_days = list(cal.itermonthdays(year, month))
+
+    # заполняем кнопки
+    for btn, day in zip(buttons_sorted, month_days):
+        if day == 0:
+            btn.setText("")
+            btn.setEnabled(False)
+        else:
+            btn.setText(str(day))
+            btn.setEnabled(True)
+
+            # отключаем старые слоты и назначаем новый
+            try:
+                btn.clicked.disconnect()
+            except Exception:
+                pass
+
+            btn.clicked.connect(
+                lambda checked=False, d=day: print(f"Clicked day: {d}")
+            )
+
+    # --------------------------------
+
     calendar_window.show()
     menu_window.close()
-
     menu_window.courses_window = calendar_window
 
 def open_StudIP(menu_window):
