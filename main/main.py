@@ -1,6 +1,7 @@
 import sys
 import os
 from pydoc import Helper
+from studipy.calendar import Calendar
 
 from PySide6.QtWidgets import (
     QGridLayout,
@@ -18,7 +19,8 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QHeaderView,
-    QAbstractItemView
+    QAbstractItemView,
+    QHBoxLayout,
 )
 import calendar
 from datetime import date
@@ -26,6 +28,10 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 from storage.notes_storage import NotesStorage
 from concurrent.futures import ThreadPoolExecutor
+from storage.course_days_storage import CourseDaysStorage
+from collections import defaultdict
+weekly_schedule = defaultdict(list)
+schedule = None
 import simargl
 user_courses = []
 notes_storage = None
@@ -33,6 +39,16 @@ current_login = None
 # =========================
 # THEMES
 # =========================
+
+WEEKDAY_MAP = {
+    0: "MO",
+    1: "TU",
+    2: "WE",
+    3: "TH",
+    4: "FR",
+    5: "SA",
+    6: "SU"
+}
 
 DARK_THEME = """
 QWidget {
@@ -547,6 +563,25 @@ def load_ui(path: str):
     return window
 
 
+class DayScheduleDialog(QDialog):
+    def __init__(self, title, entries, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setMinimumSize(450, 300)
+
+        layout = QVBoxLayout(self)
+        self.list = QListWidget()
+        layout.addWidget(self.list)
+
+        if not entries:
+            self.list.addItem("No classes this day")
+            return
+
+        for e in sorted(entries, key=lambda x: x.start):
+            self.list.addItem(
+                f"{e.start} – {e.end} | {e.title}"
+            )
+
 class AddNoteDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -569,6 +604,56 @@ class AddNoteDialog(QDialog):
     def get_name(self):
         return self.line_edit.text().strip()
 
+class CourseDayDialog(QDialog):
+    def __init__(self, courses, storage, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Set course days")
+        self.setMinimumSize(600, 400)
+
+        self.storage = storage
+        self.saved_days = storage.load()
+
+        self.layout = QVBoxLayout(self)
+        self.list = QListWidget()
+        self.layout.addWidget(self.list)
+
+        self.inputs = {}
+
+        for course in courses:
+            widget = QWidget()
+            row = QHBoxLayout(widget)
+
+            label = QLabel(course.title)
+            label.setMinimumWidth(350)
+
+            input_day = QLineEdit()
+            input_day.setPlaceholderText("MO / TU / WE ...")
+            input_day.setMaximumWidth(80)
+
+            if course.title in self.saved_days:
+                input_day.setText(self.saved_days[course.title])
+
+            row.addWidget(label)
+            row.addWidget(input_day)
+
+            self.list.addItem("")
+            self.list.setItemWidget(self.list.item(self.list.count() - 1), widget)
+
+            self.inputs[course.course_id] = input_day
+
+        save_btn = QPushButton("Save & Continue")
+        save_btn.clicked.connect(self.save_and_close)
+        self.layout.addWidget(save_btn)
+
+    def save_and_close(self):
+        result = {}
+        for course_id, input_day in self.inputs.items():
+            day = input_day.text().strip().upper()
+            if day:
+                result[course_id] = day
+
+        self.storage.save(result)
+        self.accept()
 
 # =========================
 # THEME HANDLING
@@ -626,65 +711,98 @@ def open_courses(menu_window):
 
     menu_window.courses_window = courses_window
 
+def open_calendar_entry(menu_window):
+    storage = CourseDaysStorage(current_login)
+
+    dialog = CourseDayDialog(
+        courses=user_courses,
+        storage=storage,
+        parent=menu_window
+    )
+
+    if dialog.exec():
+        open_calendar(menu_window)
+
 def open_calendar(menu_window):
     calendar_window = load_ui("calendar.ui")
 
-    # кнопка выхода обратно в menu
+    # ===== КНОПКА BACK =====
     exit_button = calendar_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
     )
 
-    # ---------- КАЛЕНДАРЬ ----------
-    # находим QWidget, в котором лежит gridLayout
-    calendar_widget = calendar_window.findChild(QWidget, "calendarWidget")  # <- имя твоего виджета с gridLayout
-    grid =  calendar_widget.findChild(QGridLayout, "gridLayout_2")  # сам gridLayout
+    # ===== ЗАГРУЗКА СОХРАНЁННЫХ ДНЕЙ =====
+    storage = CourseDaysStorage(current_login)
+    course_days = storage.load()  # { course_title: "MO" }
 
-    # собрать все кнопки из gridLayout
+    # ===== ФОРМИРОВАНИЕ WEEKLY_SCHEDULE =====
+    weekly_schedule.clear()
+
+    for entry in schedule.entries:
+        day = course_days.get(entry.related_course_id)
+        if day:
+            weekly_schedule[day].append(entry)
+
+    # ===== КАЛЕНДАРНАЯ СЕТКА =====
+    calendar_widget = calendar_window.findChild(QWidget, "calendarWidget")
+    grid = calendar_widget.findChild(QGridLayout, "gridLayout_2")
+
+    # собрать кнопки
     buttons = []
     for i in range(grid.count()):
         widget = grid.itemAt(i).widget()
         if isinstance(widget, QPushButton):
             buttons.append(widget)
 
-    # получить позиции кнопок в grid
+    # отсортировать по позиции
     buttons_with_pos = []
     for btn in buttons:
         index = grid.indexOf(btn)
         row, col, _, _ = grid.getItemPosition(index)
         buttons_with_pos.append((row, col, btn))
 
-    # сортируем по строкам и колонкам
     buttons_with_pos.sort(key=lambda x: (x[0], x[1]))
     buttons_sorted = [b[2] for b in buttons_with_pos]
 
-    # текущий месяц
+    # ===== ТЕКУЩИЙ МЕСЯЦ =====
     today = date.today()
     year = today.year
     month = today.month
-    cal = calendar.Calendar(firstweekday=0)  # Понедельник
+
+    cal = calendar.Calendar(firstweekday=0)  # Monday
     month_days = list(cal.itermonthdays(year, month))
 
-    # заполняем кнопки
+    # ===== КЛИК ПО ДНЮ =====
+    def on_day_clicked(day):
+        clicked_date = date(year, month, day)
+        weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
+
+        entries = weekly_schedule.get(weekday_code, [])
+
+        dialog = DayScheduleDialog(
+            title=clicked_date.strftime("%A %d.%m.%Y"),
+            entries=entries,
+            parent=calendar_window
+        )
+        dialog.exec()
+
+    # ===== ЗАПОЛНЕНИЕ КНОПОК =====
     for btn, day in zip(buttons_sorted, month_days):
+        try:
+            btn.clicked.disconnect()
+        except Exception:
+            pass
+
         if day == 0:
             btn.setText("")
             btn.setEnabled(False)
         else:
             btn.setText(str(day))
             btn.setEnabled(True)
-
-            # отключаем старые слоты и назначаем новый
-            try:
-                btn.clicked.disconnect()
-            except Exception:
-                pass
-
             btn.clicked.connect(
-                lambda checked=False, d=day: print(f"Clicked day: {d}")
+                lambda checked=False, d=day: on_day_clicked(d)
             )
-
-    # --------------------------------
 
     calendar_window.show()
     menu_window.close()
@@ -840,7 +958,7 @@ def open_menu(main_window):
     )
     calendar_button = menu_window.findChild(QPushButton, "Calendar")
     calendar_button.clicked.connect(
-        lambda: open_calendar(menu_window)
+        lambda: open_calendar_entry(menu_window)
     )
     StudIP_button = menu_window.findChild(QPushButton, "Messages")
     StudIP_button.clicked.connect(
@@ -915,7 +1033,7 @@ def error_login(menu_window):
 
 
 def login_from_enter(main_window):
-    global client, mail, server, user_courses, current_login
+    global client, mail, server, user_courses, current_login, schedule
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     login = login_box.text()
@@ -933,7 +1051,6 @@ def login_from_enter(main_window):
         notes_storage = NotesStorage(login)
         open_menu(main_window)
         user_courses = client.Courses.get_courses()
-
 
 # =========================
 # MAIN
