@@ -1002,13 +1002,27 @@ def back_to_main(menu_window):
         if ecampusmail.server and ecampusmail.mail:
             ecampusmail.close_conections()
             ecampusmail.server = False; ecampusmail.mail = False
-    except NameError:
+    except:
         pass
 
     # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
     theme_box.currentTextChanged.connect(
         lambda text: change_theme(QApplication.instance(), text)
+    )
+
+    # Check box "Remember me"
+    remember_check = main_window.findChild(QCheckBox, "Check_Remember")
+    remember_path = "storage/login_data.db"
+    if os.path.exists(remember_path):
+        login_database = simargl.LoginStorage()
+        db_data = login_database.load().fetchall()
+        login_box = main_window.findChild(QLineEdit, "LoginLine")
+        login_box.setText(db_data[0][0])
+        remember_check.click()
+
+    remember_check.clicked.connect(
+        lambda: check_box_remember(remember_check)
     )
 
     # Theme init
@@ -1054,13 +1068,19 @@ def login_from_enter(main_window,remember=False):
 
     try:
         studip.create_client()
-        ecampusmail.read_email_init()
-        ecampusmail.write_email_init()
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            executor.submit(ecampusmail.read_email_init())
+            executor.submit(ecampusmail.write_email_init())
     except:
         error_login(main_window)
     else:
         if remember:
-            pass
+            login_database = simargl.LoginStorage()
+            result = login_database.load()
+            if result is None:
+                login_database.create(current_login, password)
+            else:
+                login_database.compare(current_login, password)
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
         open_menu(main_window)
@@ -1095,6 +1115,14 @@ def main():
 
     # --- check box "Remember me" ---
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
+    remember_path = "storage/login_data.db"
+    if os.path.exists(remember_path):
+        login_database = simargl.LoginStorage()
+        db_data = login_database.load().fetchall()
+        login_box = main_window.findChild(QLineEdit, "LoginLine")
+        login_box.setText(db_data[0][0])
+        remember_check.click()
+
     remember_check.clicked.connect(
         lambda: check_box_remember(remember_check)
     )

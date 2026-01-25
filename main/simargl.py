@@ -6,6 +6,7 @@ import os
 import json
 import uuid
 import sqlite3 as sql
+import hashlib
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
@@ -73,7 +74,39 @@ class EcampusMail:
         self.server.quit(); self.mail.close(); self.mail.logout()
 
 class LoginStorage:
-    pass
+    def __init__(self):
+        self.base_path = "storage"
+        os.makedirs(self.base_path, exist_ok=True)
+        self.file_path = os.path.join(self.base_path, f"login_data.db")
+    
+    def load(self):
+        self.con = sql.connect(self.file_path)
+        self.cur = self.con.cursor()
+        data = self.cur.execute("SELECT name FROM sqlite_master WHERE name='users'")
+        if data.fetchone() is None:
+            return None
+        print("Loaded")
+        return self.cur.execute("SELECT * FROM users")
+    
+    def create(self, login, password):
+        self.login = login
+        self.password = hashlib.sha256(b"password").hexdigest()
+        self.cur.execute("CREATE TABLE users (name TEXT, password TEXT)")
+        self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}')")
+        self.con.commit()
+        print("Created")
+    
+    def compare(self, login, password):
+        self.login = login
+        self.password = hashlib.sha256(b"password").hexdigest()
+        result = self.cur.execute(f"SELECT name, password FROM users WHERE name='{self.login}' AND password='{self.password}'")
+        if result.fetchone() is None:
+            self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}')")
+            self.con.commit()
+            return False
+        else:
+            return True
+        
 
 class NotesStorage:
     def __init__(self, login: str):
