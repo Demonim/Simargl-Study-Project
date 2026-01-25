@@ -1081,9 +1081,15 @@ def login_from_enter(main_window,remember=False):
                 login_database.create(current_login, password)
             else:
                 login_database.compare(current_login, password)
+        if not remember:
+            if os.path.exists(remember_path):
+                os.remove(remember_path)
+
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
+
         open_menu(main_window)
+
         user_courses = studip.get_courses()
 
 # =========================
@@ -1099,7 +1105,7 @@ def check_box_remember(checkbox:QCheckBox):
 
 
 def main():
-    global remember
+    global remember, remember_path
     remember = False
 
     app = QApplication(sys.argv)
