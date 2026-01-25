@@ -2,6 +2,10 @@ import sys
 import os
 from pydoc import Helper
 from studipy.calendar import Calendar
+import simargl
+import json
+import uuid
+import datetime
 
 from PySide6.QtWidgets import (
     QGridLayout,
@@ -23,16 +27,14 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
 )
 import calendar
-from datetime import date
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-from storage.notes_storage import NotesStorage
 from concurrent.futures import ThreadPoolExecutor
-from storage.course_days_storage import CourseDaysStorage
 from collections import defaultdict
+
+
 weekly_schedule = defaultdict(list)
 schedule = None
-import simargl
 user_courses = []
 notes_storage = None
 current_login = None
@@ -604,6 +606,20 @@ class AddNoteDialog(QDialog):
     def get_name(self):
         return self.line_edit.text().strip()
 
+class CourseDaysStorage:
+    def __init__(self, login):
+        self.path = f"storage/course_days_{login}.json"
+
+    def load(self):
+        if not os.path.exists(self.path):
+            return {}
+        with open(self.path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def save(self, data):
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+
 class CourseDayDialog(QDialog):
     def __init__(self, courses, storage, parent=None):
         super().__init__(parent)
@@ -654,6 +670,33 @@ class CourseDayDialog(QDialog):
 
         self.storage.save(result)
         self.accept()
+
+class NotesStorage:
+    def __init__(self, login: str):
+        self.login = login
+        self.base_path = "storage/data"
+        os.makedirs(self.base_path, exist_ok=True)
+        self.file_path = os.path.join(self.base_path, f"{login}.json")
+
+    def load_notes(self) -> list[dict]:
+        if not os.path.exists(self.file_path):
+            return []
+
+        with open(self.file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("notes", [])
+
+    def save_notes(self, notes: list[dict]):
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump({"notes": notes}, f, ensure_ascii=False, indent=2)
+
+    def create_note(self, title: str, content: str) -> dict:
+        return {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "content": content,
+            "created": datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
 
 # =========================
 # THEME HANDLING
@@ -766,7 +809,7 @@ def open_calendar(menu_window):
     buttons_sorted = [b[2] for b in buttons_with_pos]
 
     # ===== ТЕКУЩИЙ МЕСЯЦ =====
-    today = date.today()
+    today = datetime.date.today()
     year = today.year
     month = today.month
 
@@ -775,7 +818,7 @@ def open_calendar(menu_window):
 
     # ===== КЛИК ПО ДНЮ =====
     def on_day_clicked(day):
-        clicked_date = date(year, month, day)
+        clicked_date = datetime.date(year, month, day)
         weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
 
         entries = weekly_schedule.get(weekday_code, [])
@@ -949,8 +992,7 @@ def open_menu(main_window):
         executor.submit(message_notifications.setText(f"StudIP ({simargl.new_messages_counter(client)})"), 2)
 
     name_label = menu_window.findChild(QLabel,"Name_label")
-    if name_label:
-        name_label.setText(f"{current_login}")
+    name_label.setText(f"{current_login}")
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
     courses_button.clicked.connect(
@@ -1050,7 +1092,7 @@ def login_from_enter(main_window):
         global notes_storage
         notes_storage = NotesStorage(login)
         open_menu(main_window)
-        user_courses = client.Courses.get_courses()
+        user_courses = simargl.get_courses(client)
 
 # =========================
 # MAIN

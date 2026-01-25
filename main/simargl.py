@@ -2,7 +2,6 @@ import studipy
 import imaplib
 import email
 import smtplib
-#import getpass
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
