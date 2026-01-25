@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QAbstractItemView,
     QHBoxLayout,
+    QCheckBox
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
@@ -920,15 +921,20 @@ def open_Help(main_window):
     )
     FAQ_button = Help_window.findChild(QPushButton, "FAQ")
     FAQ_button.clicked.connect(
-        lambda: textBrowser.setText("What is this app for? \n- This app is designed to help students during their university studies.\nIs my personal data saved?\n- Yes, but user data is encrypted and stored in a local database.\nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.")
+        lambda: textBrowser.setText("""What is this app for? \n- This app is designed to help students during their university studies.
+        \nIs my personal data saved?\n- Yes, but user data is encrypted and stored in a local database.
+        \nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.""")
     )
     Instructions_button = Help_window.findChild(QPushButton, "Instruction")
     Instructions_button.clicked.connect(
-        lambda: textBrowser.setText("1. Enter your login details for Stud.Ip. \n2. After logging in, you will have access to a menu with all the application functions. \n Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings")
+        lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. \n
+        2. After logging in, you will have access to a menu with all the application functions. \n 
+        Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
     )
     Support_button = Help_window.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
-        lambda: textBrowser.setText("Contact the app owner and lead developer: \n-Dmytro Kutsak. \nIf you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk")
+        lambda: textBrowser.setText("""Contact the app owner and lead developer: \n-Dmytro Kutsak. \n
+        If you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk""")
     )
     App_button = Help_window.findChild(QPushButton, "App")
     App_button.clicked.connect(
@@ -945,8 +951,8 @@ def open_menu(main_window):
     mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
     message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(mail_notifications.setText(f"ECampus Mail ({simargl.mail_notifications(mail)})"), 1)
-        executor.submit(message_notifications.setText(f"StudIP ({simargl.new_messages_counter(client)})"), 2)
+        executor.submit(mail_notifications.setText(f"ECampus Mail ({ecampusmail.mail_notifications()})"), 1)
+        executor.submit(message_notifications.setText(f"StudIP ({studip.new_messages_counter()})"), 2)
 
     name_label = menu_window.findChild(QLabel,"Name_label")
     name_label.setText(f"{current_login}")
@@ -991,7 +997,13 @@ def open_menu(main_window):
 
 def back_to_main(menu_window):
     main_window = load_ui("UI/main.ui")
-    simargl.closing_conections(server, mail)
+
+    try:
+        if ecampusmail.server and ecampusmail.mail:
+            ecampusmail.close_conections()
+            ecampusmail.server = False; ecampusmail.mail = False
+    except NameError:
+        pass
 
     # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
@@ -1005,7 +1017,7 @@ def back_to_main(menu_window):
     # Press Enter to enter the menu
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
-        lambda: login_from_enter(main_window)
+        lambda: login_from_enter(main_window, remember)
     )
 
     help_button = main_window.findChild(QPushButton, "Help")
@@ -1032,30 +1044,43 @@ def error_login(menu_window):
     menu_window.courses_window = error_window
 
 
-def login_from_enter(main_window):
-    global client, mail, server, user_courses, current_login, schedule
+def login_from_enter(main_window,remember=False):
+    global user_courses, current_login, schedule, ecampusmail, studip
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
-    current_login = login_box.text()
-    password = password_box.text()
+    current_login = login_box.text(); password = password_box.text()
+    studip = simargl.StudIP(current_login, password)
+    ecampusmail = simargl.EcampusMail(current_login, password)
 
     try:
-        client = simargl.create_client(current_login,password,simargl.BASE_URL)
-        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+current_login),password)
-        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+current_login),password)
+        studip.create_client()
+        ecampusmail.read_email_init()
+        ecampusmail.write_email_init()
     except:
         error_login(main_window)
     else:
+        if remember:
+            pass
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
         open_menu(main_window)
-        user_courses = simargl.get_courses(client)
+        user_courses = studip.get_courses()
 
 # =========================
 # MAIN
 # =========================
 
+def check_box_remember(checkbox:QCheckBox):
+    global remember
+    if checkbox.isChecked() == True:
+        remember = True
+    if checkbox.isChecked() == False:
+        remember = False
+
+
 def main():
+    global remember
+    remember = False
 
     app = QApplication(sys.argv)
 
@@ -1068,13 +1093,19 @@ def main():
         lambda text: change_theme(app, text)
     )
 
+    # --- check box "Remember me" ---
+    remember_check = main_window.findChild(QCheckBox, "Check_Remember")
+    remember_check.clicked.connect(
+        lambda: check_box_remember(remember_check)
+    )
+
     # --- setting theme on the start ---
     change_theme(app, theme_box.currentText())
 
     # --- enter button ---
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
-        lambda: login_from_enter(main_window)
+        lambda: login_from_enter(main_window,remember)
     )
 
     help_button = main_window.findChild(QPushButton, "Help")

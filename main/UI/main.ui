@@ -428,7 +428,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QCheckBox" name="CheckBox_1">
+         <widget class="QCheckBox" name="Check_Remember">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>

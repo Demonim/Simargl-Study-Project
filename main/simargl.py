@@ -5,64 +5,75 @@ import smtplib
 import os
 import json
 import uuid
-
+import sqlite3 as sql
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
 
+class StudIP:
+    def __init__(self, login, password, base_url=BASE_URL):
+        self.login = login
+        self.password = password
+        self.base_url = base_url
 
-def create_client(usrnm,psswrd,bsrl):
-    client = studipy.Client(usrnm, psswrd, bsrl)
-    return client
+    def create_client(self):
+        self.client = studipy.Client(self.login, self.password, self.base_url)
 
-def get_courses(clnt):
-    courses = clnt.Courses.get_courses()
-    return courses
+    def get_courses(self):
+        courses = self.client.Courses.get_courses()
+        return courses
 
-def get_my_messages(clnt):
-    my_messages = clnt.Messages.get_messages()
-    return my_messages
+    def get_my_messages(self):
+        my_messages = self.client.Messages.get_messages()
+        return my_messages
 
-def new_messages_counter(clnt):
-    new_messages = clnt.Messages.get_messages(True)
-    return len(new_messages)
+    def new_messages_counter(self):
+        new_messages = self.client.Messages.get_messages(True)
+        return len(new_messages)
 
-def get_schedule(clnt):
-    schedule = clnt.Calendar.get_schedule()
-    return schedule
+    def get_schedule(self):
+        schedule = self.client.Calendar.get_schedule()
+        return schedule
 
-def get_folders(clnt,crss):
-    folders = []
-    for f in range(len(crss)):
-        folders.append(clnt.Files.get_folders(courses[f]))
-    return folders
+    def get_folders(self, clnt, crss):
+        folders = []
+        for f in range(len(crss)):
+            folders.append(clnt.Files.get_folders(courses[f]))
+        return folders
 
-def get_files(clnt,crss):
-    files = []
-    for ff in range(len(crss)):
-        files.append(clnt.Files.get_folders(courses[ff]))
-    return files
+    def get_files(self, clnt, crss):
+        files = []
+        for ff in range(len(crss)):
+            files.append(clnt.Files.get_folders(courses[ff]))
+        return files
 
-def read_email_init(imap_srvr,usrnm,psswrd):
-    mail = imaplib.IMAP4_SSL(imap_srvr, 993)
-    mail.login(usrnm, psswrd)
-    return mail
+class EcampusMail:
+    def __init__(self, login, password, server=SERVER):
+        self.login = str("ug-student\\"+login)
+        self.password = password
+        self.server = server
 
-def mail_notifications(mail):
-    mail.select("inbox")
-    result, data = mail.search(None, "UNSEEN")
-    return len(data[0].split())
+    def read_email_init(self):
+        self.mail = imaplib.IMAP4_SSL(self.server, 993)
+        self.mail.login(self.login, self.password)
 
-def write_email_init(smtp_srvr,usrnm,psswrd):
-    server = smtplib.SMTP(smtp_srvr, 587)
-    server.ehlo() 
-    server.starttls() 
-    server.ehlo()
-    server.login(usrnm,psswrd)
-    return server
+    def mail_notifications(self):
+        self.mail.select("inbox")
+        result, data = self.mail.search(None, "UNSEEN")
+        return len(data[0].split())
 
-def closing_conections(server, mail):
-    server.quit(); mail.close(); mail.logout()
+    def write_email_init(self):
+        self.server = smtplib.SMTP(self.server, 587)
+        self.server.ehlo() 
+        self.server.starttls() 
+        self.server.ehlo()
+        self.server.login(self.login, self.password)
+
+    def close_conections(self):
+        self.server.quit(); self.mail.close(); self.mail.logout()
+
+class LoginStorage:
+    pass
 
 class NotesStorage:
     def __init__(self, login: str):
