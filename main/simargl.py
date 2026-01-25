@@ -2,9 +2,14 @@ import studipy
 import imaplib
 import email
 import smtplib
+import os
+import json
+import uuid
+
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
+
 
 def create_client(usrnm,psswrd,bsrl):
     client = studipy.Client(usrnm, psswrd, bsrl)
@@ -56,5 +61,46 @@ def write_email_init(smtp_srvr,usrnm,psswrd):
     server.login(usrnm,psswrd)
     return server
 
-...
+def closing_conections(server, mail):
+    server.quit(); mail.close(); mail.logout()
 
+class NotesStorage:
+    def __init__(self, login: str):
+        self.login = login
+        self.base_path = "storage/data"
+        os.makedirs(self.base_path, exist_ok=True)
+        self.file_path = os.path.join(self.base_path, f"{login}.json")
+
+    def load_notes(self) -> list[dict]:
+        if not os.path.exists(self.file_path):
+            return []
+
+        with open(self.file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("notes", [])
+
+    def save_notes(self, notes: list[dict]):
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump({"notes": notes}, f, ensure_ascii=False, indent=2)
+
+    def create_note(self, title: str, content: str) -> dict:
+        return {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "content": content,
+            "created": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        }
+
+class CourseDaysStorage:
+    def __init__(self, login):
+        self.path = f"storage/course_days_{login}.json"
+
+    def load(self):
+        if not os.path.exists(self.path):
+            return {}
+        with open(self.path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def save(self, data):
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)

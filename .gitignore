@@ -1,7 +1,2 @@
 *.pyc
-main/storage/course_days_nichita.licov.json
-main/storage/data/nichita.licov.json
-storage/course_days_dmytro.kutsak.json
-storage/data/dmytro.kutsak.json
-storage/course_days_diana.bardyk.json
-storage/data/diana.bardyk.json
+*.json

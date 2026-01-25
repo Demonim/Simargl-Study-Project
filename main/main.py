@@ -1,10 +1,6 @@
 import sys
 import os
-from pydoc import Helper
 import simargl
-import json
-import uuid
-import datetime
 
 from PySide6.QtWidgets import (
     QGridLayout,
@@ -25,18 +21,18 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QHBoxLayout,
 )
-import calendar
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+
+import datetime
+import calendar
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 
 
 weekly_schedule = defaultdict(list)
 schedule = None
-user_courses = []
 notes_storage = None
-current_login = None
 
 
 # =========================
@@ -607,20 +603,6 @@ class AddNoteDialog(QDialog):
     def get_name(self):
         return self.line_edit.text().strip()
 
-class CourseDaysStorage:
-    def __init__(self, login):
-        self.path = f"storage/course_days_{login}.json"
-
-    def load(self):
-        if not os.path.exists(self.path):
-            return {}
-        with open(self.path, "r", encoding="utf-8") as f:
-            return json.load(f)
-
-    def save(self, data):
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-
 class CourseDayDialog(QDialog):
     def __init__(self, courses, storage, parent=None):
         super().__init__(parent)
@@ -672,32 +654,6 @@ class CourseDayDialog(QDialog):
         self.storage.save(result)
         self.accept()
 
-class NotesStorage:
-    def __init__(self, login: str):
-        self.login = login
-        self.base_path = "storage/data"
-        os.makedirs(self.base_path, exist_ok=True)
-        self.file_path = os.path.join(self.base_path, f"{login}.json")
-
-    def load_notes(self) -> list[dict]:
-        if not os.path.exists(self.file_path):
-            return []
-
-        with open(self.file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data.get("notes", [])
-
-    def save_notes(self, notes: list[dict]):
-        with open(self.file_path, "w", encoding="utf-8") as f:
-            json.dump({"notes": notes}, f, ensure_ascii=False, indent=2)
-
-    def create_note(self, title: str, content: str) -> dict:
-        return {
-            "id": str(uuid.uuid4()),
-            "title": title,
-            "content": content,
-            "created": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        }
 
 # =========================
 # THEME HANDLING
@@ -756,7 +712,7 @@ def open_courses(menu_window):
     menu_window.courses_window = courses_window
 
 def open_calendar_entry(menu_window):
-    storage = CourseDaysStorage(current_login)
+    storage = simargl.CourseDaysStorage(current_login)
 
     dialog = CourseDayDialog(
         courses=user_courses,
@@ -770,14 +726,14 @@ def open_calendar_entry(menu_window):
 def open_calendar(menu_window):
     calendar_window = load_ui("UI/calendar.ui")
 
-    # ===== КНОПКА BACK =====
+    # ===== BUTTON BACK =====
     exit_button = calendar_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
     )
 
     # ===== LOADING SAVED DAYS =====
-    storage = CourseDaysStorage(current_login)
+    storage = simargl.CourseDaysStorage(current_login)
     course_days = storage.load()  # { course_title: "MO" }
 
     # ===== FORMING WEEKLY_SCHEDULE =====
@@ -1035,6 +991,7 @@ def open_menu(main_window):
 
 def back_to_main(menu_window):
     main_window = load_ui("UI/main.ui")
+    simargl.closing_conections(server, mail)
 
     # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
@@ -1079,19 +1036,18 @@ def login_from_enter(main_window):
     global client, mail, server, user_courses, current_login, schedule
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
-    login = login_box.text()
-    current_login = login
+    current_login = login_box.text()
     password = password_box.text()
 
     try:
-        client = simargl.create_client(login,password,simargl.BASE_URL)
-        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+login),password)
-        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+login),password)
+        client = simargl.create_client(current_login,password,simargl.BASE_URL)
+        mail = simargl.read_email_init(simargl.SERVER,str("ug-student\\"+current_login),password)
+        server = simargl.write_email_init(simargl.SERVER,str("ug-student\\"+current_login),password)
     except:
         error_login(main_window)
     else:
         global notes_storage
-        notes_storage = NotesStorage(login)
+        notes_storage = simargl.NotesStorage(current_login)
         open_menu(main_window)
         user_courses = simargl.get_courses(client)
 
