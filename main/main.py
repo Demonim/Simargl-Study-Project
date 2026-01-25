@@ -1,7 +1,6 @@
 import sys
 import os
 from pydoc import Helper
-from studipy.calendar import Calendar
 import simargl
 import json
 import uuid
@@ -38,6 +37,8 @@ schedule = None
 user_courses = []
 notes_storage = None
 current_login = None
+
+
 # =========================
 # THEMES
 # =========================
@@ -576,7 +577,7 @@ class DayScheduleDialog(QDialog):
         layout.addWidget(self.list)
 
         if not entries:
-            self.list.addItem("No classes this day")
+            self.list.addItem("No classes at this day")
             return
 
         for e in sorted(entries, key=lambda x: x.start):
@@ -599,7 +600,7 @@ class AddNoteDialog(QDialog):
         self.ok_button = QPushButton("Create ")
         self.ok_button.clicked.connect(self.accept)
 
-        layout.addWidget(QLabel("Введите название заметки:"))
+        layout.addWidget(QLabel("Insert a name of the note:"))
         layout.addWidget(self.line_edit)
         layout.addWidget(self.ok_button)
 
@@ -695,7 +696,7 @@ class NotesStorage:
             "id": str(uuid.uuid4()),
             "title": title,
             "content": content,
-            "created": datetime.now().strftime("%Y-%m-%d %H:%M")
+            "created": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         }
 
 # =========================
@@ -775,11 +776,11 @@ def open_calendar(menu_window):
         lambda: open_menu(calendar_window)
     )
 
-    # ===== ЗАГРУЗКА СОХРАНЁННЫХ ДНЕЙ =====
+    # ===== LOADING SAVED DAYS =====
     storage = CourseDaysStorage(current_login)
     course_days = storage.load()  # { course_title: "MO" }
 
-    # ===== ФОРМИРОВАНИЕ WEEKLY_SCHEDULE =====
+    # ===== FORMING WEEKLY_SCHEDULE =====
     weekly_schedule.clear()
 
     for entry in schedule.entries:
@@ -787,18 +788,18 @@ def open_calendar(menu_window):
         if day:
             weekly_schedule[day].append(entry)
 
-    # ===== КАЛЕНДАРНАЯ СЕТКА =====
+    # ===== CALENDAR GRID =====
     calendar_widget = calendar_window.findChild(QWidget, "calendarWidget")
     grid = calendar_widget.findChild(QGridLayout, "gridLayout_2")
 
-    # собрать кнопки
+    # ===== BUILD BUTTONS =====
     buttons = []
     for i in range(grid.count()):
         widget = grid.itemAt(i).widget()
         if isinstance(widget, QPushButton):
             buttons.append(widget)
 
-    # отсортировать по позиции
+    # ===== SORTING BY POSITION =====
     buttons_with_pos = []
     for btn in buttons:
         index = grid.indexOf(btn)
@@ -808,7 +809,7 @@ def open_calendar(menu_window):
     buttons_with_pos.sort(key=lambda x: (x[0], x[1]))
     buttons_sorted = [b[2] for b in buttons_with_pos]
 
-    # ===== ТЕКУЩИЙ МЕСЯЦ =====
+    # ===== CURRENT MONTH =====
     today = datetime.date.today()
     year = today.year
     month = today.month
@@ -816,7 +817,7 @@ def open_calendar(menu_window):
     cal = calendar.Calendar(firstweekday=0)  # Monday
     month_days = list(cal.itermonthdays(year, month))
 
-    # ===== КЛИК ПО ДНЮ =====
+    # ===== CLICK ON DAY =====
     def on_day_clicked(day):
         clicked_date = datetime.date(year, month, day)
         weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
@@ -830,7 +831,7 @@ def open_calendar(menu_window):
         )
         dialog.exec()
 
-    # ===== ЗАПОЛНЕНИЕ КНОПОК =====
+    # ===== FILLING BUTTONS =====
     for btn, day in zip(buttons_sorted, month_days):
         try:
             btn.clicked.disconnect()

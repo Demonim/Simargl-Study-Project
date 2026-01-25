@@ -180,7 +180,7 @@
           <item>
            <widget class="QPushButton" name="AddNoteButton">
             <property name="text">
-             <string>PushButton</string>
+             <string>Add note</string>
             </property>
            </widget>
           </item>
@@ -263,7 +263,7 @@
           <item>
            <widget class="QPushButton" name="SaveNoteButton">
             <property name="text">
-             <string>PushButton</string>
+             <string>Save note</string>
             </property>
            </widget>
           </item>
