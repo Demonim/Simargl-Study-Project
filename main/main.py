@@ -717,7 +717,7 @@ def change_theme(app: QApplication, theme: str):
 def open_courses(menu_window):
     global user_courses
 
-    courses_window = load_ui("courses.ui")
+    courses_window = load_ui("UI/courses.ui")
     exit_button = courses_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
@@ -767,7 +767,7 @@ def open_calendar_entry(menu_window):
         open_calendar(menu_window)
 
 def open_calendar(menu_window):
-    calendar_window = load_ui("calendar.ui")
+    calendar_window = load_ui("UI/calendar.ui")
 
     # ===== КНОПКА BACK =====
     exit_button = calendar_window.findChild(QPushButton, "Back_Button")
@@ -852,7 +852,7 @@ def open_calendar(menu_window):
     menu_window.courses_window = calendar_window
 
 def open_StudIP(menu_window):
-    StudIP_window = load_ui("StudIP.ui")
+    StudIP_window = load_ui("UI/StudIP.ui")
 
     exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
@@ -865,7 +865,7 @@ def open_StudIP(menu_window):
     menu_window.courses_window = StudIP_window
 
 def open_Email(menu_window):
-    Email_window = load_ui("Email.ui")
+    Email_window = load_ui("UI/Email.ui")
 
     exit_button = Email_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
@@ -878,7 +878,7 @@ def open_Email(menu_window):
     menu_window.courses_window = Email_window
 
 def open_Dashboard(menu_window):
-    Dashboard_window = load_ui("Dashboard.ui")
+    Dashboard_window = load_ui("UI/dashboard_test.ui")
 
     exit_button = Dashboard_window.findChild(QPushButton, "Exit_Button1")
     exit_button.clicked.connect(
@@ -892,7 +892,7 @@ def open_Dashboard(menu_window):
 
 def open_Notes(menu_window):
     global notes_storage
-    Notes_window = load_ui("notes.ui")
+    Notes_window = load_ui("UI/notes.ui")
 
     exit_button = Notes_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
@@ -953,7 +953,7 @@ def open_Notes(menu_window):
     menu_window.courses_window = Notes_window
 
 def open_Help(main_window):
-    Help_window = load_ui("help.ui")
+    Help_window = load_ui("UI/help.ui")
 
     textBrowser = Help_window.findChild(QTextBrowser, "textBrowser")
 
@@ -984,7 +984,7 @@ def open_Help(main_window):
     main_window.courses_window = Help_window
 
 def open_menu(main_window):
-    menu_window = load_ui("menu.ui")
+    menu_window = load_ui("UI/menu.ui")
     mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
     message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -1033,7 +1033,7 @@ def open_menu(main_window):
 
 
 def back_to_main(menu_window):
-    main_window = load_ui("main.ui")
+    main_window = load_ui("UI/main.ui")
 
     # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
@@ -1060,7 +1060,7 @@ def back_to_main(menu_window):
 
 
 def error_login(menu_window):
-    error_window = load_ui("error.ui")
+    error_window = load_ui("UI/error.ui")
 
     # button to exit back to the main
     exit_button = error_window.findChild(QPushButton, "Error_Button")
@@ -1103,7 +1103,7 @@ def main():
     app = QApplication(sys.argv)
 
     # --- load main window ---
-    main_window = load_ui("main.ui")
+    main_window = load_ui("UI/main.ui")
 
     # --- theme combobox ---
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
