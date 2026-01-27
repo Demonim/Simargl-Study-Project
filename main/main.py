@@ -615,20 +615,26 @@ class CourseDayDialog(QDialog):
 
         self.layout = QVBoxLayout(self)
         self.list = QListWidget()
+        self.list.setSpacing(15)
         self.layout.addWidget(self.list)
 
         self.inputs = {}
 
         for course in courses:
             widget = QWidget()
+            widget.setMinimumHeight(40)
+            widget.setStyleSheet("background-color: rgb(40, 112, 42); border-radius: 5px;")
             row = QHBoxLayout(widget)
 
             label = QLabel(course.title)
             label.setMinimumWidth(350)
+            label.setMinimumHeight(30)
+            label.setStyleSheet("font-size: 12px;")
 
             input_day = QLineEdit()
             input_day.setPlaceholderText("MO / TU / WE ...")
-            input_day.setMaximumWidth(80)
+            input_day.setMinimumWidth(80)
+            input_day.setStyleSheet("margin-left: auto;")
 
             if course.title in self.saved_days:
                 input_day.setText(self.saved_days[course.title])
@@ -1131,6 +1137,7 @@ def login_from_enter(main_window,remember=False):
         open_menu(main_window)
 
         user_courses = studip.get_courses()
+        schedule = studip.get_schedule()
 
 # =========================
 # MAIN
