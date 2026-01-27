@@ -7,6 +7,7 @@ import json
 import uuid
 import sqlite3 as sql
 import hashlib
+import datetime
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"

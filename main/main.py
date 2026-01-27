@@ -118,7 +118,7 @@ QLineEdit#LoginLine {
     background-color: 255, 255, 255
 }
 
-QCheckBox#CheckBox_1 {
+QCheckBox#Check_Remember {
     color: rgb(102, 255, 140);
     background-color: rgb(255, 255, 255, 0);
     font-size: 10pt
@@ -377,7 +377,7 @@ QLineEdit {
     background-color: 255, 255, 255
 }
 
-QCheckBox#CheckBox_1 {
+QCheckBox#Check_Remember {
     color: rgb(79, 149, 255);
     background-color: rgb(255, 255, 255, 0);
     font-size: 10pt
@@ -910,6 +910,42 @@ def open_Notes(menu_window):
     menu_window.close()
     menu_window.courses_window = Notes_window
 
+def open_Help1(main_window):
+    Help_window1 = load_ui("UI/help_1.ui")
+
+    textBrowser = Help_window1.findChild(QTextBrowser, "textBrowser")
+
+    exit_button = Help_window1.findChild(QPushButton, "Back_Button")
+    exit_button.clicked.connect(
+        lambda: open_menu(Help_window1)
+    )
+    FAQ_button = Help_window1.findChild(QPushButton, "FAQ")
+    FAQ_button.clicked.connect(
+        lambda: textBrowser.setText("""What is this app for? \n- This app is designed to help students during their university studies.
+        \nIs my personal data saved?\n- Yes, but user data is encrypted and stored in a local database.
+        \nHow can I change my password?\n- After logging into my account, go to the Account Settings tab.""")
+    )
+    Instructions_button = Help_window1.findChild(QPushButton, "Instruction")
+    Instructions_button.clicked.connect(
+        lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. 
+        \n2. After logging in, you will have access to a menu with all the application functions. 
+        \n Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
+    )
+    Support_button = Help_window1.findChild(QPushButton, "Support")
+    Support_button.clicked.connect(
+        lambda: textBrowser.setText("""Contact the app owner and lead developer: \n-Dmytro Kutsak. 
+        \nIf you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk""")
+    )
+    App_button = Help_window1.findChild(QPushButton, "App")
+    App_button.clicked.connect(
+        lambda: textBrowser.setText("The Idea: Dmytro Kutsak.\nDesigned by: Nichita Licov and Diana Bardyk ")
+    )
+
+    Help_window1.show()
+    main_window.close()
+
+    main_window.courses_window = Help_window1
+
 def open_Help(main_window):
     Help_window = load_ui("UI/help.ui")
 
@@ -927,14 +963,14 @@ def open_Help(main_window):
     )
     Instructions_button = Help_window.findChild(QPushButton, "Instruction")
     Instructions_button.clicked.connect(
-        lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. \n
-        2. After logging in, you will have access to a menu with all the application functions. \n 
-        Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
+        lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. 
+        \n2. After logging in, you will have access to a menu with all the application functions. 
+        \nAmong them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
     )
     Support_button = Help_window.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
-        lambda: textBrowser.setText("""Contact the app owner and lead developer: \n-Dmytro Kutsak. \n
-        If you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk""")
+        lambda: textBrowser.setText("""Contact the app owner and lead developer: \n-Dmytro Kutsak. 
+        \nIf you find bugs in UI, please contact: \n-Nichita Licov  \n-Diana Bardyk""")
     )
     App_button = Help_window.findChild(QPushButton, "App")
     App_button.clicked.connect(
@@ -980,6 +1016,10 @@ def open_menu(main_window):
     Notes_button = menu_window.findChild(QPushButton, "Notes")
     Notes_button.clicked.connect(
         lambda: open_Notes(menu_window)
+    )
+    help_button = menu_window.findChild(QPushButton, "Help1")
+    help_button.clicked.connect(
+        lambda: open_Help1(menu_window)
     )
     exit_button = menu_window.findChild(QPushButton, "Exit_Button")
     exit_button.clicked.connect(
