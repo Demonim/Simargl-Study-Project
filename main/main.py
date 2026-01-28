@@ -3,6 +3,7 @@ import os
 import simargl
 
 from PySide6.QtWidgets import (
+    QListWidgetItem,
     QGridLayout,
     QWidget,
     QTextBrowser,
@@ -23,7 +24,7 @@ from PySide6.QtWidgets import (
     QCheckBox
 )
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, QSize
 
 import datetime
 import calendar
@@ -818,15 +819,75 @@ def open_calendar(menu_window):
 def open_StudIP(menu_window):
     StudIP_window = load_ui("UI/StudIP.ui")
 
-    exit_button = StudIP_window.findChild(QPushButton, "Exit_Button1")
+    # кнопка выхода
+    exit_button = StudIP_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(StudIP_window)
     )
+
+    # ---------- СООБЩЕНИЯ ----------
+    messages_list = StudIP_window.findChild(QListWidget, "messagesList")
+
+    # защита на случай, если виджет не найден
+    if messages_list is not None:
+        messages_list.clear()
+        messages_list.setSpacing(8)
+
+        try:
+            messages = studip.get_my_messages()
+        except Exception as e:
+            print("Failed to load messages:", e)
+            messages = []
+
+        for msg in messages:
+            title = msg.subject if msg.subject else "Без темы"
+
+            btn = QPushButton(title)
+            btn.setMinimumHeight(48)
+            btn.setStyleSheet("""
+                QPushButton {
+                    text-align: left;
+                    padding-left: 12px;
+                    font-size: 14px;
+                }
+            """)
+            btn.clicked.connect(
+                lambda checked=False, m=msg: open_message_dialog(m)
+            )
+
+            item = QListWidgetItem()
+            item.setSizeHint(QSize(0, 54))
+
+            messages_list.addItem(item)
+            messages_list.setItemWidget(item, btn)
+
+    # --------------------------------
 
     StudIP_window.show()
     menu_window.close()
 
     menu_window.courses_window = StudIP_window
+
+
+def open_message_dialog(message):
+    dialog = load_ui("UI/MessageDialog.ui")
+
+    full_msg = studip.client.Messages.view_message(message)
+
+    sender_label = dialog.findChild(QLabel, "senderLabel")
+    date_label = dialog.findChild(QLabel, "dateLabel")
+    subject_label = dialog.findChild(QLabel, "subjectLabel")
+    body_text = dialog.findChild(QTextEdit, "bodyText")
+    close_button = dialog.findChild(QPushButton, "closeButton")
+
+    sender_label.setText(f"From: {full_msg.sender_id}")
+    date_label.setText(f"Date: {full_msg.creation_date}")
+    subject_label.setText(full_msg.subject or "Без темы")
+    body_text.setHtml(full_msg.body)
+
+    close_button.clicked.connect(dialog.close)
+
+    dialog.exec()
 
 def open_Email(menu_window):
     Email_window = load_ui("UI/Email.ui")
@@ -1105,7 +1166,7 @@ def error_login(menu_window):
 
 
 def login_from_enter(main_window,remember=False):
-    global user_courses, current_login, schedule, ecampusmail, studip
+    global user_courses, current_login, schedule, ecampusmail, studip, messages
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     current_login = login_box.text(); password = password_box.text()
@@ -1138,6 +1199,7 @@ def login_from_enter(main_window,remember=False):
 
         user_courses = studip.get_courses()
         schedule = studip.get_schedule()
+        messages = studip.get_my_messages()
 
 # =========================
 # MAIN
