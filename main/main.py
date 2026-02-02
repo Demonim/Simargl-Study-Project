@@ -315,6 +315,172 @@ QPushButton#Exit_Button1 {
 }
 """
 
+
+
+
+DARK_Minimalistic = """
+/* === ГЛОБАЛЬНЫЕ НАСТРОЙКИ === */
+QWidget {
+    background-color: rgb(18, 18, 18);
+    color: rgb(225, 225, 225);
+    font-family: Unispace;
+    selection-background-color: rgb(70, 70, 70);
+    selection-color: white;
+}
+
+/* === ТЕКСТОВЫЕ МЕТКИ === */
+QLabel {
+    color: rgb(225, 225, 225);
+    background-color: transparent;
+    font-size: 16pt;
+}
+
+QLabel#Login, QLabel#Password, QLabel#Name_label {
+    color: rgb(180, 180, 180);
+    font-size: 14pt;
+}
+
+QLabel#Ecampus {
+    color: white;
+    font-size: 32pt;
+    font-weight: bold;
+}
+
+QLabel#Error, QLabel#Error_2 {
+    color: rgb(255, 80, 80); /* Минималистичный красный для ошибок */
+    font-size: 14pt;
+}
+
+/* === ПОЛЯ ВВОДА === */
+QLineEdit {
+    background-color: rgb(30, 30, 30);
+    color: white;
+    border: 1px solid rgb(60, 60, 60);
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 12pt;
+}
+
+QLineEdit:focus {
+    border: 1px solid rgb(150, 150, 150);
+}
+
+/* === КНОПКИ === */
+QPushButton {
+    background-color: rgb(30, 30, 30);
+    border: 1px solid rgb(60, 60, 60);
+    border-radius: 6px;
+    color: rgb(225, 225, 225);
+    padding: 5px;
+    font-size: 13pt;
+}
+
+QPushButton:hover {
+    background-color: rgb(50, 50, 50);
+    border: 1px solid rgb(100, 100, 100);
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: rgb(70, 70, 70);
+}
+
+/* Кнопка выхода (красная, но приглушенная) */
+QPushButton#Exit_Button, QPushButton#Exit_Button1 {
+    background-color: rgb(60, 20, 20);
+    border: 1px solid rgb(100, 40, 40);
+    color: rgb(255, 150, 150);
+}
+QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
+    background-color: rgb(90, 30, 30);
+    color: white;
+}
+
+/* === ЧЕКБОКСЫ === */
+QCheckBox {
+    color: rgb(180, 180, 180);
+    spacing: 5px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(30, 30, 30);
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 3px;
+}
+QCheckBox::indicator:checked {
+    background-color: rgb(150, 150, 150);
+    border: 1px solid rgb(200, 200, 200);
+}
+
+/* === COMBOBOX === */
+QComboBox {
+    background-color: rgb(30, 30, 30);
+    color: white;
+    border: 1px solid rgb(60, 60, 60);
+    border-radius: 4px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border: none;
+    background: transparent;
+}
+
+QComboBox QAbstractItemView {
+    background-color: rgb(30, 30, 30);
+    color: white;
+    selection-background-color: rgb(60, 60, 60);
+    border: 1px solid rgb(60, 60, 60);
+}
+
+/* === СПИСКИ И ТАБЛИЦЫ === */
+QListWidget, QTableWidget, QTextBrowser, QTextEdit {
+    background-color: rgb(25, 25, 25);
+    border: 1px solid rgb(50, 50, 50);
+    color: rgb(220, 220, 220);
+    border-radius: 4px;
+}
+
+QHeaderView::section {
+    background-color: rgb(35, 35, 35);
+    color: white;
+    padding: 5px;
+    border: 1px solid rgb(50, 50, 50);
+}
+
+QTableWidget::item {
+    border-bottom: 1px solid rgb(40, 40, 40);
+}
+
+/* === КАЛЕНДАРЬ === */
+QCalendarWidget QWidget {
+    background-color: rgb(25, 25, 25); 
+    alternate-background-color: rgb(30, 30, 30);
+    color: white;
+}
+
+QCalendarWidget QToolButton {
+    color: white;
+    background-color: rgb(35, 35, 35);
+    border: none;
+}
+
+QCalendarWidget QMenu {
+    background-color: rgb(30, 30, 30);
+    color: white;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: white;
+    background-color: rgb(25, 25, 25);
+    selection-background-color: rgb(60, 60, 60);
+    selection-color: white;
+}
+"""
+
+
+
 LIGHT_THEME = """
 QWidget {
 background-color:qlineargradient(spread:pad, x1:10, y1:0, x2:0, y2:1,
@@ -543,6 +709,154 @@ QPushButton#Exit_Button1 {
 }
 """
 
+
+
+LIGHT_Minimalistic = """
+/* === ГЛОБАЛЬНЫЕ НАСТРОЙКИ === */
+QWidget {
+    background-color: rgb(248, 249, 250);
+    color: rgb(33, 37, 41);
+    font-family: Unispace;
+    selection-background-color: rgb(200, 200, 200);
+    selection-color: black;
+}
+
+/* === ТЕКСТОВЫЕ МЕТКИ === */
+QLabel {
+    color: rgb(33, 37, 41);
+    background-color: transparent;
+    font-size: 16pt;
+}
+
+QLabel#Login, QLabel#Password, QLabel#Name_label {
+    color: rgb(108, 117, 125); /* Серый для второстепенного текста */
+    font-size: 14pt;
+}
+
+QLabel#Ecampus {
+    color: rgb(33, 37, 41);
+    font-size: 32pt;
+    font-weight: bold;
+}
+
+QLabel#Error, QLabel#Error_2 {
+    color: rgb(220, 53, 69); /* Мягкий красный */
+    font-size: 14pt;
+}
+
+/* === ПОЛЯ ВВОДА === */
+QLineEdit {
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    border: 1px solid rgb(206, 212, 218);
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 12pt;
+}
+
+QLineEdit:focus {
+    border: 1px solid rgb(100, 100, 100);
+    background-color: rgb(255, 255, 255);
+}
+
+/* === КНОПКИ === */
+QPushButton {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(206, 212, 218);
+    border-radius: 6px;
+    color: rgb(33, 37, 41);
+    padding: 5px;
+    font-size: 13pt;
+}
+
+QPushButton:hover {
+    background-color: rgb(233, 236, 239);
+    border: 1px solid rgb(180, 180, 180);
+}
+
+QPushButton:pressed {
+    background-color: rgb(210, 210, 210);
+}
+
+/* Кнопка выхода */
+QPushButton#Exit_Button, QPushButton#Exit_Button1 {
+    background-color: rgb(255, 240, 240);
+    border: 1px solid rgb(255, 200, 200);
+    color: rgb(200, 50, 50);
+}
+QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
+    background-color: rgb(255, 220, 220);
+    color: rgb(180, 0, 0);
+}
+
+/* === ЧЕКБОКСЫ === */
+QCheckBox {
+    color: rgb(108, 117, 125);
+    spacing: 5px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(180, 180, 180);
+    border-radius: 3px;
+}
+QCheckBox::indicator:checked {
+    background-color: rgb(230, 230, 230);
+    border: 1px solid rgb(150, 150, 150);
+    image: url(:/icons/check_black.png); /* Если есть иконка, иначе цвет */
+}
+
+/* === COMBOBOX === */
+QComboBox {
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    border: 1px solid rgb(206, 212, 218);
+    border-radius: 4px;
+    padding: 5px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    selection-background-color: rgb(233, 236, 239);
+    selection-color: black;
+    border: 1px solid rgb(200, 200, 200);
+}
+
+/* === СПИСКИ И ТАБЛИЦЫ === */
+QListWidget, QTableWidget, QTextBrowser, QTextEdit {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(206, 212, 218);
+    color: rgb(33, 37, 41);
+    border-radius: 4px;
+}
+
+QHeaderView::section {
+    background-color: rgb(240, 240, 240);
+    color: rgb(33, 37, 41);
+    padding: 5px;
+    border: 1px solid rgb(200, 200, 200);
+}
+
+QTableWidget::item {
+    border-bottom: 1px solid rgb(230, 230, 230);
+}
+
+/* === КАЛЕНДАРЬ === */
+QCalendarWidget QWidget {
+    background-color: rgb(255, 255, 255); 
+    alternate-background-color: rgb(245, 245, 245);
+    color: black;
+}
+
+QCalendarWidget QToolButton {
+    color: black;
+    background-color: rgb(240, 240, 240);
+    border: none;
+}
+"""
+
 # =========================
 # UI LOADER
 # =========================
@@ -670,8 +984,12 @@ class CourseDayDialog(QDialog):
 def change_theme(app: QApplication, theme: str):
     if theme == "Dark Theme":
         app.setStyleSheet(DARK_THEME)
+    elif theme == "Dark Minimalistic":
+        app.setStyleSheet(DARK_Minimalistic)
     elif theme == "Light Theme":
         app.setStyleSheet(LIGHT_THEME)
+    elif theme == "Light Minimalistic":
+        app.setStyleSheet(LIGHT_Minimalistic)
 
 
 # =========================
