@@ -13,58 +13,158 @@ BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
 
 class StudIP:
+    """
+    A controller class for interacting with the Stud.IP learning management system.
+
+    This class serves as a wrapper around the `studipy` library to handle user 
+    authentication and retrieve academic data such as registered courses, 
+    messages, schedules, and course files.
+    """
+
     def __init__(self, login, password, base_url=BASE_URL):
+        """
+        Initialize the StudIP handler with user credentials.
+
+        Args:
+            login (str): The user's login username.
+            password (str): The user's password.
+            base_url (str, optional): The base URL of the Stud.IP instance. 
+                                      Defaults to the University of Goettingen URL.
+        """
         self.login = login
         self.password = password
         self.base_url = base_url
 
     def create_client(self):
+        """
+        Establishes the connection to Stud.IP by creating a studipy Client instance.
+        
+        This method must be called before attempting to fetch data (courses, messages, etc.).
+        """
         self.client = studipy.Client(self.login, self.password, self.base_url)
 
     def get_courses(self):
+        """
+        Retrieves the list of courses the user is enrolled in.
+
+        Returns:
+            list: A collection of course objects/dictionaries returned by the API.
+        """
         courses = self.client.Courses.get_courses()
         return courses
 
     def get_my_messages(self):
+        """
+        Retrieves all messages from the user's inbox.
+
+        Returns:
+            list: A list of message objects.
+        """
         my_messages = self.client.Messages.get_messages()
         return my_messages
 
     def new_messages_counter(self):
+        """
+        Counts the number of unread (new) messages.
+
+        Returns:
+            int: The count of unread messages.
+        """
         new_messages = self.client.Messages.get_messages(True)
         return len(new_messages)
 
     def get_schedule(self):
+        """
+        Retrieves the user's personal schedule/calendar.
+
+        Returns:
+            list: A list of schedule entries or calendar events.
+        """
         schedule = self.client.Calendar.get_schedule()
         return schedule
 
     def get_folders(self, clnt, crss):
+        """
+        Retrieves document folders for a specific list of courses.
+
+        Args:
+            clnt (studipy.Client): The active studipy client instance.
+            crss (list): A list of course objects to fetch folders for.
+
+        Returns:
+            list: A list containing folder structures for the provided courses.
+        """
         folders = []
         for f in range(len(crss)):
             folders.append(clnt.Files.get_folders(courses[f]))
         return folders
 
     def get_files(self, clnt, crss):
+        """
+        Retrieves files contained within the course folders.
+
+        Args:
+            clnt (studipy.Client): The active studipy client instance.
+            crss (list): A list of course objects to fetch files for.
+
+        Returns:
+            list: A list of file objects associated with the courses.
+        """
         files = []
         for ff in range(len(crss)):
             files.append(clnt.Files.get_folders(courses[ff]))
         return files
 
 class EcampusMail:
+    """
+    A controller class for handling email interactions with the university's eCampus mail server.
+
+    This class manages connections for both reading emails (via IMAP) and sending emails 
+    (via SMTP), specifically formatted for the University of Goettingen's infrastructure.
+    """
+
     def __init__(self, login, password, server=SERVER):
+        """
+        Initialize the EcampusMail handler.
+
+        Args:
+            login (str): The student's username. The prefix 'ug-student\\' is 
+                         automatically prepended to match the server's requirement.
+            password (str): The user's email password.
+            server (str, optional): The email server address. Defaults to the global SERVER constant.
+        """
         self.login = str("ug-student\\"+login)
         self.password = password
         self.server = server
 
     def read_email_init(self):
+        """
+        Initializes the IMAP connection for reading emails.
+
+        Connects to the server using SSL on port 993 and logs in with the 
+        stored credentials.
+        """
         self.mail = imaplib.IMAP4_SSL(self.server, 993)
         self.mail.login(self.login, self.password)
 
     def mail_notifications(self):
+        """
+        Checks the inbox for unread messages.
+
+        Returns:
+            int: The count of unseen (unread) emails in the inbox.
+        """
         self.mail.select("inbox")
         result, data = self.mail.search(None, "UNSEEN")
         return len(data[0].split())
 
     def write_email_init(self):
+        """
+        Initializes the SMTP connection for sending emails.
+
+        Connects to the server on port 587, secures the connection with TLS, 
+        and logs in.
+        """
         self.server = smtplib.SMTP(self.server, 587)
         self.server.ehlo() 
         self.server.starttls() 
@@ -72,15 +172,41 @@ class EcampusMail:
         self.server.login(self.login, self.password)
 
     def close_conections(self):
+        """
+        Safely closes all active email connections.
+
+        Quits the SMTP server session and closes/logs out of the IMAP mail session.
+        """
         self.server.quit(); self.mail.close(); self.mail.logout()
 
 class LoginStorage:
+    """
+    A storage manager for user credentials using a local SQLite database.
+
+    This class handles the initialization, creation, loading, and verification 
+    of user login data, securely hashing passwords before storage.
+    """
+
     def __init__(self):
+        """
+        Initializes the storage environment.
+
+        Creates the 'storage' directory if it doesn't exist and sets the 
+        path for the SQLite database file (`login_data.db`).
+        """
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"login_data.db")
     
     def load(self):
+        """
+        Connects to the database and checks for existing user data.
+
+        Returns:
+            sqlite3.Cursor or None: Returns the cursor executing a SELECT query on 
+            the 'users' table if the table exists. Returns None if the 'users' 
+            table does not exist.
+        """
         self.con = sql.connect(self.file_path)
         self.cur = self.con.cursor()
         data = self.cur.execute("SELECT name FROM sqlite_master WHERE name='users'")
@@ -90,6 +216,15 @@ class LoginStorage:
         return self.cur.execute("SELECT * FROM users")
     
     def create(self, login, password):
+        """
+        Creates a new user table and stores the provided credentials.
+
+        The password is hashed using SHA-256 before being stored in the database.
+
+        Args:
+            login (str): The username to store.
+            password (str): The plain-text password to hash and store.
+        """
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
         self.cur.execute("CREATE TABLE users (name TEXT, password TEXT)")
@@ -98,6 +233,21 @@ class LoginStorage:
         print("Created")
     
     def compare(self, login, password):
+        """
+        Verifies login credentials or registers them if they don't exist.
+
+        Checks if the provided login and hashed password match an entry in the database.
+        If no match is found, it automatically registers the user with the provided 
+        credentials and returns False.
+
+        Args:
+            login (str): The username to check.
+            password (str): The plain-text password to verify.
+
+        Returns:
+            bool: True if the credentials match an existing user.
+                  False if the user did not exist (and was just created).
+        """
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
         result = self.cur.execute(f"SELECT name, password FROM users WHERE name='{self.login}' AND password='{self.password}'")
@@ -110,13 +260,34 @@ class LoginStorage:
         
 
 class NotesStorage:
+    """
+    A storage manager for user-specific notes using JSON files.
+
+    This class handles loading, saving, and creating note objects, ensuring 
+    data persistence across sessions for individual users.
+    """
+
     def __init__(self, login: str):
+        """
+        Initialize the notes storage for a specific user.
+
+        Args:
+            login (str): The username of the current user. Used to generate 
+                         a unique filename (e.g., 'username.json').
+        """
         self.login = login
         self.base_path = "storage/data"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{login}.json")
 
     def load_notes(self) -> list[dict]:
+        """
+        Loads the list of notes from the user's JSON file.
+
+        Returns:
+            list[dict]: A list of dictionaries, where each dictionary represents 
+                        a note. Returns an empty list if the file does not exist.
+        """
         if not os.path.exists(self.file_path):
             return []
 
@@ -125,10 +296,32 @@ class NotesStorage:
             return data.get("notes", [])
 
     def save_notes(self, notes: list[dict]):
+        """
+        Saves a list of notes to the user's JSON file.
+
+        Writes the data with UTF-8 encoding and indentation for readability.
+
+        Args:
+            notes (list[dict]): The list of note dictionaries to save.
+        """
         with open(self.file_path, "w", encoding="utf-8") as f:
             json.dump({"notes": notes}, f, ensure_ascii=False, indent=2)
 
     def create_note(self, title: str, content: str) -> dict:
+        """
+        Generates a new note dictionary with metadata.
+
+        This method creates the note structure but does not save it to the file 
+        automatically; `save_notes` must be called separately.
+
+        Args:
+            title (str): The title of the note.
+            content (str): The body content of the note.
+
+        Returns:
+            dict: A dictionary containing the note's unique ID (UUID), title, 
+                  content, and creation timestamp.
+        """
         return {
             "id": str(uuid.uuid4()),
             "title": title,
@@ -137,15 +330,43 @@ class NotesStorage:
         }
 
 class CourseDaysStorage:
+    """
+    A storage manager for persisting course schedule information.
+
+    This class handles saving and loading the specific days associated with 
+    a user's courses to a local JSON file.
+    """
+
     def __init__(self, login):
+        """
+        Initialize the course days storage for a specific user.
+
+        Args:
+            login (str): The username of the current user. Used to generate 
+                         a unique filename (e.g., 'course_days_username.json').
+        """
         self.path = f"storage/course_days_{login}.json"
 
     def load(self):
+        """
+        Loads the course schedule data from the JSON file.
+
+        Returns:
+            dict: A dictionary containing the course-to-day mappings.
+                  Returns an empty dictionary if the file does not exist.
+        """
         if not os.path.exists(self.path):
             return {}
         with open(self.path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def save(self, data):
+        """
+        Saves the course schedule data to the JSON file.
+
+        Args:
+            data (dict): The dictionary containing course-to-day mappings 
+                         to be stored.
+        """
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
