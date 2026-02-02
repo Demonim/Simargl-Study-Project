@@ -319,7 +319,7 @@ QPushButton#Exit_Button1 {
 
 
 DARK_Minimalistic = """
-/* === ГЛОБАЛЬНЫЕ НАСТРОЙКИ === */
+/* === GLOBAL SETTINGS === */
 QWidget {
     background-color: rgb(18, 18, 18);
     color: rgb(225, 225, 225);
@@ -328,7 +328,7 @@ QWidget {
     selection-color: white;
 }
 
-/* === ТЕКСТОВЫЕ МЕТКИ === */
+/* === TEXT MARKERS === */
 QLabel {
     color: rgb(225, 225, 225);
     background-color: transparent;
@@ -351,7 +351,7 @@ QLabel#Error, QLabel#Error_2 {
     font-size: 14pt;
 }
 
-/* === ПОЛЯ ВВОДА === */
+/* === INPUT FIELD === */
 QLineEdit {
     background-color: rgb(30, 30, 30);
     color: white;
@@ -365,7 +365,7 @@ QLineEdit:focus {
     border: 1px solid rgb(150, 150, 150);
 }
 
-/* === КНОПКИ === */
+/* === BUTTONS === */
 QPushButton {
     background-color: rgb(30, 30, 30);
     border: 1px solid rgb(60, 60, 60);
@@ -385,7 +385,7 @@ QPushButton:pressed {
     background-color: rgb(70, 70, 70);
 }
 
-/* Кнопка выхода (красная, но приглушенная) */
+/* Exit button (red ) */
 QPushButton#Exit_Button, QPushButton#Exit_Button1 {
     background-color: rgb(60, 20, 20);
     border: 1px solid rgb(100, 40, 40);
@@ -396,7 +396,7 @@ QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
     color: white;
 }
 
-/* === ЧЕКБОКСЫ === */
+/* === CHECKBOXES === */
 QCheckBox {
     color: rgb(180, 180, 180);
     spacing: 5px;
@@ -434,7 +434,7 @@ QComboBox QAbstractItemView {
     border: 1px solid rgb(60, 60, 60);
 }
 
-/* === СПИСКИ И ТАБЛИЦЫ === */
+/* === LISTS AND TABLES === */
 QListWidget, QTableWidget, QTextBrowser, QTextEdit {
     background-color: rgb(25, 25, 25);
     border: 1px solid rgb(50, 50, 50);
@@ -453,7 +453,7 @@ QTableWidget::item {
     border-bottom: 1px solid rgb(40, 40, 40);
 }
 
-/* === КАЛЕНДАРЬ === */
+/* === CALENDAR === */
 QCalendarWidget QWidget {
     background-color: rgb(25, 25, 25); 
     alternate-background-color: rgb(30, 30, 30);
@@ -712,7 +712,7 @@ QPushButton#Exit_Button1 {
 
 
 LIGHT_Minimalistic = """
-/* === ГЛОБАЛЬНЫЕ НАСТРОЙКИ === */
+/* === GLOBAL SETTINGS === */
 QWidget {
     background-color: rgb(248, 249, 250);
     color: rgb(33, 37, 41);
@@ -721,7 +721,7 @@ QWidget {
     selection-color: black;
 }
 
-/* === ТЕКСТОВЫЕ МЕТКИ === */
+/* === TEXT MARKERS === */
 QLabel {
     color: rgb(33, 37, 41);
     background-color: transparent;
@@ -744,7 +744,7 @@ QLabel#Error, QLabel#Error_2 {
     font-size: 14pt;
 }
 
-/* === ПОЛЯ ВВОДА === */
+/* === INPUT FIELD === */
 QLineEdit {
     background-color: rgb(255, 255, 255);
     color: rgb(33, 37, 41);
@@ -759,7 +759,7 @@ QLineEdit:focus {
     background-color: rgb(255, 255, 255);
 }
 
-/* === КНОПКИ === */
+/* === BUTTONS === */
 QPushButton {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(206, 212, 218);
@@ -778,7 +778,7 @@ QPushButton:pressed {
     background-color: rgb(210, 210, 210);
 }
 
-/* Кнопка выхода */
+/* Exit button */
 QPushButton#Exit_Button, QPushButton#Exit_Button1 {
     background-color: rgb(255, 240, 240);
     border: 1px solid rgb(255, 200, 200);
@@ -789,7 +789,7 @@ QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
     color: rgb(180, 0, 0);
 }
 
-/* === ЧЕКБОКСЫ === */
+/* === CHECKBOXES === */
 QCheckBox {
     color: rgb(108, 117, 125);
     spacing: 5px;
@@ -824,7 +824,7 @@ QComboBox QAbstractItemView {
     border: 1px solid rgb(200, 200, 200);
 }
 
-/* === СПИСКИ И ТАБЛИЦЫ === */
+/* === LISTS AND TABLES === */
 QListWidget, QTableWidget, QTextBrowser, QTextEdit {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(206, 212, 218);
@@ -843,7 +843,7 @@ QTableWidget::item {
     border-bottom: 1px solid rgb(230, 230, 230);
 }
 
-/* === КАЛЕНДАРЬ === */
+/* === CALENDER === */
 QCalendarWidget QWidget {
     background-color: rgb(255, 255, 255); 
     alternate-background-color: rgb(245, 245, 245);
@@ -1137,16 +1137,16 @@ def open_calendar(menu_window):
 def open_StudIP(menu_window):
     StudIP_window = load_ui("UI/StudIP.ui")
 
-    # кнопка выхода
+    # exit button
     exit_button = StudIP_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(StudIP_window)
     )
 
-    # ---------- СООБЩЕНИЯ ----------
+    # ---------- MESSAGES ----------
     messages_list = StudIP_window.findChild(QListWidget, "messagesList")
 
-    # защита на случай, если виджет не найден
+    # settback in the case of not finding the widget
     if messages_list is not None:
         messages_list.clear()
         messages_list.setSpacing(8)
