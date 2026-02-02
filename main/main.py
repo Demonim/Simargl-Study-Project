@@ -1088,7 +1088,7 @@ def open_menu(main_window):
     help_button.clicked.connect(
         lambda: open_Help1(menu_window)
     )
-    exit_button = menu_window.findChild(QPushButton, "Exit_Button")
+    exit_button = menu_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: back_to_main(menu_window)
     )
