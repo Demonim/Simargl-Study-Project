@@ -56,6 +56,9 @@
    <property name="text">
     <string>Incorrect login Creditencials</string>
    </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
   </widget>
   <widget class="QLabel" name="Error_2">
    <property name="geometry">
@@ -68,6 +71,9 @@
    </property>
    <property name="text">
     <string>Please try again </string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
   </widget>
   <widget class="QPushButton" name="Error_Button">

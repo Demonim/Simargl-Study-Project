@@ -56,7 +56,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>110</width>
+            <width>120</width>
             <height>30</height>
            </size>
           </property>
@@ -94,10 +94,10 @@
         <item>
          <spacer name="verticalSpacer_9">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -112,10 +112,10 @@
       <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
+         <enum>QSizePolicy::Policy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -153,7 +153,7 @@
       <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -205,10 +205,10 @@
         <item>
          <spacer name="verticalSpacer_8">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -227,10 +227,10 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
+         <enum>QSizePolicy::Policy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -248,7 +248,7 @@
         <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
            <enum>QSizePolicy::Policy::Expanding</enum>
@@ -295,10 +295,10 @@
         <item>
          <spacer name="horizontalSpacer_5">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Minimum</enum>
+           <enum>QSizePolicy::Policy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -336,10 +336,10 @@
         <item>
          <spacer name="verticalSpacer_3">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -380,10 +380,10 @@
         <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -417,17 +417,17 @@
            <string notr="true"/>
           </property>
           <property name="echoMode">
-            <enum>QLineEdit::Password</enum>
+           <enum>QLineEdit::EchoMode::Password</enum>
           </property>
          </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_5">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -468,10 +468,10 @@
         <item>
          <spacer name="verticalSpacer_6">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Preferred</enum>
+           <enum>QSizePolicy::Policy::Preferred</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -509,10 +509,10 @@
         <item>
          <spacer name="verticalSpacer_7">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -585,10 +585,10 @@
         <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Orientation::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Maximum</enum>
+           <enum>QSizePolicy::Policy::Maximum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -603,10 +603,10 @@
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
+         <enum>QSizePolicy::Policy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

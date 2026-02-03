@@ -25,6 +25,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
+from PySide6.QtWidgets import QApplication, QVBoxLayout
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
 
 import datetime
 import calendar
@@ -88,13 +91,16 @@ font-family: Unispace;
 
 
 
-QLabel#Login {
+
+
+/* === Main.ui === */
+QLabel#Ecampus{
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
+    font-size: 40pt;
 }
 
-QLabel#Password{
+QLabel#Login, QLabel#Password{
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
@@ -128,7 +134,7 @@ QCheckBox#Check_Remember {
 QPushButton {
     border: 2px solid #00ff88;
     border-radius: 6px;
-    background-color: transparent;
+    background-color: black;
     color: rgb(102, 255, 140);
     font-size: 15pt;
 }
@@ -171,13 +177,13 @@ QPushButton#Help:hover{
 	font-size: 15pt;
 }
 
-QLabel#Error {
-	color: rgb(0, 0, 0);
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
-}
 
-QLabel#Error_2 {
+
+
+
+
+/* === Error Window === */
+QLabel#Error, QLabel#Error_2 {
 	color: rgb(0, 0, 0);
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
@@ -210,6 +216,10 @@ QPushButton#Back_Button:hover{
 
 
 
+
+
+
+/* === Help Window === */
 QLabel#Help {
     color: rgb(102, 255, 140);
     background-color: rgba(255, 255, 255, 0);
@@ -223,12 +233,12 @@ QTextBrowser {
     font: 15pt;
 }
 
-QLineEdit#Help_Search {
-    background-color: rgba(255, 255, 255);
-}
 
 
 
+
+
+/* === Menu Window === */
 QTableWidget {
     background-color: #000000;
     color: rgb(102, 255, 140);
@@ -284,34 +294,41 @@ QCalendarWidget QToolButton QMenu {
      color: white
 }
 
-
-
-
-QLabel#Ecampus{
-    color: rgb(102, 255, 140);
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 40pt;
-}
-
 QTableView {
     background-color: rgba(255, 255, 255, 0);
 }
 
-QPushButton#Exit_Button {
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background-color: rgb(243, 70, 70);
-    color: white;
+
+
+/* === Notes Window === */
+QListWidget#NotesList{
+    background-color: rgb(0, 0, 0);
+    color: rgb(102, 255, 140);
+    font-size: 14pt;
+    
+}
+
+QTextEdit#NotesText{
+    background-color: rgb(0, 0, 0);
+    color: rgb(102, 255, 140);
+    font-size: 14pt;
+    border: 5px solid green; border-radius: 5px
 }
 
 
+/* === Dashboard Window === */
+QLabel#Dashboard {
+    font-size: 24pt;
+}
 
+QWidget#Dashboard_1, #Dashboard_2, #Dashboard_3{
+    background-color: rgb(0, 0, 0);
+    border: 2px solid green; border-radius: 5px
+}
 
-QPushButton#Exit_Button1 {
-    border: 2px solid #000000;
-    border-radius: 6px;
-    background-color: rgb(243, 70, 70);
-    color: white;
+QLineEdit{
+    background-color: rgb(0, 0, 0);
+    border: 2px solid green; border-radius: 5px
 }
 """
 
@@ -1210,7 +1227,7 @@ def open_message_dialog(message):
 def open_Email(menu_window):
     Email_window = load_ui("UI/Email.ui")
 
-    exit_button = Email_window.findChild(QPushButton, "Exit_Button1")
+    exit_button = Email_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(Email_window)
     )
@@ -1220,10 +1237,32 @@ def open_Email(menu_window):
 
     menu_window.courses_window = Email_window
 
+
 def open_Dashboard(menu_window):
     Dashboard_window = load_ui("UI/dashboard_test.ui")
 
-    exit_button = Dashboard_window.findChild(QPushButton, "Exit_Button1")
+    target_widget = Dashboard_window.findChild(QWidget, "Dashboard_1")
+
+    if target_widget:
+        fig = Figure(figsize=(5, 4), dpi=100, facecolor='none')
+        canvas = FigureCanvasQTAgg(fig)
+        canvas.setStyleSheet("background-color: transparent;")
+        ax = fig.add_subplot(111)
+
+        labels = ["Python", "C++", "JS", "Other"]
+        values = [40, 30, 20, 10]
+        ax.pie(values, labels=labels, autopct='%1.1f%%', textprops={'color': "w"})
+        ax.set_title("Языки программирования", color="w")
+
+        if target_widget.layout() is None:
+            layout = QVBoxLayout(target_widget)
+            target_widget.setLayout(layout)
+        else:
+            layout = target_widget.layout()
+
+        layout.addWidget(canvas)
+
+    exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(Dashboard_window)
     )
