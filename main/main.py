@@ -177,6 +177,10 @@ QPushButton#Help:hover{
 	font-size: 15pt;
 }
 
+QWidget#CourseItem {
+    background-color: rgb(40, 112, 42); 
+    border-radius: 5px;
+}
 
 
 
@@ -184,9 +188,9 @@ QPushButton#Help:hover{
 
 /* === Error Window === */
 QLabel#Error, QLabel#Error_2 {
-	color: rgb(0, 0, 0);
+	color: rgb(255, 255, 255);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
+    font-size: 14pt;
 }
 
 QPushButton#Error_Button {
@@ -239,22 +243,6 @@ QTextBrowser {
 
 
 /* === Menu Window === */
-QTableWidget {
-    background-color: #000000;
-    color: rgb(102, 255, 140);
-    gridline-color: rgb(102, 255, 140);
-    font-size: 10pt;
-}
-
-QHeaderView::section {
-    background-color: #02070f;
-    color: #00ff88;
-    padding: 8px;
-    border: 1px solid #00ff88;
-    font-weight: bold;
-}
-
-
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(17, 148, 28);
 }
@@ -299,6 +287,24 @@ QTableView {
 }
 
 
+/* === Courses Window === */
+QTableWidget#Table{
+    background-color: black;
+    color: rgb(102, 255, 140);
+    gridline-color: rgb(102, 255, 140);
+    font-size: 10pt;
+    border: 4px solid green; border-radius: 5px
+}
+    
+QHeaderView::section {
+    background-color: #02070f;
+    color: #00ff88;
+    padding: 8px;
+    border: 1px solid #00ff88;
+    font-weight: bold;
+}
+
+
 
 /* === Notes Window === */
 QListWidget#NotesList{
@@ -332,9 +338,6 @@ QLineEdit{
 }
 """
 
-
-
-
 DARK_Minimalistic = """
 /* === GLOBAL SETTINGS === */
 QWidget {
@@ -345,30 +348,26 @@ QWidget {
     selection-color: white;
 }
 
-/* === TEXT MARKERS === */
+
+
+/* === Main.ui === */
 QLabel {
     color: rgb(225, 225, 225);
     background-color: transparent;
     font-size: 16pt;
 }
 
-QLabel#Login, QLabel#Password, QLabel#Name_label {
+QLabel#Ecampus {
+    color: white;
+    font-size: 40pt;
+    font-weight: bold;
+}
+
+QLabel#Login,#Password,#Name_label {
     color: rgb(180, 180, 180);
     font-size: 14pt;
 }
 
-QLabel#Ecampus {
-    color: white;
-    font-size: 32pt;
-    font-weight: bold;
-}
-
-QLabel#Error, QLabel#Error_2 {
-    color: rgb(255, 80, 80); /* Минималистичный красный для ошибок */
-    font-size: 14pt;
-}
-
-/* === INPUT FIELD === */
 QLineEdit {
     background-color: rgb(30, 30, 30);
     color: white;
@@ -382,14 +381,35 @@ QLineEdit:focus {
     border: 1px solid rgb(150, 150, 150);
 }
 
-/* === BUTTONS === */
+QCheckBox {
+    color: rgb(180, 180, 180);
+    spacing: 5px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(30, 30, 30);
+    border: 1px solid rgb(80, 80, 80);
+    border-radius: 3px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: rgb(150, 150, 150);
+    border: 1px solid rgb(200, 200, 200);
+}
+
+
+
+/* === Buttons === */
 QPushButton {
     background-color: rgb(30, 30, 30);
     border: 1px solid rgb(60, 60, 60);
     border-radius: 6px;
     color: rgb(225, 225, 225);
-    padding: 5px;
+    padding: 6px;
     font-size: 13pt;
+
 }
 
 QPushButton:hover {
@@ -402,77 +422,38 @@ QPushButton:pressed {
     background-color: rgb(70, 70, 70);
 }
 
-/* Exit button (red ) */
-QPushButton#Exit_Button, QPushButton#Exit_Button1 {
-    background-color: rgb(60, 20, 20);
-    border: 1px solid rgb(100, 40, 40);
-    color: rgb(255, 150, 150);
-}
-QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
-    background-color: rgb(90, 30, 30);
-    color: white;
+
+
+/* === Error Window === */
+QLabel#Error,QLabel#Error_2 {
+    color: rgb(255, 80, 80);
+    font-size: 14pt;
 }
 
-/* === CHECKBOXES === */
-QCheckBox {
-    color: rgb(180, 180, 180);
-    spacing: 5px;
-}
-QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
+QPushButton#Error_Button {
     background-color: rgb(30, 30, 30);
     border: 1px solid rgb(80, 80, 80);
-    border-radius: 3px;
-}
-QCheckBox::indicator:checked {
-    background-color: rgb(150, 150, 150);
-    border: 1px solid rgb(200, 200, 200);
-}
-
-/* === COMBOBOX === */
-QComboBox {
-    background-color: rgb(30, 30, 30);
     color: white;
-    border: 1px solid rgb(60, 60, 60);
-    border-radius: 4px;
-    padding: 5px;
 }
 
-QComboBox::drop-down {
-    border: none;
-    background: transparent;
+
+
+/* === Help Window === */
+QLabel#Help {
+    font-size: 30pt;
 }
 
-QComboBox QAbstractItemView {
-    background-color: rgb(30, 30, 30);
-    color: white;
-    selection-background-color: rgb(60, 60, 60);
-    border: 1px solid rgb(60, 60, 60);
-}
-
-/* === LISTS AND TABLES === */
-QListWidget, QTableWidget, QTextBrowser, QTextEdit {
+QTextBrowser {
     background-color: rgb(25, 25, 25);
     border: 1px solid rgb(50, 50, 50);
     color: rgb(220, 220, 220);
-    border-radius: 4px;
+    font-size: 14pt;
 }
 
-QHeaderView::section {
-    background-color: rgb(35, 35, 35);
-    color: white;
-    padding: 5px;
-    border: 1px solid rgb(50, 50, 50);
-}
 
-QTableWidget::item {
-    border-bottom: 1px solid rgb(40, 40, 40);
-}
-
-/* === CALENDAR === */
+/* === Menu Window === */
 QCalendarWidget QWidget {
-    background-color: rgb(25, 25, 25); 
+    background-color: rgb(25, 25, 25);
     alternate-background-color: rgb(30, 30, 30);
     color: white;
 }
@@ -483,16 +464,62 @@ QCalendarWidget QToolButton {
     border: none;
 }
 
-QCalendarWidget QMenu {
+QCalendarWidget QWidget#qt_calendar_navigationbar {
     background-color: rgb(30, 30, 30);
-    color: white;
 }
 
-QCalendarWidget QAbstractItemView:enabled {
-    color: white;
+QCalendarWidget QAbstractItemView {
     background-color: rgb(25, 25, 25);
+    color: white;
     selection-background-color: rgb(60, 60, 60);
     selection-color: white;
+}
+
+
+
+/* === Tables / Lists === */
+QTableWidget,QListWidget,QTextEdit {
+    background-color: rgb(25, 25, 25);
+    border: 1px solid rgb(50, 50, 50);
+    color: rgb(220, 220, 220);
+    border-radius: 4px;
+}
+
+QHeaderView::section {
+    background-color: rgb(35, 35, 35);
+    color: white;
+    padding: 6px;
+    border: 1px solid rgb(50, 50, 50);
+}
+
+/* === Notes Window === */
+QListWidget#NotesList{
+    background-color: rgb(0, 0, 0);
+    color: white;
+    font-size: 15pt;
+
+}
+
+QTextEdit#NotesText{
+    background-color: rgb(0,0,0);
+    color: white;
+    font-size: 15pt;
+}
+
+/* === Dashboard === */
+QLabel#Dashboard {
+    font-size: 24pt;
+}
+
+QWidget#Dashboard_1,#Dashboard_2,#Dashboard_3 {
+    background-color: rgb(25, 25, 25);
+    border: 1px solid rgb(50, 50, 50);
+    border-radius: 5px;
+
+QLineEdit{
+    background-color: rgb(255, 255, 255);
+    border: 2px solid black; border-radius: 5px
+}
 }
 """
 
@@ -534,13 +561,18 @@ font-family: Unispace;
 
 
 
-QLabel#Login {
+
+
+
+
+/* === Main.ui === */
+QLabel#Ecampus{
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
-    font-size: 18pt;
+    font-size: 40pt;
 }
 
-QLabel#Password{
+QLabel#Login, QLabel#Password{
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
     font-size: 18pt;
@@ -557,7 +589,11 @@ QLabel {
     font-size: 20pt;
 }
 
-QLineEdit {
+QLineEdit#PasswordLine {
+    background-color: 255, 255, 255
+}
+
+QLineEdit#LoginLine {
     background-color: 255, 255, 255
 }
 
@@ -589,6 +625,7 @@ QComboBox#ThemeBox {
     border: 2px solid #4f95ff;
     padding: 5px;
 }
+
 QComboBox#ThemeBox QAbstractItemView {
     background-color: rgb(114, 163, 242);
     color: #f0f7ff;               
@@ -612,6 +649,29 @@ QPushButton#Help:hover{
 	font-size: 15pt;
 }
 
+QWidget#CourseItem {
+    background-color: rgb(64, 50, 195); 
+    border-radius: 5px;
+}
+
+
+
+
+
+/* === Error Window === */
+QLabel#Error, QLabel#Error_2 {
+	color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0);
+    font-size: 14pt;
+}
+
+QPushButton#Error_Button {
+    border: 2px solid #000000;
+    border-radius: 6px;
+    background-color: transparent;
+    color: rgb(0, 0, 0);
+    font-size: 15pt;
+}
 
 
 QPushButton#Back_Button{
@@ -630,6 +690,12 @@ QPushButton#Back_Button:hover{
 	font-size: 15pt;
 }
 
+
+
+
+
+
+/* === Help Window === */
 QLabel#Help {
     color: rgb(79, 149, 255);
     background-color: rgba(255, 255, 255, 0);
@@ -637,22 +703,18 @@ QLabel#Help {
 }
 
 QTextBrowser {
-    color: rgb(0, 0, 0);
+    color: rgb(79, 149, 255);
+    border: 10px solid rgb(102, 255, 140);
     background-color: rgb(255, 255, 255);
     font: 15pt;
 }
 
 
-QLineEdit#Help_Search {
-    background-color: rgba(255, 255, 255);
-}
 
 
 
 
-
-
-
+/* === Menu Window === */
 QCalendarWidget QWidget{
 	alternate-background-color: rgb(74, 222, 252);
 }
@@ -694,39 +756,67 @@ QCalendarWidget QToolButton QMenu {
      color: black
 }
 
-
-
-
-QLabel#Ecampus{
-    color: rgb(79, 149, 255);
-    background-color: rgba(255, 255, 255, 0);
-    font-size: 40pt;
-}
-
 QTableView {
     background-color: rgba(255, 255, 255, 0);
 }
 
-QPushButton#Exit_Button {
-    border: 2px solid #ffffff;
-    border-radius: 6px;
-    background-color: rgb(243, 70, 70);
-    color: white;
+
+/* === Courses Window === */
+QTableWidget#Table{
+    background-color: white;
+    color: rgb(79, 149, 255);
+    gridline-color: rgb(79, 149, 255);
+    font-size: 10pt;
+    border: 4px solid blue; border-radius: 5px
+}
+    
+QHeaderView::section {
+    background-color: rgb(249,243,246);
+    color: rgb(79, 149, 255);
+    padding: 8px;
+    border: 1px solid rgb(79, 149, 255);
+    font-weight: bold;
 }
 
 
 
+/* === Notes Window === */
+QListWidget#NotesList{
+    background-color: rgb(255, 255, 255);
+    color: rgb(79, 149, 255);
+    font-size: 14pt;
+    border: 5px solid blue; border-radius: 5px
+    
+}
+
+QTextEdit#NotesText{
+    background-color: rgb(255, 255, 255);
+    color: rgb(79, 149, 255);
+    font-size: 14pt;
+    border: 5px solid blue; border-radius: 5px
+}
+
+/* === StudIP Window === */
+QTextEdit#bodyText{
+    color: rgb(0, 0, 0);
+}
 
 
-QPushButton#Exit_Button1 {
-    border: 2px solid #ffffff;
-    border-radius: 6px;
-    background-color: rgb(243, 70, 70);
-    color: white;
+/* === Dashboard Window === */
+QLabel#Dashboard {
+    font-size: 24pt;
+}
+
+QWidget#Dashboard_1, #Dashboard_2, #Dashboard_3{
+    background-color: rgb(255, 255, 255);
+    border: 2px solid blue; border-radius: 5px
+}
+
+QLineEdit{
+    background-color: rgb(255, 255, 255);
+    border: 2px solid blue; border-radius: 5px
 }
 """
-
-
 
 LIGHT_Minimalistic = """
 /* === GLOBAL SETTINGS === */
@@ -738,30 +828,26 @@ QWidget {
     selection-color: black;
 }
 
-/* === TEXT MARKERS === */
+
+
+/* === Main.ui === */
 QLabel {
     color: rgb(33, 37, 41);
     background-color: transparent;
     font-size: 16pt;
 }
 
-QLabel#Login, QLabel#Password, QLabel#Name_label {
-    color: rgb(108, 117, 125); /* Серый для второстепенного текста */
-    font-size: 14pt;
-}
-
 QLabel#Ecampus {
     color: rgb(33, 37, 41);
-    font-size: 32pt;
+    font-size: 40pt;
     font-weight: bold;
 }
 
-QLabel#Error, QLabel#Error_2 {
-    color: rgb(220, 53, 69); /* Мягкий красный */
+QLabel#Login,#Password,#Name_label {
+    color: rgb(108, 117, 125);
     font-size: 14pt;
 }
 
-/* === INPUT FIELD === */
 QLineEdit {
     background-color: rgb(255, 255, 255);
     color: rgb(33, 37, 41);
@@ -773,16 +859,35 @@ QLineEdit {
 
 QLineEdit:focus {
     border: 1px solid rgb(100, 100, 100);
-    background-color: rgb(255, 255, 255);
 }
 
-/* === BUTTONS === */
+QCheckBox {
+    color: rgb(108, 117, 125);
+    spacing: 5px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(180, 180, 180);
+    border-radius: 3px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: rgb(230, 230, 230);
+    border: 1px solid rgb(150, 150, 150);
+}
+
+
+
+/* === Buttons === */
 QPushButton {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(206, 212, 218);
     border-radius: 6px;
     color: rgb(33, 37, 41);
-    padding: 5px;
+    padding: 6px;
     font-size: 13pt;
 }
 
@@ -795,54 +900,64 @@ QPushButton:pressed {
     background-color: rgb(210, 210, 210);
 }
 
-/* Exit button */
-QPushButton#Exit_Button, QPushButton#Exit_Button1 {
-    background-color: rgb(255, 240, 240);
-    border: 1px solid rgb(255, 200, 200);
-    color: rgb(200, 50, 50);
-}
-QPushButton#Exit_Button:hover, QPushButton#Exit_Button1:hover {
-    background-color: rgb(255, 220, 220);
-    color: rgb(180, 0, 0);
+
+
+/* === Error Window === */
+QLabel#Error,QLabel#Error_2 {
+    color: rgb(220, 53, 69);
+    font-size: 14pt;
 }
 
-/* === CHECKBOXES === */
-QCheckBox {
-    color: rgb(108, 117, 125);
-    spacing: 5px;
-}
-QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
+QPushButton#Error_Button {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(180, 180, 180);
-    border-radius: 3px;
-}
-QCheckBox::indicator:checked {
-    background-color: rgb(230, 230, 230);
-    border: 1px solid rgb(150, 150, 150);
-    image: url(:/icons/check_black.png); /* Если есть иконка, иначе цвет */
+    color: black;
 }
 
-/* === COMBOBOX === */
-QComboBox {
+
+
+/* === Help Window === */
+QLabel#Help {
+    font-size: 30pt;
+}
+
+QTextBrowser {
     background-color: rgb(255, 255, 255);
-    color: rgb(33, 37, 41);
     border: 1px solid rgb(206, 212, 218);
-    border-radius: 4px;
-    padding: 5px;
-}
-
-QComboBox QAbstractItemView {
-    background-color: rgb(255, 255, 255);
     color: rgb(33, 37, 41);
-    selection-background-color: rgb(233, 236, 239);
-    selection-color: black;
-    border: 1px solid rgb(200, 200, 200);
+    font-size: 15pt;
 }
 
-/* === LISTS AND TABLES === */
-QListWidget, QTableWidget, QTextBrowser, QTextEdit {
+
+
+/* === Menu Window === */
+QCalendarWidget QWidget {
+    background-color: rgb(255, 255, 255);
+    alternate-background-color: rgb(245, 245, 245);
+    color: black;
+}
+
+QCalendarWidget QToolButton {
+    color: black;
+    background-color: rgb(240, 240, 240);
+    border: none;
+}
+
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: rgb(240, 240, 240);
+}
+
+QCalendarWidget QAbstractItemView {
+    background-color: rgb(255, 255, 255);
+    color: black;
+    selection-background-color: rgb(220, 220, 220);
+    selection-color: black;
+}
+
+
+
+/* === Tables / Lists === */
+QTableWidget,QListWidget,QTextEdit {
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(206, 212, 218);
     color: rgb(33, 37, 41);
@@ -852,25 +967,38 @@ QListWidget, QTableWidget, QTextBrowser, QTextEdit {
 QHeaderView::section {
     background-color: rgb(240, 240, 240);
     color: rgb(33, 37, 41);
-    padding: 5px;
+    padding: 6px;
     border: 1px solid rgb(200, 200, 200);
 }
 
-QTableWidget::item {
-    border-bottom: 1px solid rgb(230, 230, 230);
+/* === Notes Window === */
+QListWidget#NotesList{
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    font-size: 15pt;
+
 }
 
-/* === CALENDER === */
-QCalendarWidget QWidget {
-    background-color: rgb(255, 255, 255); 
-    alternate-background-color: rgb(245, 245, 245);
-    color: black;
+QTextEdit#NotesText{
+    background-color: rgb(255, 255, 255);
+    color: rgb(33, 37, 41);
+    font-size: 15pt;
 }
 
-QCalendarWidget QToolButton {
-    color: black;
-    background-color: rgb(240, 240, 240);
-    border: none;
+/* === Dashboard === */
+QLabel#Dashboard {
+    font-size: 24pt;
+}
+
+QWidget#Dashboard_1,#Dashboard_2,#Dashboard_3 {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(206, 212, 218);
+    border-radius: 5px;
+
+QLineEdit{
+    background-color: rgb(0, 0, 0);
+    border: 2px solid black; border-radius: 5px
+}
 }
 """
 
@@ -955,7 +1083,7 @@ class CourseDayDialog(QDialog):
         for course in courses:
             widget = QWidget()
             widget.setMinimumHeight(40)
-            widget.setStyleSheet("background-color: rgb(40, 112, 42); border-radius: 5px;")
+            widget.setObjectName("CourseItem")
             row = QHBoxLayout(widget)
 
             label = QLabel(course.title)
@@ -1022,7 +1150,7 @@ def open_courses(menu_window):
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
     )
-    table = courses_window.findChild(QTableWidget, "tableWidget")
+    table = courses_window.findChild(QTableWidget, "Table")
 
     if table is not None:
         table.setRowCount(0)
