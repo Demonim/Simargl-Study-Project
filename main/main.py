@@ -1129,11 +1129,11 @@ class CourseDayDialog(QDialog):
 def change_theme(app: QApplication, theme: str):
     if theme == "Dark Theme":
         app.setStyleSheet(DARK_THEME)
-    elif theme == "Dark Minimalistic":
+    elif theme == "Dark Mini":
         app.setStyleSheet(DARK_Minimalistic)
     elif theme == "Light Theme":
         app.setStyleSheet(LIGHT_THEME)
-    elif theme == "Light Minimalistic":
+    elif theme == "Light Mini":
         app.setStyleSheet(LIGHT_Minimalistic)
 
 
@@ -1656,7 +1656,7 @@ def login_from_enter(main_window,remember=False):
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     current_login = login_box.text(); password = password_box.text()
     studip = simargl.StudIP(current_login, password)
-    ecampusmail = simargl.EcampusMail(current_login, password)
+    ecampusmail = simargl.ECampusMail(current_login, password)
 
     try:
         studip.create_client()
