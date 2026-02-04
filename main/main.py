@@ -1001,11 +1001,11 @@ class CourseDayDialog(QDialog):
 def change_theme(app: QApplication, theme: str):
     if theme == "Dark Theme":
         app.setStyleSheet(DARK_THEME)
-    elif theme == "Dark Minimalistic":
+    elif theme == "Dark Mini":
         app.setStyleSheet(DARK_Minimalistic)
     elif theme == "Light Theme":
         app.setStyleSheet(LIGHT_THEME)
-    elif theme == "Light Minimalistic":
+    elif theme == "Light Mini":
         app.setStyleSheet(LIGHT_Minimalistic)
 
 
