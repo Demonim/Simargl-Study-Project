@@ -31,6 +31,7 @@ class StudIP:
             base_url (str, optional): The base URL of the Stud.IP instance. 
                                       Defaults to the University of Goettingen URL.
         """
+
         self.login = login
         self.password = password
         self.base_url = base_url
@@ -41,6 +42,7 @@ class StudIP:
         
         This method must be called before attempting to fetch data (courses, messages, etc.).
         """
+
         self.client = studipy.Client(self.login, self.password, self.base_url)
 
     def get_courses(self):
@@ -50,6 +52,7 @@ class StudIP:
         Returns:
             list: A collection of course objects/dictionaries returned by the API.
         """
+
         courses = self.client.Courses.get_courses()
         return courses
 
@@ -60,6 +63,7 @@ class StudIP:
         Returns:
             list: A list of message objects.
         """
+
         my_messages = self.client.Messages.get_messages()
         return my_messages
 
@@ -70,6 +74,7 @@ class StudIP:
         Returns:
             int: The count of unread messages.
         """
+
         new_messages = self.client.Messages.get_messages(True)
         return len(new_messages)
 
@@ -80,6 +85,7 @@ class StudIP:
         Returns:
             list: A list of schedule entries or calendar events.
         """
+
         schedule = self.client.Calendar.get_schedule()
         return schedule
 
@@ -94,6 +100,7 @@ class StudIP:
         Returns:
             list: A list containing folder structures for the provided courses.
         """
+
         folders = []
         for f in range(len(crss)):
             folders.append(clnt.Files.get_folders(courses[f]))
@@ -110,12 +117,13 @@ class StudIP:
         Returns:
             list: A list of file objects associated with the courses.
         """
+
         files = []
         for ff in range(len(crss)):
             files.append(clnt.Files.get_folders(courses[ff]))
         return files
 
-class EcampusMail:
+class ECampusMail:
     """
     A controller class for handling email interactions with the university's eCampus mail server.
 
@@ -133,6 +141,7 @@ class EcampusMail:
             password (str): The user's email password.
             server (str, optional): The email server address. Defaults to the global SERVER constant.
         """
+
         self.login = str("ug-student\\"+login)
         self.password = password
         self.server = server
@@ -144,6 +153,7 @@ class EcampusMail:
         Connects to the server using SSL on port 993 and logs in with the 
         stored credentials.
         """
+
         self.mail = imaplib.IMAP4_SSL(self.server, 993)
         self.mail.login(self.login, self.password)
 
@@ -154,6 +164,7 @@ class EcampusMail:
         Returns:
             int: The count of unseen (unread) emails in the inbox.
         """
+
         self.mail.select("inbox")
         result, data = self.mail.search(None, "UNSEEN")
         return len(data[0].split())
@@ -165,11 +176,51 @@ class EcampusMail:
         Connects to the server on port 587, secures the connection with TLS, 
         and logs in.
         """
+
         self.server = smtplib.SMTP(self.server, 587)
         self.server.ehlo() 
         self.server.starttls() 
         self.server.ehlo()
         self.server.login(self.login, self.password)
+
+    def send_email(self, text, subject, sender, receiver, filename=None):
+        """
+        Composes and sends an email via the SMTP server, optionally with an attachment.
+
+        This method constructs a MIME multipart message including the subject, sender, 
+        receiver, and body text. If a filename is provided, the file is read in 
+        binary mode, encoded in base64, and attached to the email.
+
+        Args:
+            text (str): The body content of the email.
+            subject (str): The subject line of the email.
+            sender (str): The email address of the sender.
+            receiver (str): The email address of the recipient.
+            filename (str, optional): The local file path of an attachment to include. 
+                                      Defaults to None.
+
+        Raises:
+            Exception: If the underlying SMTP server fails to send the message.
+        """
+
+        message = email.mime.multipart.MIMEMultipart()
+        message["Subject"] = str(subject)
+        message["From"] = str(sender)
+        message["To"] = str(receiver)
+        message.attach(email.mime.text.MIMEText(str(text), "plain"))
+
+        if filename != None:
+            with open(filename, "rb") as attachment:
+                part = email.mime.base.MIMEBase("application", "octet-stream")
+                part.set_payload(attachment.read())
+            email.encoders.encode_base64(part)
+            part.add_header("Content-Disposition", f"attachment; filename= {filename}")
+            message.attach(part)
+
+        try: 
+            self.server.sendmail(str(sender),str(receiver), message.as_string())
+        except Exception:
+            raise Exception("Error in sending email")
 
     def close_conections(self):
         """
@@ -177,6 +228,7 @@ class EcampusMail:
 
         Quits the SMTP server session and closes/logs out of the IMAP mail session.
         """
+
         self.server.quit(); self.mail.close(); self.mail.logout()
 
 class LoginStorage:
@@ -194,6 +246,7 @@ class LoginStorage:
         Creates the 'storage' directory if it doesn't exist and sets the 
         path for the SQLite database file (`login_data.db`).
         """
+
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"login_data.db")
@@ -207,6 +260,7 @@ class LoginStorage:
             the 'users' table if the table exists. Returns None if the 'users' 
             table does not exist.
         """
+
         self.con = sql.connect(self.file_path)
         self.cur = self.con.cursor()
         data = self.cur.execute("SELECT name FROM sqlite_master WHERE name='users'")
@@ -225,6 +279,7 @@ class LoginStorage:
             login (str): The username to store.
             password (str): The plain-text password to hash and store.
         """
+
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
         self.cur.execute("CREATE TABLE users (name TEXT, password TEXT)")
@@ -248,6 +303,7 @@ class LoginStorage:
             bool: True if the credentials match an existing user.
                   False if the user did not exist (and was just created).
         """
+
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
         result = self.cur.execute(f"SELECT name, password FROM users WHERE name='{self.login}' AND password='{self.password}'")
@@ -275,6 +331,7 @@ class NotesStorage:
             login (str): The username of the current user. Used to generate 
                          a unique filename (e.g., 'username.json').
         """
+
         self.login = login
         self.base_path = "storage/data"
         os.makedirs(self.base_path, exist_ok=True)
@@ -288,6 +345,7 @@ class NotesStorage:
             list[dict]: A list of dictionaries, where each dictionary represents 
                         a note. Returns an empty list if the file does not exist.
         """
+
         if not os.path.exists(self.file_path):
             return []
 
@@ -304,6 +362,7 @@ class NotesStorage:
         Args:
             notes (list[dict]): The list of note dictionaries to save.
         """
+
         with open(self.file_path, "w", encoding="utf-8") as f:
             json.dump({"notes": notes}, f, ensure_ascii=False, indent=2)
 
@@ -322,6 +381,7 @@ class NotesStorage:
             dict: A dictionary containing the note's unique ID (UUID), title, 
                   content, and creation timestamp.
         """
+
         return {
             "id": str(uuid.uuid4()),
             "title": title,
@@ -345,6 +405,7 @@ class CourseDaysStorage:
             login (str): The username of the current user. Used to generate 
                          a unique filename (e.g., 'course_days_username.json').
         """
+
         self.path = f"storage/course_days_{login}.json"
 
     def load(self):
@@ -355,6 +416,7 @@ class CourseDaysStorage:
             dict: A dictionary containing the course-to-day mappings.
                   Returns an empty dictionary if the file does not exist.
         """
+
         if not os.path.exists(self.path):
             return {}
         with open(self.path, "r", encoding="utf-8") as f:
@@ -368,5 +430,6 @@ class CourseDaysStorage:
             data (dict): The dictionary containing course-to-day mappings 
                          to be stored.
         """
+
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)

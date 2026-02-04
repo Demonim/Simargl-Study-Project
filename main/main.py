@@ -364,7 +364,7 @@ QLabel#Ecampus {
 }
 
 QLabel#Error, QLabel#Error_2 {
-    color: rgb(255, 80, 80); /* Минималистичный красный для ошибок */
+    color: rgb(255, 80, 80); /* Minimalistic red for errors */
     font-size: 14pt;
 }
 
@@ -746,7 +746,7 @@ QLabel {
 }
 
 QLabel#Login, QLabel#Password, QLabel#Name_label {
-    color: rgb(108, 117, 125); /* Серый для второстепенного текста */
+    color: rgb(108, 117, 125); /* Gray for secondary text */
     font-size: 14pt;
 }
 
@@ -757,7 +757,7 @@ QLabel#Ecampus {
 }
 
 QLabel#Error, QLabel#Error_2 {
-    color: rgb(220, 53, 69); /* Мягкий красный */
+    color: rgb(220, 53, 69); /* Soft red */
     font-size: 14pt;
 }
 
@@ -821,7 +821,7 @@ QCheckBox::indicator {
 QCheckBox::indicator:checked {
     background-color: rgb(230, 230, 230);
     border: 1px solid rgb(150, 150, 150);
-    image: url(:/icons/check_black.png); /* Если есть иконка, иначе цвет */
+    image: url(:/icons/check_black.png); /* If there is an icon, else color */
 }
 
 /* === COMBOBOX === */
@@ -1175,7 +1175,7 @@ def open_StudIP(menu_window):
             messages = []
 
         for msg in messages:
-            title = msg.subject if msg.subject else "Без темы"
+            title = msg.subject if msg.subject else "Without theme"
 
             btn = QPushButton(title)
             btn.setMinimumHeight(48)
@@ -1217,7 +1217,7 @@ def open_message_dialog(message):
 
     sender_label.setText(f"From: {full_msg.sender_id}")
     date_label.setText(f"Date: {full_msg.creation_date}")
-    subject_label.setText(full_msg.subject or "Без темы")
+    subject_label.setText(full_msg.subject or "Without theme")
     body_text.setHtml(full_msg.body)
 
     close_button.clicked.connect(dialog.close)
@@ -1353,7 +1353,8 @@ def open_Help1(main_window):
     Instructions_button.clicked.connect(
         lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. 
         \n2. After logging in, you will have access to a menu with all the application functions. 
-        \n Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
+        \n Among them you can use: 
+        \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
     )
     Support_button = Help_window1.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
@@ -1389,7 +1390,8 @@ def open_Help(main_window):
     Instructions_button.clicked.connect(
         lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. 
         \n2. After logging in, you will have access to a menu with all the application functions. 
-        \nAmong them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
+        \nAmong them you can use: 
+        \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
     )
     Support_button = Help_window.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
@@ -1528,7 +1530,7 @@ def login_from_enter(main_window,remember=False):
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     current_login = login_box.text(); password = password_box.text()
     studip = simargl.StudIP(current_login, password)
-    ecampusmail = simargl.EcampusMail(current_login, password)
+    ecampusmail = simargl.ECampusMail(current_login, password)
 
     try:
         studip.create_client()
@@ -1612,7 +1614,6 @@ def main():
     help_button.clicked.connect(
         lambda: open_Help(main_window)
     )
-
 
 
     main_window.show()
