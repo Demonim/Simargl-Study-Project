@@ -10,7 +10,3 @@ def subject_hours(schedule) -> dict[str, float]:
         subjects[lesson.title] = subjects.get(lesson.title, 0) + hours
 
     return subjects
-
-
-
-
