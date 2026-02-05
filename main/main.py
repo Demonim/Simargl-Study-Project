@@ -1484,7 +1484,7 @@ def open_Themes(menu_window):
     if btn_light_mini:
         btn_light_mini.clicked.connect(lambda: apply_and_close("Light Mini"))
 
-    theme_dialog.exec()
+    theme_dialog.exec() 
     open_menu(menu_window)
 
 
