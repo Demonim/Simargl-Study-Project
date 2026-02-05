@@ -1462,6 +1462,32 @@ def open_Notes(menu_window):
     menu_window.close()
     menu_window.courses_window = Notes_window
 
+
+def open_Themes(menu_window):
+    theme_dialog = load_ui("UI/Theme.ui")
+
+    btn_dark = theme_dialog.findChild(QPushButton, "Dark")
+    btn_dark_mini = theme_dialog.findChild(QPushButton, "Dark_mini")
+    btn_light = theme_dialog.findChild(QPushButton, "Light")
+    btn_light_mini = theme_dialog.findChild(QPushButton, "Light_mini")
+
+    def apply_and_close(theme_name):
+        change_theme(QApplication.instance(), theme_name)
+        theme_dialog.accept()
+
+    if btn_dark:
+        btn_dark.clicked.connect(lambda: apply_and_close("Dark Theme"))
+    if btn_dark_mini:
+        btn_dark_mini.clicked.connect(lambda: apply_and_close("Dark Mini"))
+    if btn_light:
+        btn_light.clicked.connect(lambda: apply_and_close("Light Theme"))
+    if btn_light_mini:
+        btn_light_mini.clicked.connect(lambda: apply_and_close("Light Mini"))
+
+    theme_dialog.exec()
+    open_menu(menu_window)
+
+
 def open_Help1(main_window):
     Help_window1 = load_ui("UI/help_1.ui")
 
@@ -1568,6 +1594,10 @@ def open_menu(main_window):
     Notes_button = menu_window.findChild(QPushButton, "Notes")
     Notes_button.clicked.connect(
         lambda: open_Notes(menu_window)
+    )
+    Theme_button = menu_window.findChild(QPushButton, "Theme")
+    Theme_button.clicked.connect(
+        lambda: open_Themes(menu_window)
     )
     help_button = menu_window.findChild(QPushButton, "Help1")
     help_button.clicked.connect(

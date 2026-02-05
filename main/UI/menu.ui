@@ -253,7 +253,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="Settings">
+         <widget class="QPushButton" name="Theme">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -267,7 +267,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Settings</string>
+           <string>Change Theme</string>
           </property>
          </widget>
         </item>
