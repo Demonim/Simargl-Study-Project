@@ -157,6 +157,39 @@ class ECampusMail:
         self.mail = imaplib.IMAP4_SSL(self.server, 993)
         self.mail.login(self.login, self.password)
 
+    @staticmethod
+    def clean_header(header_value):
+        """
+        Decodes an email header (Subject, From, etc.) to a readable string.
+        
+        Handles various encodings and formats.
+        
+        Args:
+            header_value (str or bytes): The raw header value from the email.
+            
+        Returns:
+            str: The decoded and concatenated header string, or "None" if empty.
+        """
+        
+        if not header_value:
+            return "None"
+    
+        decoded_list = email.header.decode_header(header_value)
+        header_text = ""
+    
+        for token, encoding in decoded_list:
+            if isinstance(token, bytes):
+            # If no encoding is specified, usually assume utf-8 or ascii
+                try:
+                    token = token.decode(encoding if encoding else 'utf-8')
+                except (LookupError, UnicodeDecodeError):
+                # Fallback if encoding is unknown or fails
+                    token = token.decode('utf-8', errors='ignore')
+
+            header_text += token
+        
+        return header_text
+
     def mail_notifications(self):
         """
         Checks the inbox for unread messages.
@@ -168,6 +201,65 @@ class ECampusMail:
         self.mail.select("inbox")
         result, data = self.mail.search(None, "UNSEEN")
         return len(data[0].split())
+    
+    def show_subjects(self, last_n:int):
+        """
+        Fetches the Subject, Sender, and CC headers for the N most recent emails.
+
+        This method uses BODY.PEEK to retrieve header information without 
+        marking the emails as 'Read' on the server.
+
+        Args:
+            last_n (int): The number of recent emails to retrieve.
+
+        Returns:
+            list: A list containing three sub-lists: 
+                  [subjects_list, senders_list, ccs_list].
+        """
+        
+        result, data = self.mail.search(None, "ALL")
+        email_ids = read_data[0].split()
+
+        latest_email_ids = email_ids[-last_n:]
+        if not latest_email_ids:
+            return [[],[],[]]
+
+        subjects_list = []; senders_list = []; ccs_list = []
+
+        id_string = b",".join(latest_email_ids).decode('utf-8')
+        result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM CC)])')
+
+        for response_part in msg_data:
+            if isinstance(response_part, tuple):
+                # Parse the header fragment
+                msg = email.message_from_bytes(response_part[1])
+
+                # Extract and Clean Data
+                subjects_list.append((e_id, self.clean_header(msg['Subject'])))
+                senders_list.append(clean_header(msg['From']))
+                ccs_list.append(clean_header(msg['Cc']))
+        
+        full_data_list = [subjects_list, senders_list, ccs_list]
+        return full_data_list
+
+    def open_mail(self, mail_id):
+        """
+        Fetches and parses the full content of a specific email.
+
+        Uses the 'RFC822' protocol to retrieve the raw email body and headers (also marks the email as seen).
+
+        Args:
+            mail_id (int or str): The index of the email in self.email_ids to fetch.
+        
+        Returns:
+            email.message.Message: The parsed email object. You can access parts 
+                                   using msg['Subject'] or msg.get_payload().
+        """
+
+        status, data = self.mail.fetch(self.email_ids[mail_id], "(RFC822)")
+        raw_email_bytes = data[0][1]
+        msg = email.message_from_bytes(raw_email_bytes)
+        return msg
 
     def write_email_init(self):
         """
