@@ -202,52 +202,48 @@ class ECampusMail:
         result, data = self.mail.search(None, "UNSEEN")
         return len(data[0].split())
     
-    def show_subjects(self, last_n:int):
+    def show_subjects(self, last_n: int):
         """
-        Fetches the Subject, Sender, and CC headers for the N most recent emails.
-
-        This method uses BODY.PEEK to retrieve header information without 
-        marking the emails as 'Read' on the server.
-
+        Fetches the subjects and timestamps for the N most recent emails.
+        
         Args:
             last_n (int): The number of recent emails to retrieve.
 
         Returns:
-            list: [subjects (str), senders (str), ccs (str), dates (datetime)].
-                  Dates are timezone-aware datetime objects.
+            list: A list containing two sub-lists [subjects_list, dates_list].
+                  subjects_list (list[str]): Decoded email subjects.
+                  dates_list (list[datetime]): Timezone-aware datetime objects.
         """
-        
+        self.mail.select("inbox")
         result, data = self.mail.search(None, "ALL")
         email_ids = data[0].split()
+        latest_ids = email_ids[-last_n:]
+        
+        if not latest_ids:
+            return [[], []]
 
-        latest_email_ids = email_ids[-last_n:]
-        if not latest_email_ids:
-            return [[],[],[]]
+        subjects_list = []
+        dates_list = []
 
-        subjects_list = []; senders_list = []; ccs_list = []; dates_list = []
-
-        id_string = b",".join(latest_email_ids).decode('utf-8')
-        result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM CC DATE)])')
+        id_string = b",".join(latest_ids).decode('utf-8')
+        result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT DATE)])')
 
         for response_part in msg_data:
             if isinstance(response_part, tuple):
-                # Parse the header fragment
-                e_id = response_part[0].split()[0].decode()
                 msg = email.message_from_bytes(response_part[1])
-
-                # Extract and Clean Data
-                subjects_list.append((e_id, self.clean_header(msg['Subject'])))
-                senders_list.append(self.clean_header(msg['From']))
-                ccs_list.append(self.clean_header(msg['Cc']))
-
-                raw_date = self.clean_header(msg['Date'])
-                if raw_date and raw_date != "None":
-                    dates_list.append(email.utils.parsedate_to_datetime(raw_date))
-                else:
-                    dates_list.append(None)
+                
+                subject = self.clean_header(msg['Subject'])
+                subjects_list.append(subject)
+                
+                raw_date = msg['Date']
+                try:
+                    date_obj = email.utils.parsedate_to_datetime(raw_date)
+                    dates_list.append(date_obj)
+                except Exception:
+                    dates_list.append(None) 
         
-        return [subjects_list, senders_list, ccs_list, dates_list]
-
+        return [subjects_list, dates_list]
+    
     def open_mail(self, mail_id):
         """
         Fetches and parses the full content of a specific email.
@@ -321,13 +317,13 @@ class ECampusMail:
             raise Exception("Error in sending email")
 
     def close_conections(self):
-        """
-        Safely closes all active email connections.
+        """Safely closes active connections."""
 
-        Quits the SMTP server session and closes/logs out of the IMAP mail session.
-        """
-
-        self.server.quit(); self.mail.close(); self.mail.logout()
+        if hasattr(self, 'mail'):
+            self.mail.logout()
+        
+        if hasattr(self, 'smtp_conn'):
+            self.smtp_conn.quit()
 
 class LoginStorage:
     """
