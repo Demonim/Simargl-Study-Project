@@ -3,3 +3,5 @@
 *.db
 main/est.py
 main/untitled.ui
+.venv/
+__pycache__/

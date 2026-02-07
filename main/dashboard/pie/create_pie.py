@@ -1,5 +1,5 @@
 from pie_val_lab import pie_values_labels
-from matplotlip.figure import Figure
+from matplotlib.figure import Figure
 
 def create_pie(subject_hours):
     fig = Figure()
