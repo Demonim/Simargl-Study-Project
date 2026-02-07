@@ -3,7 +3,9 @@ from weeks import week_offset
 
 TOPICS = {
     "exam": {
-        "keywords": ["klausur", "test", "presentation", "prüfung"],
+        "keywords": ["klausur", "test", "presentation", 
+                     "prüfung", "prüfungsergebnis", "prüfungsleistungen",
+                     "prüfungsanmeldung", "anmeldung", "abmeldung", "prüfungsanmeldung"],
         "label": "Exam"
     },
     "termin": {
@@ -11,24 +13,24 @@ TOPICS = {
         "label": "Termin"
     },
     "news": {
-        "keywords": ["news", "uninews"],
+        "keywords": ["news", "uninews", "newsletter"],
         "label": "News"
     },
-    "changes": {
-        "keywords": [],
-        "label": "Changes"
+    "updates": {
+        "keywords": ["updates", "verschiebung", "neue"],
+        "label": "Updates"
     },
     "events": {
-        "keywords": [],
+        "keywords": ["events", "einladung", "event"],
         "label": "Events"
     }
-}                #ДОПИСАТИ
+}                
 
 def detect_topic(subject: str) -> str | None:
     subject = subject.lower()
 
     for topic_id, data in TOPICS.items():
-        for word in data:
+        for word in data["keywords"]: 
             if word in subject:
                 return topic_id
     return None
