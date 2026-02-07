@@ -116,7 +116,7 @@
      </spacer>
     </item>
     <item>
-     <widget class="QWidget" name="calendarWidget" native="true">
+     <widget class="QWidget" name="Calendar" native="true">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -124,7 +124,7 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(0, 0, 0);</string>
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
