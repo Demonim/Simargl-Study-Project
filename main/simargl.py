@@ -213,8 +213,8 @@ class ECampusMail:
             last_n (int): The number of recent emails to retrieve.
 
         Returns:
-            list: A list containing three sub-lists: 
-                  [subjects_list, senders_list, ccs_list].
+            list: [subjects (str), senders (str), ccs (str), dates (datetime)].
+                  Dates are timezone-aware datetime objects.
         """
         
         result, data = self.mail.search(None, "ALL")
@@ -224,10 +224,10 @@ class ECampusMail:
         if not latest_email_ids:
             return [[],[],[]]
 
-        subjects_list = []; senders_list = []; ccs_list = []
+        subjects_list = []; senders_list = []; ccs_list = []; dates_list = []
 
         id_string = b",".join(latest_email_ids).decode('utf-8')
-        result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM CC)])')
+        result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT FROM CC DATE)])')
 
         for response_part in msg_data:
             if isinstance(response_part, tuple):
@@ -238,9 +238,14 @@ class ECampusMail:
                 subjects_list.append((e_id, self.clean_header(msg['Subject'])))
                 senders_list.append(clean_header(msg['From']))
                 ccs_list.append(clean_header(msg['Cc']))
+
+                raw_date = self.clean_header(msg['Date'])
+                if raw_date and raw_date != "None":
+                    dates_list.append(email.utils.parsedate_to_datetime(raw_date))
+                else:
+                    dates_list.append(None)
         
-        full_data_list = [subjects_list, senders_list, ccs_list]
-        return full_data_list
+        return [subjects_list, senders_list, ccs_list, dates_list]
 
     def open_mail(self, mail_id):
         """
