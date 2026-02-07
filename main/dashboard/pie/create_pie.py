@@ -1,7 +1,6 @@
 from pie_val_lab import pie_values_labels
-import matplotlip.figure as Figure
+from matplotlip.figure import Figure
 
-#figure with matplotlib
 def create_pie(subject_hours):
     fig = Figure()
     ax = fig.add_subplot(111)

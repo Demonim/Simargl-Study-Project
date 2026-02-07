@@ -1,6 +1,5 @@
 from utils_time import duration_hours
 
-#creation of dictionary with subjects(keys) and hours from schedule(values)
 def subject_hours(schedule) -> dict[str, float]:
 
     subjects = {}
