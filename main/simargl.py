@@ -103,7 +103,7 @@ class StudIP:
 
         folders = []
         for f in range(len(crss)):
-            folders.append(clnt.Files.get_folders(courses[f]))
+            folders.append(clnt.Files.get_folders(crss[f]))
         return folders
 
     def get_files(self, clnt, crss):
@@ -120,7 +120,7 @@ class StudIP:
 
         files = []
         for ff in range(len(crss)):
-            files.append(clnt.Files.get_folders(courses[ff]))
+            files.append(clnt.Files.get_folders(crss[ff]))
         return files
 
 class ECampusMail:
@@ -218,7 +218,7 @@ class ECampusMail:
         """
         
         result, data = self.mail.search(None, "ALL")
-        email_ids = read_data[0].split()
+        email_ids = data[0].split()
 
         latest_email_ids = email_ids[-last_n:]
         if not latest_email_ids:
@@ -232,12 +232,13 @@ class ECampusMail:
         for response_part in msg_data:
             if isinstance(response_part, tuple):
                 # Parse the header fragment
+                e_id = response_part[0].split()[0].decode()
                 msg = email.message_from_bytes(response_part[1])
 
                 # Extract and Clean Data
                 subjects_list.append((e_id, self.clean_header(msg['Subject'])))
-                senders_list.append(clean_header(msg['From']))
-                ccs_list.append(clean_header(msg['Cc']))
+                senders_list.append(self.clean_header(msg['From']))
+                ccs_list.append(self.clean_header(msg['Cc']))
 
                 raw_date = self.clean_header(msg['Date'])
                 if raw_date and raw_date != "None":
