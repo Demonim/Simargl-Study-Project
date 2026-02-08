@@ -27,6 +27,9 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from themes import *
+from dashboard.pie.subject_hours import subject_hours
+from dashboard.pie.create_pie import create_pie
+from dashboard.heatmap.create_heatmap import create_heatmap
 
 import datetime
 import calendar
@@ -437,31 +440,36 @@ def open_Email(menu_window):
 def open_Dashboard(menu_window):
     Dashboard_window = load_ui("UI/dashboard_test.ui")
 
-    target_widget = Dashboard_window.findChild(QWidget, "Dashboard_1")
+    target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
+    if target_1 and schedule:
+        data_pie = subject_hours(schedule)
+        fig_pie = create_pie(data_pie)
+        fig_pie.patch.set_facecolor('none')
 
-    if target_widget:
-        fig = Figure(figsize=(5, 4), dpi=100, facecolor='none')
-        canvas = FigureCanvasQTAgg(fig)
-        canvas.setStyleSheet("background-color: transparent;")
-        ax = fig.add_subplot(111)
+        canvas_1 = FigureCanvasQTAgg(fig_pie)
+        canvas_1.setStyleSheet("background-color: transparent;")
 
-        labels = ["Python", "C++", "JS", "Other"]
-        values = [40, 30, 20, 10]
-        ax.pie(values, labels=labels, autopct='%1.1f%%', textprops={'color': "w"})
-        ax.set_title("Языки программирования", color="w")
+        layout_1 = QVBoxLayout(target_1)
+        layout_1.addWidget(canvas_1)
+        target_1.setLayout(layout_1)
 
-        if target_widget.layout() is None:
-            layout = QVBoxLayout(target_widget)
-            target_widget.setLayout(layout)
-        else:
-            layout = target_widget.layout()
+    target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
+    if target_2 and messages:
+        msg_subjects = [m.subject for m in messages]
+        msg_dates = [m.creation_date for m in messages]
 
-        layout.addWidget(canvas)
+        fig_heat = create_heatmap(msg_subjects, msg_dates)  #
+        fig_heat.patch.set_facecolor('none')
+
+        canvas_2 = FigureCanvasQTAgg(fig_heat)
+        canvas_2.setStyleSheet("background-color: transparent;")
+
+        layout_2 = QVBoxLayout(target_2)
+        layout_2.addWidget(canvas_2)
+        target_2.setLayout(layout_2)
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
-    exit_button.clicked.connect(
-        lambda: open_menu(Dashboard_window)
-    )
+    exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
 
     Dashboard_window.show()
     menu_window.close()

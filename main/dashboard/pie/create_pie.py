@@ -1,8 +1,8 @@
-from main.dashboard.pie.pie_val_lab import pie_values_labels
+from dashboard.pie.pie_val_lab import pie_values_labels
 from matplotlib.figure import Figure
 
 def create_pie(subject_hours):
-    fig = Figure(figsize=(8, 6), tight_layout=True)
+    fig = Figure(figsize=(8, 6), tight_layout=True, dpi=120)
     ax = fig.add_subplot(111)
 
     values, labels = pie_values_labels(subject_hours)
@@ -21,9 +21,10 @@ def create_pie(subject_hours):
         title="Subjects",
         loc="center left",
         bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=8
+        fontsize=7,
+        frameon = False
     )
 
-    fig.suptitle("Subject Hours Distribution", fontsize=14, fontweight='bold', y=0.95)
+    fig.suptitle("Subject Hours Distribution", fontsize=13, fontweight='bold', y=0.95)
 
     return fig

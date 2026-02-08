@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib.figure import Figure
-from main.dashboard.heatmap.messages_logic import topics_week_matrix, topic_labels
+from dashboard.heatmap.messages_logic import topics_week_matrix, topic_labels
 
 def create_heatmap(subjects, dates):
 
@@ -10,7 +10,7 @@ def create_heatmap(subjects, dates):
     topic_ids = list(matrix_dict.keys())
     data = np.array([matrix_dict[tid] for tid in topic_ids])
     
-    fig = Figure(figsize=(10, 6))
+    fig = Figure(figsize=(10, 6), dpi=120)
     ax = fig.add_subplot(111)
     
     im = ax.imshow(data, cmap='YlGn')
@@ -37,7 +37,7 @@ def create_heatmap(subjects, dates):
             ax.text(j, i, int(data[i, j]),
                     ha="center", va="center", color=color)
 
-    fig.suptitle("Topic Activity Heatmap (Last 5 Weeks)", fontsize=12, fontweight='bold')
+    fig.suptitle("Topic Activity Heatmap (Last 5 Weeks)", fontsize=10, fontweight='bold')
     
     fig.subplots_adjust(bottom=0.2) 
     

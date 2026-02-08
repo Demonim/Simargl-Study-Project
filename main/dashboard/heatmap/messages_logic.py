@@ -1,4 +1,4 @@
-from main.dashboard.heatmap.weeks import week_offset
+from dashboard.heatmap.weeks import week_offset
 
 TOPICS = {
     "exam": {

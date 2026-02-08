@@ -1,4 +1,4 @@
-from main.dashboard.utils_time import hour_str
+from dashboard.utils_time import hour_str
 import re
 
 #to get values and labels for pie

@@ -1,4 +1,4 @@
-from main.dashboard.utils_time import duration_hours
+from dashboard.utils_time import duration_hours
 
 def subject_hours(schedule) -> dict[str, float]:
 
