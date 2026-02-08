@@ -20,7 +20,6 @@ mail_handler = ECampusMail(login, password)
 mail_handler.read_email_init()
 subjects, dates = mail_handler.show_subjects(last_n=200)
 
-
 # об'єкти графіків
 my_pie = create_pie(subject_hours)
 my_heatmap = create_heatmap(subjects, dates)
