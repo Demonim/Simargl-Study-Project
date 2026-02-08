@@ -55,7 +55,7 @@ def main():
         elif choice == '4':
             break
 
-        #перемалювання графіка
+
         update_stacked_bar(plot_widget, tracker.all())
         
         print(f"Data saved to {user_filename}")

@@ -2,7 +2,6 @@ import pyqtgraph as pg
 import numpy as np
 
 class TimeAxisItem(pg.AxisItem):
-    """HH:MM"""
     def tickStrings(self, values, scale, spacing):
         return [f"{int(v)}:{int((v % 1) * 60):02d}" for v in values]
 

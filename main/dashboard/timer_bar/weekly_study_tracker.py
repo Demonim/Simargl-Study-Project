@@ -5,7 +5,7 @@ class WeeklyStudyTracker:
     def __init__(self, filename="study_data.json"):
         self.filename = filename
 
-        # автоматичне створення папки, якщо її немає
+        # автоматичне створення папки якщо її немає
         directory = os.path.dirname(self.filename)
         if directory and not os.path.exists(directory):
             os.makedirs(directory, exist_ok=True)

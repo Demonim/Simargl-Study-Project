@@ -1,6 +1,6 @@
 from datetime import datetime
 
-#class to work with timer
+#class to work w timer
 class Study_Timer:
     def __init__(self):
         self.start_time = None
