@@ -42,7 +42,7 @@ schedule = None
 notes_storage = None
 admin_login = "Admin"
 admin_password = "Admin"
-
+current_theme_name = "Dark"
 
 # =========================
 # THEMES
@@ -182,7 +182,10 @@ class CourseDayDialog(QDialog):
 # THEME HANDLING
 # =========================
 
-def change_theme(app: QApplication, theme: str):
+def change_theme(app, theme):
+    global current_theme_name
+    current_theme_name = theme
+
     if theme == "Dark Theme":
         app.setStyleSheet(DARK_THEME)
     elif theme == "Dark Mini":
@@ -191,6 +194,12 @@ def change_theme(app: QApplication, theme: str):
         app.setStyleSheet(LIGHT_THEME)
     elif theme == "Light Mini":
         app.setStyleSheet(LIGHT_Minimalistic)
+
+def get_plot_colors():
+    if "Dark" in current_theme_name:
+        return 'white'  # Цвет текста для темных тем
+    else:
+        return 'black'  # Цвет текста для светлых тем
 
 
 # =========================
@@ -443,7 +452,7 @@ def open_Dashboard(menu_window):
     target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
     if target_1 and schedule:
         data_pie = subject_hours(schedule)
-        fig_pie = create_pie(data_pie)
+        fig_pie = create_pie(data_pie, text_color=get_plot_colors())
         fig_pie.patch.set_facecolor('none')
 
         canvas_1 = FigureCanvasQTAgg(fig_pie)
@@ -458,7 +467,7 @@ def open_Dashboard(menu_window):
         msg_subjects = [m.subject for m in messages]
         msg_dates = [m.creation_date for m in messages]
 
-        fig_heat = create_heatmap(msg_subjects, msg_dates)  #
+        fig_heat = create_heatmap(msg_subjects, msg_dates, color=get_plot_colors())  #
         fig_heat.patch.set_facecolor('none')
 
         canvas_2 = FigureCanvasQTAgg(fig_heat)
