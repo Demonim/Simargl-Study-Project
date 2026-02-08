@@ -1,6 +1,6 @@
 import sys
 import os
-import simargl
+import main.simargl as simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,7 +26,7 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-from themes import *
+from main.themes import *
 
 import datetime
 import calendar
