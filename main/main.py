@@ -26,10 +26,7 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-<<<<<<< HEAD
 from main.themes import *
-=======
->>>>>>> 1b93eae6079b72cc8211c592d692c531f0560595
 from themes import *
 from dashboard.pie.subject_hours import subject_hours
 from dashboard.pie.create_pie import create_pie
