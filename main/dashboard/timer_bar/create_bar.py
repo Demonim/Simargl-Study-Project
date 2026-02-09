@@ -1,75 +1,43 @@
-import pyqtgraph as pg
+import matplotlib.pyplot as plt
 import numpy as np
-
-class TimeAxisItem(pg.AxisItem):
-    def tickStrings(self, values, scale, spacing):
-        return [f"{int(v)}:{int((v % 1) * 60):02d}" for v in values]
+from matplotlib.figure import Figure
 
 def create_stacked_bar(study_data):
+    fig = Figure(figsize=(8, 6), dpi=100)
+    update_stacked_bar(fig, study_data)
+    return fig
 
-    plot = pg.PlotWidget(axisItems={'left': TimeAxisItem(orientation='left')})
-    plot.setBackground("w")
-    plot.addLegend()
-
+def update_stacked_bar(fig, study_data):
+    fig.clear()
+    ax = fig.add_subplot(111)
     days = list(study_data.keys())
-    x = np.arange(len(days))
-
     manual = [study_data[d]["manual"] for d in days]
-    timer  = [study_data[d]["timer"]  for d in days]
-
-    y_axis = plot.getAxis("left")
-    y_axis.enableAutoSIPrefix(False) 
+    timer = [study_data[d]["timer"] for d in days]
     
-
-    total_hours_per_day = [m + t for m, t in zip(manual, timer)]
-    max_val = max(total_hours_per_day) if any(total_hours_per_day) else 0
-
-    if max_val <= 10:
-        plot.setYRange(0, 10, padding=0.02) 
-    else:
-        plot.setYRange(0, max_val, padding=0.05)
-    
-    plot.enableAutoRange(axis='y', enable=False)
-
-    bar_width = 0.6
-    manual_bar = pg.BarGraphItem(
-        x=x, height=manual, width=bar_width, 
-        brush="skyblue", name="Manual"
-    )
-    
-    timer_bar = pg.BarGraphItem(
-        x=x, height=timer, width=bar_width, 
-        brush="orange", y0=manual, name="Timer"
-    )
-
-    plot.addItem(manual_bar)
-    plot.addItem(timer_bar)
-
-    plot.getAxis("bottom").setTicks([list(enumerate(days))])
-    plot.setLabel("left", "Study Time", units="HH:MM")
-
-    return plot
-
-def update_stacked_bar(plot_widget, study_data):
-    """Оновлює дані в уже існуючому графіку"""
-    plot_widget.clear()
-
-    days = list(study_data.keys())
     x = np.arange(len(days))
-    manual = [study_data[d]["manual"] for d in days]
-    timer  = [study_data[d]["timer"]  for d in days]
+    width = 0.6
 
-    total_hours_per_day = [m + t for m, t in zip(manual, timer)]
-    max_val = max(total_hours_per_day) if any(total_hours_per_day) else 0
+    ax.bar(x, manual, width, label='Manual', color='#87CEEB', linewidth=0)
+    ax.bar(x, timer, width, bottom=manual, label='Timer', color='#FFA500', linewidth=0)
+
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"{int(x)}:{int((x % 1) * 60):02d}"))
+
+    total_hours = [m + t for m, t in zip(manual, timer)]
+    max_val = max(total_hours) if any(total_hours) else 0
+    ax.set_ylim(0, max(4, max_val * 1.1))
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(days)
+    ax.set_ylabel('Study Time (HH:MM)')
+    ax.legend()
+    ax.grid(axis='y', linestyle='--', alpha=0.3)
     
-    if max_val<=10:
-        plot_widget.setYRange(0, 10, padding=0.02)
-    else:
-        plot_widget.setYRange(0, max_val, padding=0.05)
+    if fig.canvas:
+        fig.canvas.draw_idle()
 
-    bar_width = 0.6
-    manual_bar = pg.BarGraphItem(x=x, height=manual, width=bar_width, brush="skyblue", name="Manual")
-    timer_bar = pg.BarGraphItem(x=x, height=timer, width=bar_width, brush="orange", y0=manual, name="Timer")
-
-    plot_widget.addItem(manual_bar)
-    plot_widget.addItem(timer_bar)
+def show_chart(fig, title="Tracker"):
+    new_manager = plt.figure().canvas.manager
+    new_manager.canvas.figure = fig
+    fig.set_canvas(new_manager.canvas)
+    new_manager.set_window_title(title)
+    plt.show()

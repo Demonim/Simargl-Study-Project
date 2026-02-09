@@ -26,14 +26,11 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-<<<<<<< HEAD
 from main.themes import *
-=======
 from themes import *
 from dashboard.pie.subject_hours import subject_hours
 from dashboard.pie.create_pie import create_pie
 from dashboard.heatmap.create_heatmap import create_heatmap
->>>>>>> f69ba22893d2dfce7886190392ebd94adc7b19e5
 
 import datetime
 import calendar

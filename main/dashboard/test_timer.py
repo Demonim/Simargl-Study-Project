@@ -1,64 +1,46 @@
 import sys
-import os
-from PySide6.QtWidgets import QApplication
-import pyqtgraph as pg
+import matplotlib.pyplot as plt
 from main.dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from main.dashboard.timer_bar.study_timer import Study_Timer
-from main.dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
-
+from main.dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar, show_chart
+import main.dashboard.timer_bar.tracker_controller as actions
 
 def main():
-    login = input('Enter your login: ')
-    password = input('Enter your password: ')
-
-    app = QApplication(sys.argv)
-    
-    user_filename = f"storage/{login}_study_data.json"
-    tracker = WeeklyStudyTracker(filename=user_filename) 
+    login = input('Login: ')
+    tracker = WeeklyStudyTracker(filename=f"storage/{login}_study_data.json") 
     timer = Study_Timer()
     
-    # вікно графіка
-    plot_widget = create_stacked_bar(tracker.all())
-    plot_widget.setWindowTitle(f"Simargl Study Tracker - {login}")
-    plot_widget.resize(800, 600)
-    plot_widget.show()
-
-    print("1 (Manual), 2 (Timer), 3 (Reset), 4 (Exit)")
+    plt.ion()
+    fig = create_stacked_bar(tracker.all())
+    show_chart(fig, title=f"Tracker: {login}")
 
     while True:
-        app.processEvents() 
-        choice = input("\nChoice: ")
+        plt.pause(0.1)
+        cmd = input("\n1-Manual, 2-Timer, 3-Reset, 4-Exit: ")
 
-        if choice == '1':
-            day = input("Day (Mon-Sun): ").capitalize()[:3]
-            try:
-                h = float(input("Hours: "))
-                m = float(input("Minutes: "))
-                tracker.set_day(day, h + (m/60))
-            except ValueError: 
-                print("Error")
-            
-        elif choice == '2':
-            day = input("Day for timer: ").capitalize()[:3]
-            input("Enter to START")
+        if cmd == '1':
+            d = input("Day: ").capitalize()[:3]
+            if actions.manual_entry(tracker, d, input("H: "), input("M: ")):
+                update_stacked_bar(fig, tracker.all())
+
+        elif cmd == '2':
+            input("Enter to Start")
             timer.start()
-            print("Enter to STOP")
-            input()
-            timer.stop()
-            tracker.add_time(day, timer.hours())
-            timer.reset()
             
-        elif choice == '3':
-            confirm = input("Clear all data for this user? (y/n): ")
-            if confirm.lower() == 'y': tracker.reset_all()
+            input("Enter to Stop")
             
-        elif choice == '4':
+            recorded_day = actions.stop_timer(tracker, timer)
+            
+            update_stacked_bar(fig, tracker.all())
+            print("Done")
+
+        elif cmd == '3':
+            if input("Reset? (y/n): ").lower() == 'y':
+                actions.reset_data(tracker)
+                update_stacked_bar(fig, tracker.all())
+
+        elif cmd == '4':
             break
-
-
-        update_stacked_bar(plot_widget, tracker.all())
-        
-        print(f"Data saved to {user_filename}")
 
     sys.exit(0)
 
