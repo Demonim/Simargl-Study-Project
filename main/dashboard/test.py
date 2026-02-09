@@ -38,4 +38,4 @@ show_figure(my_pie)
 show_figure(my_heatmap)
 
 plt.show() 
-mail_handler.close_conections()
+mail_handler.close_conections() 

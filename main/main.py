@@ -1,6 +1,6 @@
 import sys
 import os
-import simargl
+from . import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,11 +26,10 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-from main.themes import *
-from themes import *
-from dashboard.pie.subject_hours import subject_hours
-from dashboard.pie.create_pie import create_pie
-from dashboard.heatmap.create_heatmap import create_heatmap
+from .themes import *
+from .dashboard.pie.subject_hours import subject_hours
+from .dashboard.pie.create_pie import create_pie
+from .dashboard.heatmap.create_heatmap import create_heatmap
 
 import datetime
 import calendar

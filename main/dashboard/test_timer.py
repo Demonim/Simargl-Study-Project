@@ -5,6 +5,8 @@ from main.dashboard.timer_bar.study_timer import Study_Timer
 from main.dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar, show_chart
 import main.dashboard.timer_bar.tracker_controller as actions
 
+
+
 def main():
     login = input('Login: ')
     tracker = WeeklyStudyTracker(filename=f"storage/{login}_study_data.json") 
