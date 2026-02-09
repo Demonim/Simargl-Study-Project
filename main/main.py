@@ -30,11 +30,13 @@ from .themes import *
 from .dashboard.pie.subject_hours import subject_hours
 from .dashboard.pie.create_pie import create_pie
 from .dashboard.heatmap.create_heatmap import create_heatmap
+from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 
-import datetime
+
 import calendar
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
+from datetime import datetime
 
 
 weekly_schedule = defaultdict(list)
@@ -453,36 +455,34 @@ def open_Dashboard(menu_window):
     if target_1 and schedule:
         data_pie = subject_hours(schedule)
         fig_pie = create_pie(data_pie, text_color=get_plot_colors())
-        fig_pie.patch.set_facecolor('none')
+        fig_pie.patch.set_alpha(0.0) 
 
         canvas_1 = FigureCanvasQTAgg(fig_pie)
         canvas_1.setStyleSheet("background-color: transparent;")
-
         layout_1 = QVBoxLayout(target_1)
         layout_1.addWidget(canvas_1)
         target_1.setLayout(layout_1)
 
     target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
-    if target_2 and messages:
-        msg_subjects = [m.subject for m in messages]
-        msg_dates = [m.creation_date for m in messages]
+    if target_2:
 
-        fig_heat = create_heatmap(msg_subjects, msg_dates, color=get_plot_colors())  #
-        fig_heat.patch.set_facecolor('none')
+        subjects_data, dates_data = ecampusmail.show_subjects(last_n=200)
+
+        fig_heat = create_heatmap(subjects_data, dates_data, color=get_plot_colors())
+        fig_heat.patch.set_alpha(0.0)
 
         canvas_2 = FigureCanvasQTAgg(fig_heat)
         canvas_2.setStyleSheet("background-color: transparent;")
-
         layout_2 = QVBoxLayout(target_2)
         layout_2.addWidget(canvas_2)
         target_2.setLayout(layout_2)
+
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
 
     Dashboard_window.show()
     menu_window.close()
-
     menu_window.courses_window = Dashboard_window
 
 def open_Notes(menu_window):
@@ -765,7 +765,7 @@ def error_login(menu_window):
     menu_window.courses_window = error_window
 
 
-def login_from_enter(main_window,remember=False):
+def login_from_enter(main_window, remember=False):
     global user_courses, current_login, schedule, ecampusmail, studip, messages
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
@@ -777,6 +777,8 @@ def login_from_enter(main_window,remember=False):
 
     studip = simargl.StudIP(current_login, password)
     ecampusmail = simargl.ECampusMail(current_login, password)
+    
+    tracker = WeeklyStudyTracker(filename=f"storage/{current_login}_study_data.json")
 
     try:
         studip.create_client()
@@ -786,17 +788,6 @@ def login_from_enter(main_window,remember=False):
     except:
         error_login(main_window)
     else:
-        if remember:
-            login_database = simargl.LoginStorage("ecampus_login_data")
-            result = login_database.load()
-            if result is None:
-                login_database.create(current_login, password)
-            else:
-                login_database.compare(current_login, password)
-        if not remember:
-            if os.path.exists(remember_path):
-                os.remove(remember_path)
-
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
 
@@ -805,6 +796,8 @@ def login_from_enter(main_window,remember=False):
         user_courses = studip.get_courses()
         schedule = studip.get_schedule()
         messages = studip.get_my_messages()
+        
+        globals()['tracker_instance'] = tracker
 
 
 # =========================
