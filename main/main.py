@@ -26,14 +26,7 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-<<<<<<< HEAD
-from main.themes import *
-=======
 from themes import *
-from dashboard.pie.subject_hours import subject_hours
-from dashboard.pie.create_pie import create_pie
-from dashboard.heatmap.create_heatmap import create_heatmap
->>>>>>> f69ba22893d2dfce7886190392ebd94adc7b19e5
 
 import datetime
 import calendar
@@ -724,9 +717,9 @@ def back_to_main(menu_window):
 
     # Check box "Remember me"
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/login_data.db"
+    remember_path = "storage/ecampus_login_data.db"
     if os.path.exists(remember_path):
-        login_database = simargl.LoginStorage()
+        login_database = simargl.LoginStorage("ecampus_login_data")
         db_data = login_database.load().fetchall()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
         login_box.setText(db_data[0][0])
@@ -791,7 +784,7 @@ def login_from_enter(main_window,remember=False):
         error_login(main_window)
     else:
         if remember:
-            login_database = simargl.LoginStorage()
+            login_database = simargl.LoginStorage("ecampus_login_data")
             result = login_database.load()
             if result is None:
                 login_database.create(current_login, password)
@@ -840,9 +833,9 @@ def main():
 
     # --- check box "Remember me" ---
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/login_data.db"
+    remember_path = "storage/ecampus_login_data.db"
     if os.path.exists(remember_path):
-        login_database = simargl.LoginStorage()
+        login_database = simargl.LoginStorage("ecampus_login_data")
         db_data = login_database.load().fetchall()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
         login_box.setText(db_data[0][0])

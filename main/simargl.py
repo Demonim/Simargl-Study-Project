@@ -333,17 +333,20 @@ class LoginStorage:
     of user login data, securely hashing passwords before storage.
     """
 
-    def __init__(self):
+    def __init__(self, name):
         """
         Initializes the storage environment.
 
         Creates the 'storage' directory if it doesn't exist and sets the 
-        path for the SQLite database file (`login_data.db`).
+        path for the SQLite database file (`{name}.db`).
+
+        Args:
+            name (str): The name of the file
         """
 
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
-        self.file_path = os.path.join(self.base_path, f"login_data.db")
+        self.file_path = os.path.join(self.base_path, f"{name}.db")
     
     def load(self):
         """
@@ -376,8 +379,8 @@ class LoginStorage:
 
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
-        self.cur.execute("CREATE TABLE users (name TEXT, password TEXT)")
-        self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}')")
+        self.cur.execute("CREATE TABLE users (name TEXT, password TEXT, banned INTEGER)")
+        self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}',0)")
         self.con.commit()
         print("Created")
     
@@ -400,14 +403,42 @@ class LoginStorage:
 
         self.login = login
         self.password = hashlib.sha256(b"password").hexdigest()
-        result = self.cur.execute(f"SELECT name, password FROM users WHERE name='{self.login}' AND password='{self.password}'")
+        result = self.cur.execute(f"SELECT name, password, banned FROM users WHERE name='{self.login}' AND password='{self.password}'")
         if result.fetchone() is None:
-            self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}')")
+            self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}',0)")
             self.con.commit()
             return False
         else:
             return True
         
+    def un_ban(self, login, password):
+        """
+        Bans or unbans user by checking the database from provided credentials.
+
+        if the user is unbaned, the users becomes baned and vice versa.
+
+        Args:
+            login (str): The username to check.
+            password (str): The plain-text password to verify.
+        Returns:
+            bool: True if the user is banned.
+                  False if the user is unbanned.
+            None: if no user from loghin and password is fetched.
+        """
+
+        self.login = login
+        self.password = hashlib.sha256(b"password").hexdigest()
+        result = self.cur.execute(f"SELECT name, password, banned FROM users WHERE name='{self.login}' AND password='{self.password}'")
+        fetch = result.fetchone()
+        if fetch is None:
+            return None
+        else:
+            if fetch[0][2] == 0:
+                self.cur.execute(f"UPDATE users SET banned=1 WHERE name='{self.login}' AND password='{self.password}")
+                return True
+            else:
+                self.cur.execute(f"UPDATE users SET banned=0 WHERE name='{self.login}' AND password='{self.password}")
+                return False
 
 class NotesStorage:
     """
