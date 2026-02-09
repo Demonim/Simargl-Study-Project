@@ -1,5 +1,5 @@
 from matplotlib.figure import Figure
-from dashboard.pie.pie_val_lab import pie_values_labels
+from .pie_val_lab import pie_values_labels
 
 
 def create_pie(subject_hours, text_color='black'):

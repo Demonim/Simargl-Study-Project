@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib.figure import Figure
-from dashboard.heatmap.messages_logic import topics_week_matrix, topic_labels
+from .messages_logic import topics_week_matrix, topic_labels
 
 
 def create_heatmap(subjects, dates, color='black'):
