@@ -164,6 +164,81 @@ def apply_bar_theme(canvas_bar, theme):
 
     canvas_bar.draw()
 
+
+def load_ecampus_mail_data(Email_window):
+    global ecampusmail
+
+    # Находим список в интерфейсе
+    messages_list = Email_window.findChild(QListWidget, "messagesList")
+    if not messages_list:
+        return
+
+    # Очищаем список перед загрузкой
+    messages_list.clear()
+
+    try:
+        # ЗАГРУЗКА: Программа остановится здесь до получения ответа от сервера
+        subjects, dates = ecampusmail.show_subjects(100)
+
+        for i in range(len(subjects)):
+            # Создаем контейнер для строки
+            item_widget = QWidget()
+            layout = QHBoxLayout(item_widget)
+            layout.setContentsMargins(5, 2, 5, 2)
+
+            # Создаем кнопку как в StudIP
+            display_text = f"{dates[i]} | {subjects[i]}"
+            msg_button = QPushButton(display_text)
+            msg_button.setStyleSheet("text-align: left; padding: 10px;")
+
+            # Привязываем открытие письма по индексу i
+            msg_button.clicked.connect(lambda ch=False, idx=i: open_mail_content(idx))
+
+            layout.addWidget(msg_button)
+
+            # Добавляем виджет в QListWidget
+            list_item = QListWidgetItem(messages_list)
+            list_item.setSizeHint(item_widget.sizeHint())
+            messages_list.addItem(list_item)
+            messages_list.setItemWidget(list_item, item_widget)
+
+    except Exception as e:
+        print(f"Ошибка при получении почты: {e}")
+
+
+def open_mail_content(mail_index):
+    global ecampusmail
+
+    try:
+        # 1. Вызываем ваш метод из simargl.py
+        # Он возвращает объект email.message.Message
+        msg = ecampusmail.open_mail(mail_index)
+
+        # 2. Извлекаем текст из этого объекта
+        content = ""
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_type() == "text/plain":
+                    content += part.get_payload(decode=True).decode('utf-8', errors='ignore')
+        else:
+            content = msg.get_payload(decode=True).decode('utf-8', errors='ignore')
+
+        # 3. Показываем в окне (как в StudIP)
+        dialog = QDialog()
+        dialog.setWindowTitle(f"Письмо: {msg['Subject']}")
+        dialog.setMinimumSize(600, 400)
+        layout = QVBoxLayout(dialog)
+
+        text_edit = QTextEdit()
+        text_edit.setReadOnly(True)
+        text_edit.setText(content)
+
+        layout.addWidget(text_edit)
+        dialog.exec()
+
+    except Exception as e:
+        print(f"Ошибка: {e}")
+
 class DayScheduleDialog(QDialog):
     def __init__(self, title, entries, parent=None):
         super().__init__(parent)
@@ -517,17 +592,19 @@ def open_message_dialog(message):
 
     dialog.exec()
 
+
 def open_Email(menu_window):
     Email_window = load_ui("UI/Email.ui")
 
     exit_button = Email_window.findChild(QPushButton, "Back_Button")
-    exit_button.clicked.connect(
-        lambda: open_menu(Email_window)
-    )
+    exit_button.clicked.connect(lambda: open_menu(Email_window))
+
+    write_button = Email_window.findChild(QPushButton, "Write_Button")
+
+    load_ecampus_mail_data(Email_window)
 
     Email_window.show()
     menu_window.close()
-
     menu_window.courses_window = Email_window
 
 
