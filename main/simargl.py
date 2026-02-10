@@ -2,10 +2,10 @@ import studipy
 
 import imaplib
 import email
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-
+import email.mime.multipart
+import email.mime.text
+import email.mime.base
+import email.encoders
 import smtplib
 
 import os
