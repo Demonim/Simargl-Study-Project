@@ -1,13 +1,21 @@
 import studipy
+
 import imaplib
 import email
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+
 import smtplib
+
 import os
 import json
 import uuid
+import datetime
+
 import sqlite3 as sql
 import hashlib
-import datetime
+
 
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
@@ -301,11 +309,11 @@ class ECampusMail:
         message["Subject"] = str(subject)
         message["From"] = str(sender)
         message["To"] = str(receiver)
-        message.attach(email.mime.text.MIMEText(str(text), "plain"))
+        message.attach(MIMEText(str(text), "plain"))
 
         if filename != None:
             with open(filename, "rb") as attachment:
-                part = email.mime.base.MIMEBase("application", "octet-stream")
+                part = MIMEBase("application", "octet-stream")
                 part.set_payload(attachment.read())
             email.encoders.encode_base64(part)
             part.add_header("Content-Disposition", f"attachment; filename= {filename}")
@@ -433,11 +441,11 @@ class LoginStorage:
         if fetch is None:
             return None
         else:
-            if fetch[0][2] == 0:
-                self.cur.execute(f"UPDATE users SET banned=1 WHERE name='{self.login}' AND password='{self.password}")
+            if fetch[2] == 0:
+                self.cur.execute(f"UPDATE users SET banned=1 WHERE name='{self.login}' AND password='{self.password}'")
                 return True
             else:
-                self.cur.execute(f"UPDATE users SET banned=0 WHERE name='{self.login}' AND password='{self.password}")
+                self.cur.execute(f"UPDATE users SET banned=0 WHERE name='{self.login}' AND password='{self.password}'")
                 return False
 
 class NotesStorage:
