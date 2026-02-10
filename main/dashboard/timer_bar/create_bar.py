@@ -9,7 +9,9 @@ def create_stacked_bar(study_data):
 
 def update_stacked_bar(fig, study_data):
     fig.clear()
+    fig.patch.set_facecolor('none')
     ax = fig.add_subplot(111)
+    ax.set_facecolor('none')
     days = list(study_data.keys())
     manual = [study_data[d]["manual"] for d in days]
     timer = [study_data[d]["timer"] for d in days]

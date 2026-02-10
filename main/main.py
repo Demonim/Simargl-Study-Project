@@ -1,6 +1,6 @@
 import sys
 import os
-from . import simargl
+import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,11 +26,13 @@ from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-from .themes import *
-from .dashboard.pie.subject_hours import subject_hours
-from .dashboard.pie.create_pie import create_pie
-from .dashboard.heatmap.create_heatmap import create_heatmap
-from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
+from themes import *
+from dashboard.pie.subject_hours import subject_hours
+from dashboard.pie.create_pie import create_pie
+from dashboard.heatmap.create_heatmap import create_heatmap
+from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
+from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
+from dashboard.timer_bar.study_timer import Study_Timer
 
 
 import calendar
@@ -40,6 +42,8 @@ from datetime import datetime
 
 
 weekly_schedule = defaultdict(list)
+study_timer = Study_Timer()
+active_timer_day = None
 schedule = None
 notes_storage = None
 admin_login = "Admin"
@@ -80,6 +84,85 @@ def load_ui(path: str):
     ui_file.close()
     return window
 
+
+def save_tracker_data(dashboard_window, canvas_bar, tracker, theme):
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    for day in days:
+        h_line = dashboard_window.findChild(QLineEdit, f"{day}_H")
+        m_line = dashboard_window.findChild(QLineEdit, f"{day}_M")
+
+        if h_line and m_line:
+            try:
+
+                h = float(h_line.text()) if h_line.text().strip() else 0.0
+                m = float(m_line.text()) if m_line.text().strip() else 0.0
+
+                total_hours = h + (m / 60.0)
+                tracker.set_day(day, total_hours)
+            except ValueError:
+                continue
+
+    update_stacked_bar(canvas_bar.figure, tracker.all())
+    apply_bar_theme(canvas_bar, current_theme_name)
+    canvas_bar.draw()
+
+
+def choose_day_and_start(parent_window):
+    global active_timer_day
+
+    loader = QUiLoader()
+    ui_file = QFile("UI/Dashboard_dialogue.ui")
+    if not ui_file.open(QFile.ReadOnly):
+        return
+    dialog = loader.load(ui_file, parent_window)
+    ui_file.close()
+
+    def handle_selection(day_code):
+        global active_timer_day
+        active_timer_day = day_code
+        study_timer.start()
+        print(f"Таймер запущен для: {day_code}")
+        dialog.accept()
+    days_buttons = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
+    for day_name in days_buttons:
+        btn = dialog.findChild(QPushButton, day_name)
+        if btn:
+            btn.clicked.connect(lambda checked, d=day_name: handle_selection(d))
+
+    dialog.exec()
+
+
+def stop_timer_and_save(canvas_bar, tracker, current_theme):
+    global active_timer_day
+    if study_timer.running and active_timer_day:
+        study_timer.stop()
+        hours = study_timer.hours()
+
+        tracker.add_time(active_timer_day, hours)
+        study_timer.reset()
+
+        update_stacked_bar(canvas_bar.figure, tracker.all())
+
+        apply_bar_theme(canvas_bar, current_theme)
+
+        active_timer_day = None
+        print(f"Таймер остановлен. Добавлено {hours:.2f} ч.")
+
+
+def apply_bar_theme(canvas_bar, theme):
+    txt_col = 'white' if "Dark" in theme else 'black'
+    fig = canvas_bar.figure
+    ax = fig.gca()
+
+    ax.tick_params(colors=txt_col)
+    ax.xaxis.label.set_color(txt_col)
+    ax.yaxis.label.set_color(txt_col)
+
+    for spine in ax.spines.values():
+        spine.set_edgecolor(txt_col)
+
+    canvas_bar.draw()
 
 class DayScheduleDialog(QDialog):
     def __init__(self, title, entries, parent=None):
@@ -477,6 +560,52 @@ def open_Dashboard(menu_window):
         layout_2.addWidget(canvas_2)
         target_2.setLayout(layout_2)
 
+    target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
+
+    tracker_obj = WeeklyStudyTracker(filename="storage/study_data.json")
+
+    if target_3:
+        fig_bar = create_stacked_bar(tracker_obj.all())
+        canvas_bar = FigureCanvasQTAgg(fig_bar)
+        canvas_bar.setStyleSheet("background-color: transparent;")
+
+        if not target_3.layout():
+            QVBoxLayout(target_3).setContentsMargins(0, 0, 0, 0)
+        target_3.layout().addWidget(canvas_bar)
+
+        apply_bar_theme(canvas_bar, current_theme_name)
+
+        save_btn = Dashboard_window.findChild(QPushButton, "Save_Button")
+        if save_btn:
+            def run_save():
+                save_tracker_data(Dashboard_window, canvas_bar, tracker_obj, current_theme_name)
+                apply_bar_theme(canvas_bar, current_theme_name)
+
+            save_btn.clicked.connect(run_save)
+
+        reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
+        if reset_btn:
+            def run_reset():
+                tracker_obj.reset_all()
+                for day in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
+                    Dashboard_window.findChild(QLineEdit, f"{day}_H").clear()
+                    Dashboard_window.findChild(QLineEdit, f"{day}_M").clear()
+                update_stacked_bar(canvas_bar.figure, tracker_obj.all())
+                apply_bar_theme(canvas_bar, current_theme_name)
+
+            reset_btn.clicked.connect(run_reset)
+
+        start_btn = Dashboard_window.findChild(QPushButton, "Start_Button")
+        if start_btn:
+            start_btn.clicked.connect(lambda: choose_day_and_start(Dashboard_window))
+
+        stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
+        if stop_btn:
+            def run_stop():
+                stop_timer_and_save(canvas_bar, tracker_obj, current_theme_name)
+                apply_bar_theme(canvas_bar, current_theme_name)
+
+            stop_btn.clicked.connect(run_stop)
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
@@ -499,13 +628,11 @@ def open_Notes(menu_window):
     add_button = Notes_window.findChild(QPushButton, "AddNoteButton")
     save_button = Notes_window.findChild(QPushButton, "SaveNoteButton")
 
-    # Notes safe (saves while the window is open)
     notes = notes_storage.load_notes()
 
     for note in notes:
         notes_list.addItem(note["title"])
 
-    # --- add note ---
     def add_note():
         dialog = AddNoteDialog(Notes_window)
         if dialog.exec():
