@@ -222,6 +222,7 @@ class ECampusMail:
                   subjects_list (list[str]): Decoded email subjects.
                   dates_list (list[datetime]): Timezone-aware datetime objects.
         """
+
         self.mail.select("inbox")
         result, data = self.mail.search(None, "ALL")
         self.email_ids = data[0].split()
@@ -309,11 +310,11 @@ class ECampusMail:
         message["Subject"] = str(subject)
         message["From"] = str(sender)
         message["To"] = str(receiver)
-        message.attach(MIMEText(str(text), "plain"))
+        message.attach(email.mime.text.MIMEText(str(text), "plain"))
 
         if filename != None:
             with open(filename, "rb") as attachment:
-                part = MIMEBase("application", "octet-stream")
+                part = email.mime.multipart.MIMEBase("application", "octet-stream")
                 part.set_payload(attachment.read())
             email.encoders.encode_base64(part)
             part.add_header("Content-Disposition", f"attachment; filename= {filename}")
