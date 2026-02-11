@@ -224,8 +224,8 @@ class ECampusMail:
         """
         self.mail.select("inbox")
         result, data = self.mail.search(None, "ALL")
-        email_ids = data[0].split()
-        latest_ids = email_ids[-last_n:]
+        self.email_ids = data[0].split()
+        latest_ids = self.email_ids[-last_n:]
         
         if not latest_ids:
             return [[], []]
