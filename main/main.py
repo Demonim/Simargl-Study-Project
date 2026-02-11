@@ -394,28 +394,25 @@ def add_user_item(username, list_widget, mode, refresh_callback):
 def open_unbanned():
     global current_active_window
     window = load_ui("UI/Unbanned.ui")
-
     prev_window = current_active_window
     current_active_window = window
 
     user_list_widget = window.findChild(QListWidget, "User_list")
     back_button = window.findChild(QPushButton, "pushButton")
-
     storage = simargl.LoginStorage("users_db")
 
     def refresh_list():
         user_list_widget.clear()
-        users_data = storage.load()
-        if users_data:
-            for row in users_data.fetchall():
-                # row[0] - name, row[2] - banned
-                if row[2] == 0:  # Показываем только незабаненных
-                    add_user_item(row[0], user_list_widget, "ban", refresh_list)
+        users_data = storage.load() # Возвращает SELECT * FROM users
+        for row in users_data.fetchall():
+            # row[0] - name, row[2] - banned_status
+            if row[2] == 0:
+                add_user_item(row[0], user_list_widget, "ban", refresh_list)
 
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
     window.show()
-    prev_window.close()
+    if prev_window: prev_window.close()
 
 
 def open_banned():
@@ -453,18 +450,22 @@ def show_ban_dialog(username, mode, refresh_callback):
     ban_btn = dialog.findChild(QPushButton, "Ban")
     unban_btn = dialog.findChild(QPushButton, "Unban")
 
+    # Ссылка на ту же базу, что и в приложении
     storage = simargl.LoginStorage("users_db")
-    storage.load()
 
-    def apply_change():
-        storage.un_ban(username)
-        storage.con.commit()
-
+    def handle_ban():
+        storage.set_ban_status(username, 1)
         dialog.accept()
         refresh_callback()
 
-    ban_btn.clicked.connect(apply_change)
-    unban_btn.clicked.connect(apply_change)
+    def handle_unban():
+        storage.set_ban_status(username, 0)
+        dialog.accept()
+        refresh_callback()
+
+    # Привязываем действия к конкретным кнопкам
+    if ban_btn: ban_btn.clicked.connect(handle_ban)
+    if unban_btn: unban_btn.clicked.connect(handle_unban)
 
     dialog.exec()
 
@@ -1142,19 +1143,20 @@ def open_registration(prelogin_window, storage):
     reg_window = load_ui("UI/new_user.ui")
 
     def create_user():
-        l = reg_window.findChild(QLineEdit, "LoginLine").text()
-        p = reg_window.findChild(QLineEdit, "PasswordLine").text()
+        login = reg_window.findChild(QLineEdit, "LoginLine").text().strip()
+        password = reg_window.findChild(QLineEdit, "PasswordLine").text().strip()
 
-        if l and p:
-            storage.load()
-            if storage.compare(l, p):
-                QMessageBox.warning(reg_window, "Mistake", "User already exists!")
-            else:
-                storage.create(l, p)
-                QMessageBox.information(reg_window, "Success", f"User {l} created successfully!")
-                reg_window.accept()
-        else:
+        if not login or not password:
             QMessageBox.warning(reg_window, "Mistake", "Fill every field!")
+            return
+
+        # Используем новый метод проверки существования
+        if storage.user_exists(login):
+            QMessageBox.warning(reg_window, "Mistake", "User already exists!")
+        else:
+            storage.create(login, password)
+            QMessageBox.information(reg_window, "Success", f"User {login} created successfully!")
+            reg_window.accept()
 
     reg_window.findChild(QPushButton, "Create").clicked.connect(create_user)
     reg_window.exec()

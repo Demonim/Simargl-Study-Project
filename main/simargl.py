@@ -335,90 +335,50 @@ class ECampusMail:
             self.smtp_conn.quit()
 
 class LoginStorage:
-    """
-    A storage manager for user credentials using a local SQLite database.
-
-    This class handles the initialization, creation, loading, and verification 
-    of user login data, securely hashing passwords before storage.
-    """
-
     def __init__(self, name):
-        """
-        Initializes the storage environment.
-
-        Creates the 'storage' directory if it doesn't exist and sets the 
-        path for the SQLite database file (`{name}.db`).
-
-        Args:
-            name (str): The name of the file
-        """
-
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{name}.db")
-    
-    def load(self):
-        """
-        Connects to the database and checks for existing user data.
-
-        Returns:
-            sqlite3.Cursor or None: Returns the cursor executing a SELECT query on 
-            the 'users' table if the table exists. Returns None if the 'users' 
-            table does not exist.
-        """
-
+        # Инициализируем соединение сразу
         self.con = sql.connect(self.file_path)
         self.cur = self.con.cursor()
-        data = self.cur.execute("SELECT name FROM sqlite_master WHERE name='users'")
-        if data.fetchone() is None:
-            return None
-        print("Loaded")
-        return self.cur.execute("SELECT * FROM users")
+        self._create_table()
+
+    def _create_table(self):
+        """Внутренний метод для гарантии наличия таблицы"""
+        self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT PRIMARY KEY, password TEXT, banned INTEGER)")
+        self.con.commit()
+
+    def load(self):
+        """Возвращает всех пользователей для списка Админа"""
+        return self.cur.execute("SELECT name, password, banned FROM users")
+
+    def user_exists(self, login):
+        """Проверка: занято ли имя (нужно для регистрации)"""
+        result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
+        return result.fetchone() is not None
 
     def create(self, login, password):
-        self.login = login
-        self.password = hashlib.sha256(password.encode()).hexdigest()
-
-        self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT, password TEXT, banned INTEGER)")
-        self.cur.execute("INSERT INTO users (name, password, banned) VALUES (?, ?, 0)", (self.login, self.password))
-        self.con.commit()
-        print(f"User {login} added to DB")
-    
-    def compare(self, login, password):
-        """
-        Verifies login credentials or registers them if they don't exist.
-
-        Checks if the provided login and hashed password match an entry in the database.
-        If no match is found, it automatically registers the user with the provided 
-        credentials and returns False.
-
-        Args:
-            login (str): The username to check.
-            password (str): The plain-text password to verify.
-
-        Returns:
-            bool: True if the credentials match an existing user.
-                  False if the user did not exist (and was just created).
-        """
-
-        self.login = login
-        self.password = hashlib.sha256(password.encode()).hexdigest()
-        result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (self.login, self.password))
-        if result.fetchone() is None:
-            return False
-        return True
-
-    def un_ban(self, login):  # Убрали аргумент password
-        result = self.cur.execute("SELECT name, banned FROM users WHERE name=?", (login,))
-        fetch = result.fetchone()
-
-        if fetch is None:
-            return None
-        else:
-            new_status = 1 if fetch[1] == 0 else 0
-            self.cur.execute("UPDATE users SET banned=? WHERE name=?", (new_status, login))
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        try:
+            self.cur.execute("INSERT INTO users (name, password, banned) VALUES (?, ?, 0)", (login, hashed_password))
             self.con.commit()
-            return True if new_status == 1 else False
+            print(f"User {login} created.")
+            return True
+        except sql.IntegrityError:
+            return False
+
+    def compare(self, login, password):
+        """Только для входа: проверка пары логин-пароль"""
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (login, hashed_password))
+        return result.fetchone() is not None
+
+    def set_ban_status(self, login, status: int):
+        """Установка конкретного статуса (1 - бан, 0 - разбан)"""
+        self.cur.execute("UPDATE users SET banned=? WHERE name=?", (status, login))
+        self.con.commit()
+
 class NotesStorage:
     """
     A storage manager for user-specific notes using JSON files.
