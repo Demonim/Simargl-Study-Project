@@ -408,17 +408,25 @@ class LoginStorage:
             return False
         return True
 
-    def un_ban(self, login):  # Убрали аргумент password
-        result = self.cur.execute("SELECT name, banned FROM users WHERE name=?", (login,))
-        fetch = result.fetchone()
-
-        if fetch is None:
+    def ban_user(self, login):
+        result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
+        if result.fetchone() is None:
             return None
-        else:
-            new_status = 1 if fetch[1] == 0 else 0
-            self.cur.execute("UPDATE users SET banned=? WHERE name=?", (new_status, login))
-            self.con.commit()
-            return True if new_status == 1 else False
+
+        self.cur.execute("UPDATE users SET banned=1 WHERE name=?", (login,))
+        self.con.commit()
+        print(f"User {login} has been banned.")
+        return True
+
+    def unban_user(self, login):
+        result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
+        if result.fetchone() is None:
+            return None
+
+        self.cur.execute("UPDATE users SET banned=0 WHERE name=?", (login,))
+        self.con.commit()
+        print(f"User {login} has been unbanned.")
+        return True
 class NotesStorage:
     """
     A storage manager for user-specific notes using JSON files.

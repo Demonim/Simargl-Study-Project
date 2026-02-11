@@ -50,6 +50,7 @@ notes_storage = None
 admin_login = "Admin"
 admin_password = "Admin"
 current_theme_name = "Dark"
+db_storage = None
 
 # =========================
 # THEMES
@@ -449,23 +450,29 @@ def open_banned():
 
 
 def show_ban_dialog(username, mode, refresh_callback):
+    global db_storage
+
     dialog = load_ui("UI/Ban_Dialogue.ui")
     ban_btn = dialog.findChild(QPushButton, "Ban")
     unban_btn = dialog.findChild(QPushButton, "Unban")
 
-    storage = simargl.LoginStorage("users_db")
-    storage.load()
-
-    def apply_change():
-        storage.un_ban(username)
-        storage.con.commit()
-
+    def press_ban():
+        db_storage.ban_user(username)
         dialog.accept()
         refresh_callback()
 
-    ban_btn.clicked.connect(apply_change)
-    unban_btn.clicked.connect(apply_change)
+    def press_unban():
+        db_storage.unban_user(username)
+        dialog.accept()
+        refresh_callback()
 
+    ban_btn.clicked.connect(press_ban)
+    unban_btn.clicked.connect(press_unban)
+
+    if mode == "unbanned":
+        unban_btn.setEnabled(False)
+    elif mode == "banned":
+        ban_btn.setEnabled(False)
     dialog.exec()
 
 def open_admin(main_window):
@@ -1236,7 +1243,9 @@ def handle_auth(prelogin_window, storage):
 
 
 def main():
-    global prelogin_window, current_active_window
+    global prelogin_window, current_active_window, db_storage
+    db_storage = simargl.LoginStorage("users_db")
+    db_storage.load()
 
     app = QApplication.instance()
     if not app:
