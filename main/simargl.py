@@ -414,8 +414,6 @@ class LoginStorage:
         self.password = hashlib.sha256(b"password").hexdigest()
         result = self.cur.execute(f"SELECT name, password, banned FROM users WHERE name='{self.login}' AND password='{self.password}'")
         if result.fetchone() is None:
-            self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}',0)")
-            self.con.commit()
             return False
         else:
             return True

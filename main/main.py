@@ -19,7 +19,8 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QAbstractItemView,
     QHBoxLayout,
-    QCheckBox
+    QCheckBox,
+    QMessageBox
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
@@ -34,13 +35,13 @@ from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from dashboard.timer_bar.study_timer import Study_Timer
 
-
 import calendar
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from datetime import datetime
 
-
+current_active_window = None
+prelogin_window = None
 weekly_schedule = defaultdict(list)
 study_timer = Study_Timer()
 active_timer_day = None
@@ -64,6 +65,7 @@ WEEKDAY_MAP = {
     6: "SU"
 }
 
+
 # =========================
 # UI LOADER
 # =========================
@@ -79,7 +81,7 @@ def load_ui(path: str):
         print(f"CRITICAL ERROR: Could not find or open UI file at: {ui_path}")
         print(f"Qt Error: {ui_file.errorString()}")
         sys.exit(-1)
-    
+
     window = loader.load(ui_file)
     ui_file.close()
     return window
@@ -124,6 +126,7 @@ def choose_day_and_start(parent_window):
         study_timer.start()
         print(f"Таймер запущен для: {day_code}")
         dialog.accept()
+
     days_buttons = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
     for day_name in days_buttons:
         btn = dialog.findChild(QPushButton, day_name)
@@ -239,6 +242,7 @@ def open_mail_content(mail_index):
     except Exception as e:
         print(f"Ошибка: {e}")
 
+
 class DayScheduleDialog(QDialog):
     def __init__(self, title, entries, parent=None):
         super().__init__(parent)
@@ -257,6 +261,7 @@ class DayScheduleDialog(QDialog):
             self.list.addItem(
                 f"{e.start} – {e.end} | {e.title}"
             )
+
 
 class AddNoteDialog(QDialog):
     def __init__(self, parent=None):
@@ -279,6 +284,7 @@ class AddNoteDialog(QDialog):
 
     def get_name(self):
         return self.line_edit.text().strip()
+
 
 class CourseDayDialog(QDialog):
     def __init__(self, courses, storage, parent=None):
@@ -355,6 +361,7 @@ def change_theme(app, theme):
     elif theme == "Light Mini":
         app.setStyleSheet(LIGHT_Minimalistic)
 
+
 def get_plot_colors():
     if "Dark" in current_theme_name:
         return 'white'  # Цвет текста для темных тем
@@ -368,12 +375,14 @@ def get_plot_colors():
 
 def open_admin(main_window):
     admin_window = load_ui("UI/Admin.ui")
+    global current_active_window
+    current_active_window = admin_window
 
     ban_button = admin_window.findChild(QPushButton, "Ban_Button")
     unban_button = admin_window.findChild(QPushButton, "Unban_Button")
     back_button = admin_window.findChild(QPushButton, "Back_Button")
     back_button.clicked.connect(
-        lambda: back_to_main(admin_window)
+        lambda: universal_logout()
     )
 
     admin_window.show()
@@ -422,6 +431,7 @@ def open_courses(menu_window):
 
     menu_window.courses_window = courses_window
 
+
 def open_calendar_entry(menu_window):
     storage = simargl.CourseDaysStorage(current_login)
 
@@ -433,6 +443,7 @@ def open_calendar_entry(menu_window):
 
     if dialog.exec():
         open_calendar(menu_window)
+
 
 def open_calendar(menu_window):
     calendar_window = load_ui("UI/calendar.ui")
@@ -518,6 +529,7 @@ def open_calendar(menu_window):
     calendar_window.show()
     menu_window.close()
     menu_window.courses_window = calendar_window
+
 
 def open_StudIP(menu_window):
     StudIP_window = load_ui("UI/StudIP.ui")
@@ -615,7 +627,7 @@ def open_Dashboard(menu_window):
     if target_1 and schedule:
         data_pie = subject_hours(schedule)
         fig_pie = create_pie(data_pie, text_color=get_plot_colors())
-        fig_pie.patch.set_alpha(0.0) 
+        fig_pie.patch.set_alpha(0.0)
 
         canvas_1 = FigureCanvasQTAgg(fig_pie)
         canvas_1.setStyleSheet("background-color: transparent;")
@@ -625,7 +637,6 @@ def open_Dashboard(menu_window):
 
     target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
     if target_2:
-
         subjects_data, dates_data = ecampusmail.show_subjects(last_n=200)
 
         fig_heat = create_heatmap(subjects_data, dates_data, color=get_plot_colors())
@@ -690,6 +701,7 @@ def open_Dashboard(menu_window):
     Dashboard_window.show()
     menu_window.close()
     menu_window.courses_window = Dashboard_window
+
 
 def open_Notes(menu_window):
     global notes_storage
@@ -813,6 +825,7 @@ def open_Help1(main_window):
 
     main_window.courses_window = Help_window1
 
+
 def open_Help(main_window):
     Help_window = load_ui("UI/help.ui")
 
@@ -849,15 +862,16 @@ def open_Help(main_window):
 
     main_window.courses_window = Help_window
 
+
 def open_menu(main_window):
     menu_window = load_ui("UI/menu.ui")
-    mail_notifications = menu_window.findChild(QLabel,"Ecampus_Mail")
-    message_notifications = menu_window.findChild(QLabel,"StudIP_Messages")
+    mail_notifications = menu_window.findChild(QLabel, "Ecampus_Mail")
+    message_notifications = menu_window.findChild(QLabel, "StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(mail_notifications.setText(f"ECampus Mail ({ecampusmail.mail_notifications()})"), 1)
         executor.submit(message_notifications.setText(f"StudIP ({studip.new_messages_counter()})"), 2)
 
-    name_label = menu_window.findChild(QLabel,"Name_label")
+    name_label = menu_window.findChild(QLabel, "Name_label")
     name_label.setText(f"{current_login}")
 
     courses_button = menu_window.findChild(QPushButton, "Courses")
@@ -897,22 +911,22 @@ def open_menu(main_window):
         lambda: back_to_main(menu_window)
     )
 
-
     menu_window.show()
     main_window.close()
 
     main_window.menu_window = menu_window
 
 
-
-
 def back_to_main(menu_window):
     main_window = load_ui("UI/main.ui")
+    global current_active_window
+    current_active_window = main_window
 
     try:
         if ecampusmail.server and ecampusmail.mail:
             ecampusmail.close_conections()
-            ecampusmail.server = False; ecampusmail.mail = False
+            ecampusmail.server = False;
+            ecampusmail.mail = False
     except:
         pass
 
@@ -950,38 +964,24 @@ def back_to_main(menu_window):
         lambda: open_Help(main_window)
     )
 
+    logout_btn = main_window.findChild(QPushButton, "Logout")
+    if logout_btn:
+        logout_btn.clicked.connect(lambda: universal_logout())
+
     main_window.show()
     menu_window.close()
-
-
-def error_login(menu_window):
-    error_window = load_ui("UI/error.ui")
-
-    # button to exit back to the main
-    exit_button = error_window.findChild(QPushButton, "Error_Button")
-    exit_button.clicked.connect(
-        lambda: back_to_main(error_window)
-    )
-
-    error_window.show()
-    menu_window.close()
-
-    menu_window.courses_window = error_window
 
 
 def login_from_enter(main_window, remember=False):
     global user_courses, current_login, schedule, ecampusmail, studip, messages
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
-    current_login = login_box.text(); password = password_box.text()
-
-    if current_login == admin_login and password == admin_password:
-        open_admin(main_window)
-        return
+    current_login = login_box.text();
+    password = password_box.text()
 
     studip = simargl.StudIP(current_login, password)
     ecampusmail = simargl.ECampusMail(current_login, password)
-    
+
     tracker = WeeklyStudyTracker(filename=f"storage/{current_login}_study_data.json")
 
     try:
@@ -990,7 +990,7 @@ def login_from_enter(main_window, remember=False):
             executor.submit(ecampusmail.read_email_init())
             executor.submit(ecampusmail.write_email_init())
     except:
-        error_login(main_window)
+        QMessageBox.warning(prelogin_window, "Mistake", "Incorrect Login or Password")
     else:
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
@@ -1000,7 +1000,7 @@ def login_from_enter(main_window, remember=False):
         user_courses = studip.get_courses()
         schedule = studip.get_schedule()
         messages = studip.get_my_messages()
-        
+
         globals()['tracker_instance'] = tracker
 
 
@@ -1008,7 +1008,7 @@ def login_from_enter(main_window, remember=False):
 # MAIN
 # =========================
 
-def check_box_remember(checkbox:QCheckBox):
+def check_box_remember(checkbox: QCheckBox):
     global remember
     if checkbox.isChecked() == True:
         remember = True
@@ -1016,22 +1016,70 @@ def check_box_remember(checkbox:QCheckBox):
         remember = False
 
 
-def main():
+def universal_logout():
+    global current_active_window, prelogin_window
+
+    if prelogin_window:
+        login_box = prelogin_window.findChild(QLineEdit, "LoginLine")
+        pass_box = prelogin_window.findChild(QLineEdit, "PasswordLine")
+        if login_box: login_box.clear()
+        if pass_box: pass_box.clear()
+
+    if current_active_window:
+        current_active_window.close()
+
+    if prelogin_window:
+        prelogin_window.show()
+        current_active_window = prelogin_window
+
+
+def open_registration(prelogin_window, storage):
+    reg_window = load_ui("UI/new_user.ui")
+
+    def create_user():
+        l = reg_window.findChild(QLineEdit, "LoginLine").text()
+        p = reg_window.findChild(QLineEdit, "PasswordLine").text()
+        if l and p:
+            if storage.load() is None:
+                storage.create(l, p)
+            else:
+                storage.compare(l, p)
+            QMessageBox.information(reg_window, "Dialogue", "User Created!")
+            reg_window.accept()
+        else:
+            QMessageBox.warning(reg_window, "Mistake", "Complete Login!")
+
+    reg_window.findChild(QPushButton, "Create").clicked.connect(create_user)
+    reg_window.exec()
+
+
+def start_main_app(prelogin_window):
     global remember, remember_path
     remember = False
+    prelogin_window.hide()
 
-    app = QApplication(sys.argv)
-
-    # --- load main window ---
     main_window = load_ui("UI/main.ui")
+    app = QApplication.instance()
+    global current_active_window
+    current_active_window = main_window
 
-    # --- theme combobox ---
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
-    theme_box.currentTextChanged.connect(
-        lambda text: change_theme(app, text)
-    )
+    if theme_box:
+        theme_box.currentTextChanged.connect(lambda t: change_theme(app, t))
+        change_theme(app, theme_box.currentText())
 
-    # --- check box "Remember me" ---
+    logout_btn = main_window.findChild(QPushButton, "Logout")
+    if logout_btn:
+        logout_btn.clicked.connect(lambda: universal_logout())
+
+    enter_btn = main_window.findChild(QPushButton, "Enter")
+    if enter_btn:
+        enter_btn.clicked.connect(lambda: login_from_enter(main_window, remember))
+
+    help_btn = main_window.findChild(QPushButton, "Help")
+    if help_btn:
+        help_btn.clicked.connect(lambda: open_Help(main_window))
+
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
     remember_path = "storage/ecampus_login_data.db"
     if os.path.exists(remember_path):
@@ -1045,23 +1093,51 @@ def main():
         lambda: check_box_remember(remember_check)
     )
 
-    # --- setting theme on the start ---
-    change_theme(app, theme_box.currentText())
-
-    # --- enter button ---
-    enter_button = main_window.findChild(QPushButton, "Enter")
-    enter_button.clicked.connect(
-        lambda: login_from_enter(main_window,remember)
-    )
-
-    help_button = main_window.findChild(QPushButton, "Help")
-    help_button.clicked.connect(
-        lambda: open_Help(main_window)
-    )
-
-
-
     main_window.show()
+    prelogin_window.main_ref = main_window
+
+
+def handle_auth(prelogin_window, storage):
+    login = prelogin_window.findChild(QLineEdit, "LoginLine").text()
+    password = prelogin_window.findChild(QLineEdit, "PasswordLine").text()
+
+    if not login or not password:
+        QMessageBox.warning(prelogin_window, "Mistake", "Enter Login and Password")
+        return
+
+    if login == "Admin" and password == "Admin":
+        open_admin(prelogin_window)
+        return
+
+    if storage.load() is None or not storage.compare(login, password):
+        QMessageBox.critical(prelogin_window, "Mistake", "Incorrect Login or Password")
+        return
+
+    start_main_app(prelogin_window)
+
+
+def main():
+    app = QApplication.instance()
+    if not app:
+        app = QApplication(sys.argv)
+
+    storage = simargl.LoginStorage("users_db")
+
+    prelogin_window = load_ui("UI/prelogin.ui")
+
+    theme_box_pre = prelogin_window.findChild(QComboBox, "ThemeBox")
+    if theme_box_pre:
+        change_theme(app, theme_box_pre.currentText())
+        theme_box_pre.currentTextChanged.connect(lambda t: change_theme(app, t))
+
+    prelogin_window.findChild(QPushButton, "Enter_main").clicked.connect(
+        lambda: handle_auth(prelogin_window, storage)
+    )
+    prelogin_window.findChild(QPushButton, "NewUser").clicked.connect(
+        lambda: open_registration(prelogin_window, storage)
+    )
+
+    prelogin_window.show()
     sys.exit(app.exec())
 
 
