@@ -374,24 +374,15 @@ class LoginStorage:
             return None
         print("Loaded")
         return self.cur.execute("SELECT * FROM users")
-    
+
     def create(self, login, password):
-        """
-        Creates a new user table and stores the provided credentials.
-
-        The password is hashed using SHA-256 before being stored in the database.
-
-        Args:
-            login (str): The username to store.
-            password (str): The plain-text password to hash and store.
-        """
-
         self.login = login
-        self.password = hashlib.sha256(b"password").hexdigest()
-        self.cur.execute("CREATE TABLE users (name TEXT, password TEXT, banned INTEGER)")
-        self.cur.execute(f"INSERT INTO users VALUES ('{self.login}','{self.password}',0)")
+        self.password = hashlib.sha256(password.encode()).hexdigest()
+
+        self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT, password TEXT, banned INTEGER)")
+        self.cur.execute("INSERT INTO users (name, password, banned) VALUES (?, ?, 0)", (self.login, self.password))
         self.con.commit()
-        print("Created")
+        print(f"User {login} added to DB")
     
     def compare(self, login, password):
         """
@@ -411,42 +402,23 @@ class LoginStorage:
         """
 
         self.login = login
-        self.password = hashlib.sha256(b"password").hexdigest()
-        result = self.cur.execute(f"SELECT name, password, banned FROM users WHERE name='{self.login}' AND password='{self.password}'")
+        self.password = hashlib.sha256(password.encode()).hexdigest()
+        result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (self.login, self.password))
         if result.fetchone() is None:
             return False
-        else:
-            return True
-        
-    def un_ban(self, login, password):
-        """
-        Bans or unbans user by checking the database from provided credentials.
+        return True
 
-        if the user is unbaned, the users becomes baned and vice versa.
-
-        Args:
-            login (str): The username to check.
-            password (str): The plain-text password to verify.
-        Returns:
-            bool: True if the user is banned.
-                  False if the user is unbanned.
-            None: if no user from loghin and password is fetched.
-        """
-
-        self.login = login
-        self.password = hashlib.sha256(b"password").hexdigest()
-        result = self.cur.execute(f"SELECT name, password, banned FROM users WHERE name='{self.login}' AND password='{self.password}'")
+    def un_ban(self, login):  # Убрали аргумент password
+        result = self.cur.execute("SELECT name, banned FROM users WHERE name=?", (login,))
         fetch = result.fetchone()
+
         if fetch is None:
             return None
         else:
-            if fetch[2] == 0:
-                self.cur.execute(f"UPDATE users SET banned=1 WHERE name='{self.login}' AND password='{self.password}'")
-                return True
-            else:
-                self.cur.execute(f"UPDATE users SET banned=0 WHERE name='{self.login}' AND password='{self.password}'")
-                return False
-
+            new_status = 1 if fetch[1] == 0 else 0
+            self.cur.execute("UPDATE users SET banned=? WHERE name=?", (new_status, login))
+            self.con.commit()
+            return True if new_status == 1 else False
 class NotesStorage:
     """
     A storage manager for user-specific notes using JSON files.

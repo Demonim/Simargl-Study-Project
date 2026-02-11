@@ -182,6 +182,8 @@ def load_ecampus_mail_data(Email_window):
     try:
         # ЗАГРУЗКА: Программа остановится здесь до получения ответа от сервера
         subjects, dates = ecampusmail.show_subjects(100)
+        subjects = subjects[::-1]
+        dates = dates[::-1]
 
         for i in range(len(subjects)):
             # Создаем контейнер для строки
@@ -372,6 +374,99 @@ def get_plot_colors():
 # =========================
 # WINDOW SWITCH
 # =========================
+def add_user_item(username, list_widget, mode, refresh_callback):
+    item = QListWidgetItem(list_widget)
+    item_widget = QWidget()
+    layout = QHBoxLayout(item_widget)
+    layout.setContentsMargins(5, 2, 5, 2)
+
+    btn = QPushButton(f"User: {username}")
+    btn.setStyleSheet("text-align: left; padding: 8px; font-size: 14px;")
+
+    btn.clicked.connect(lambda: show_ban_dialog(username, mode, refresh_callback))
+
+    layout.addWidget(btn)
+
+    item.setSizeHint(item_widget.sizeHint())
+    list_widget.addItem(item)
+    list_widget.setItemWidget(item, item_widget)
+
+def open_unbanned():
+    global current_active_window
+    window = load_ui("UI/Unbanned.ui")
+
+    prev_window = current_active_window
+    current_active_window = window
+
+    user_list_widget = window.findChild(QListWidget, "User_list")
+    back_button = window.findChild(QPushButton, "pushButton")
+
+    storage = simargl.LoginStorage("users_db")
+
+    def refresh_list():
+        user_list_widget.clear()
+        users_data = storage.load()
+        if users_data:
+            for row in users_data.fetchall():
+                # row[0] - name, row[2] - banned
+                if row[2] == 0:  # Показываем только незабаненных
+                    add_user_item(row[0], user_list_widget, "ban", refresh_list)
+
+    refresh_list()
+    back_button.clicked.connect(lambda: open_admin(window))
+    window.show()
+    prev_window.close()
+
+
+def open_banned():
+    global current_active_window
+    window = load_ui("UI/Unbanned.ui")
+    window.setWindowTitle("Banned Users")
+
+    label = window.findChild(QLabel, "Users")
+    if label: label.setText("Banned Users")
+
+    prev_window = current_active_window
+    current_active_window = window
+
+    user_list_widget = window.findChild(QListWidget, "User_list")
+    back_button = window.findChild(QPushButton, "pushButton")
+
+    storage = simargl.LoginStorage("users_db")
+
+    def refresh_list():
+        user_list_widget.clear()
+        users_data = storage.load()
+        if users_data:
+            for row in users_data.fetchall():
+                if row[2] == 1:  # Показываем только забаненных
+                    add_user_item(row[0], user_list_widget, "unban", refresh_list)
+
+    refresh_list()
+    back_button.clicked.connect(lambda: open_admin(window))
+    window.show()
+    prev_window.close()
+
+
+def show_ban_dialog(username, mode, refresh_callback):
+    dialog = load_ui("UI/Ban_Dialogue.ui")
+    ban_btn = dialog.findChild(QPushButton, "Ban")
+    unban_btn = dialog.findChild(QPushButton, "Unban")
+
+    storage = simargl.LoginStorage("users_db")
+    storage.load()
+
+    def apply_change():
+        storage.un_ban(username)
+        storage.con.commit()
+
+        dialog.accept()
+        refresh_callback()
+
+    ban_btn.clicked.connect(apply_change)
+    unban_btn.clicked.connect(apply_change)
+
+    dialog.exec()
 
 def open_admin(main_window):
     admin_window = load_ui("UI/Admin.ui")
@@ -379,7 +474,13 @@ def open_admin(main_window):
     current_active_window = admin_window
 
     ban_button = admin_window.findChild(QPushButton, "Ban_Button")
+    ban_button.clicked.connect(
+        lambda: open_unbanned()
+    )
     unban_button = admin_window.findChild(QPushButton, "Unban_Button")
+    unban_button.clicked.connect(
+        lambda: open_banned()
+    )
     back_button = admin_window.findChild(QPushButton, "Back_Button")
     back_button.clicked.connect(
         lambda: universal_logout()
@@ -488,7 +589,7 @@ def open_calendar(menu_window):
     buttons_sorted = [b[2] for b in buttons_with_pos]
 
     # ===== CURRENT MONTH =====
-    today = datetime.date.today()
+    today = datetime.now().date()
     year = today.year
     month = today.month
 
@@ -497,7 +598,7 @@ def open_calendar(menu_window):
 
     # ===== CLICK ON DAY =====
     def on_day_clicked(day):
-        clicked_date = datetime.date(year, month, day)
+        clicked_date = datetime(year, month, day).date()
         weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
 
         entries = weekly_schedule.get(weekday_code, [])
@@ -1019,18 +1120,22 @@ def check_box_remember(checkbox: QCheckBox):
 def universal_logout():
     global current_active_window, prelogin_window
 
-    if prelogin_window:
-        login_box = prelogin_window.findChild(QLineEdit, "LoginLine")
-        pass_box = prelogin_window.findChild(QLineEdit, "PasswordLine")
-        if login_box: login_box.clear()
-        if pass_box: pass_box.clear()
+    if not prelogin_window:
+        prelogin_window = load_ui("UI/prelogin.ui")
 
-    if current_active_window:
+    login_box = prelogin_window.findChild(QLineEdit, "LoginLine")
+    pass_box = prelogin_window.findChild(QLineEdit, "PasswordLine")
+    if login_box: login_box.clear()
+    if pass_box: pass_box.clear()
+
+    prelogin_window.show()
+
+    if current_active_window and current_active_window != prelogin_window:
         current_active_window.close()
 
-    if prelogin_window:
-        prelogin_window.show()
-        current_active_window = prelogin_window
+    current_active_window = prelogin_window
+
+    QMessageBox.information(prelogin_window, "Dialogue", "Thank you very much!")
 
 
 def open_registration(prelogin_window, storage):
@@ -1039,19 +1144,20 @@ def open_registration(prelogin_window, storage):
     def create_user():
         l = reg_window.findChild(QLineEdit, "LoginLine").text()
         p = reg_window.findChild(QLineEdit, "PasswordLine").text()
+
         if l and p:
-            if storage.load() is None:
-                storage.create(l, p)
+            storage.load()
+            if storage.compare(l, p):
+                QMessageBox.warning(reg_window, "Mistake", "User already exists!")
             else:
-                storage.compare(l, p)
-            QMessageBox.information(reg_window, "Dialogue", "User Created!")
-            reg_window.accept()
+                storage.create(l, p)
+                QMessageBox.information(reg_window, "Success", f"User {l} created successfully!")
+                reg_window.accept()
         else:
-            QMessageBox.warning(reg_window, "Mistake", "Complete Login!")
+            QMessageBox.warning(reg_window, "Mistake", "Fill every field!")
 
     reg_window.findChild(QPushButton, "Create").clicked.connect(create_user)
     reg_window.exec()
-
 
 def start_main_app(prelogin_window):
     global remember, remember_path
@@ -1101,45 +1207,68 @@ def handle_auth(prelogin_window, storage):
     login = prelogin_window.findChild(QLineEdit, "LoginLine").text()
     password = prelogin_window.findChild(QLineEdit, "PasswordLine").text()
 
+
     if not login or not password:
-        QMessageBox.warning(prelogin_window, "Mistake", "Enter Login and Password")
+        QMessageBox.warning(prelogin_window, "Caution", "Enter login and password!")
         return
+
 
     if login == "Admin" and password == "Admin":
         open_admin(prelogin_window)
         return
 
-    if storage.load() is None or not storage.compare(login, password):
-        QMessageBox.critical(prelogin_window, "Mistake", "Incorrect Login or Password")
-        return
+    storage.load()
+    if storage.compare(login, password):
+        storage.cur.execute("SELECT banned FROM users WHERE name = ?", (login,))
+        result = storage.cur.fetchone()
 
-    start_main_app(prelogin_window)
+        if result and result[0] == 1:
+            QMessageBox.critical(
+                prelogin_window,
+                "Access Denied",
+                f"User {login} was banned!"
+            )
+            return
+
+        start_main_app(prelogin_window)
+    else:
+        QMessageBox.critical(prelogin_window, "Mistake", "Login or password is incorrect!")
 
 
 def main():
+    global prelogin_window, current_active_window
+
     app = QApplication.instance()
     if not app:
         app = QApplication(sys.argv)
 
+    app.setQuitOnLastWindowClosed(False)
+
     storage = simargl.LoginStorage("users_db")
 
     prelogin_window = load_ui("UI/prelogin.ui")
+    current_active_window = prelogin_window
+
 
     theme_box_pre = prelogin_window.findChild(QComboBox, "ThemeBox")
     if theme_box_pre:
         change_theme(app, theme_box_pre.currentText())
         theme_box_pre.currentTextChanged.connect(lambda t: change_theme(app, t))
 
-    prelogin_window.findChild(QPushButton, "Enter_main").clicked.connect(
-        lambda: handle_auth(prelogin_window, storage)
-    )
-    prelogin_window.findChild(QPushButton, "NewUser").clicked.connect(
-        lambda: open_registration(prelogin_window, storage)
-    )
+    enter_btn = prelogin_window.findChild(QPushButton, "Enter_main")
+    if enter_btn:
+        enter_btn.clicked.connect(
+            lambda: handle_auth(prelogin_window, storage)
+        )
+
+    new_user_btn = prelogin_window.findChild(QPushButton, "NewUser")
+    if new_user_btn:
+        new_user_btn.clicked.connect(
+            lambda: open_registration(prelogin_window, storage)
+        )
 
     prelogin_window.show()
     sys.exit(app.exec())
-
 
 if __name__ == "__main__":
     main()
