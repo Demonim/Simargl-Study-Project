@@ -85,6 +85,35 @@ def load_ui(path: str):
     return window
 
 
+import json
+
+
+def log_user_to_json(username):
+    file_path = "storage/users_database.json"
+
+    if not os.path.exists("storage"):
+        os.makedirs("storage")
+
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            try:
+                users_data = json.load(f)
+            except json.JSONDecodeError:
+                users_data = {}
+    else:
+        users_data = {}
+
+    if username not in users_data:
+        users_data[username] = {
+            "status": "unbanned",
+            "first_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        # 3. Сохраняем обновленный файл
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(users_data, f, indent=4, ensure_ascii=False)
+
+
 def save_tracker_data(dashboard_window, canvas_bar, tracker, theme):
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -974,7 +1003,6 @@ def login_from_enter(main_window, remember=False):
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
     current_login = login_box.text(); password = password_box.text()
-
     if current_login == admin_login and password == admin_password:
         open_admin(main_window)
         return
@@ -985,6 +1013,7 @@ def login_from_enter(main_window, remember=False):
     tracker = WeeklyStudyTracker(filename=f"storage/{current_login}_study_data.json")
 
     try:
+        log_user_to_json(current_login)
         studip.create_client()
         with ThreadPoolExecutor(max_workers=2) as executor:
             executor.submit(ecampusmail.read_email_init())
