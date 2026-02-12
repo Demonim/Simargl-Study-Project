@@ -26,7 +26,6 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
 from themes import *
 from dashboard.pie.subject_hours import subject_hours
 from dashboard.pie.create_pie import create_pie
@@ -412,7 +411,8 @@ def open_unbanned():
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
     window.show()
-    if prev_window: prev_window.close()
+    if prev_window: 
+        prev_window.close()
 
 
 def open_banned():
@@ -421,7 +421,8 @@ def open_banned():
     window.setWindowTitle("Banned Users")
 
     label = window.findChild(QLabel, "Users")
-    if label: label.setText("Banned Users")
+    if label: 
+        label.setText("Banned Users")
 
     prev_window = current_active_window
     current_active_window = window
@@ -464,8 +465,10 @@ def show_ban_dialog(username, mode, refresh_callback):
         refresh_callback()
 
     # Привязываем действия к конкретным кнопкам
-    if ban_btn: ban_btn.clicked.connect(handle_ban)
-    if unban_btn: unban_btn.clicked.connect(handle_unban)
+    if ban_btn: 
+        ban_btn.clicked.connect(handle_ban)
+    if unban_btn: 
+        unban_btn.clicked.connect(handle_unban)
 
     dialog.exec()
 
@@ -1070,10 +1073,10 @@ def back_to_main(menu_window):
     try:
         if ecampusmail.server and ecampusmail.mail:
             ecampusmail.close_conections()
-            ecampusmail.server = False;
+            ecampusmail.server = False
             ecampusmail.mail = False
     except:
-        pass
+        raise Exception
 
     # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
@@ -1121,7 +1124,7 @@ def login_from_enter(main_window, remember=False):
     global user_courses, current_login, schedule, ecampusmail, studip, messages
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
-    current_login = login_box.text();
+    current_login = login_box.text()
     password = password_box.text()
 
     studip = simargl.StudIP(current_login, password)
@@ -1155,9 +1158,9 @@ def login_from_enter(main_window, remember=False):
 
 def check_box_remember(checkbox: QCheckBox):
     global remember
-    if checkbox.isChecked() == True:
+    if checkbox.isChecked():
         remember = True
-    if checkbox.isChecked() == False:
+    if not checkbox.isChecked():
         remember = False
 
 
@@ -1169,8 +1172,10 @@ def universal_logout():
 
     login_box = prelogin_window.findChild(QLineEdit, "LoginLine")
     pass_box = prelogin_window.findChild(QLineEdit, "PasswordLine")
-    if login_box: login_box.clear()
-    if pass_box: pass_box.clear()
+    if login_box: 
+        login_box.clear()
+    if pass_box: 
+        pass_box.clear()
 
     prelogin_window.show()
 

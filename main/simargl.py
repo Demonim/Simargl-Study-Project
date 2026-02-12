@@ -312,7 +312,7 @@ class ECampusMail:
         message["To"] = str(receiver)
         message.attach(email.mime.text.MIMEText(str(text), "plain"))
 
-        if filename != None:
+        if filename is not None:
             with open(filename, "rb") as attachment:
                 part = email.mime.multipart.MIMEBase("application", "octet-stream")
                 part.set_payload(attachment.read())
@@ -335,7 +335,24 @@ class ECampusMail:
             self.smtp_conn.quit()
 
 class LoginStorage:
+    """
+    A storage manager for user authentication and account status using SQLite.
+
+    This class handles the creation of user databases, password hashing (SHA-256),
+    credential verification, and the management of user ban statuses.
+    """
+
     def __init__(self, name):
+        """
+        Initialize the database connection.
+
+        Sets up the storage directory and connects to (or creates) the SQLite 
+        database file specific to the provided name.
+
+        Args:
+            name (str): The identifier for the database file (e.g., 'users' or a specific group).
+                        The file will be created at 'storage/{name}.db'.
+        """
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{name}.db")
@@ -344,17 +361,51 @@ class LoginStorage:
         self._create_table()
 
     def _create_table(self):
+        """
+        Initializes the 'users' table if it does not already exist.
+
+        The table schema includes:
+        - name (TEXT PRIMARY KEY): The username.
+        - password (TEXT): The hashed password.
+        - banned (INTEGER): A flag indicating if the user is banned (0 or 1).
+        """
         self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT PRIMARY KEY, password TEXT, banned INTEGER)")
         self.con.commit()
 
     def load(self):
+        """
+        Retrieves all user records from the database.
+
+        Returns:
+            sqlite3.Cursor: An iterable cursor containing tuples of (name, password, banned).
+        """
         return self.cur.execute("SELECT name, password, banned FROM users")
 
     def user_exists(self, login):
+        """
+        Checks if a specific username exists in the database.
+
+        Args:
+            login (str): The username to check.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
         result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
         return result.fetchone() is not None
 
     def create(self, login, password):
+        """
+        Registers a new user with a hashed password.
+
+        Args:
+            login (str): The new username.
+            password (str): The plain-text password (will be hashed before storage).
+
+        Returns:
+            bool: True if the user was successfully created. 
+                  False if the username already exists (IntegrityError).
+        """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         try:
             self.cur.execute("INSERT INTO users (name, password, banned) VALUES (?, ?, 0)", (login, hashed_password))
@@ -365,11 +416,31 @@ class LoginStorage:
             return False
 
     def compare(self, login, password):
+        """
+        Verifies login credentials.
+
+        Hashes the provided password and compares it against the stored hash 
+        for the given username.
+
+        Args:
+            login (str): The username.
+            password (str): The plain-text password to verify.
+
+        Returns:
+            bool: True if the credentials match, False otherwise.
+        """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (login, hashed_password))
         return result.fetchone() is not None
 
     def set_ban_status(self, login, status: int):
+        """
+        Updates the ban status for a specific user.
+
+        Args:
+            login (str): The username to update.
+            status (int): The new status (e.g., 1 for banned, 0 for active).
+        """
         self.cur.execute("UPDATE users SET banned=? WHERE name=?", (status, login))
         self.con.commit()
 
