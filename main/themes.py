@@ -259,7 +259,7 @@ QListWidget#NotesList{
 
 }
 
-QTextEdit#NotesText{
+QTextEdit#NotesText, #Email_text{
     background-color: rgb(0, 0, 0);
     color: rgb(102, 255, 140);
     font-size: 14pt;
@@ -455,7 +455,7 @@ QListWidget#NotesList{
 
 }
 
-QTextEdit#NotesText{
+QTextEdit#NotesText, #Email_text{
     background-color: rgb(0,0,0);
     color: white;
     font-size: 15pt;
@@ -742,7 +742,7 @@ QListWidget#NotesList{
 
 }
 
-QTextEdit#NotesText{
+QTextEdit#NotesText, #Email_text{
     background-color: rgb(255, 255, 255);
     color: rgb(79, 149, 255);
     font-size: 14pt;
@@ -767,7 +767,8 @@ QWidget#Dashboard_1, #Dashboard_2, #Dashboard_3{
 
 QLineEdit{
     background-color: rgb(255, 255, 255);
-    border: 2px solid blue; border-radius: 5px
+    border: 2px solid blue; border-radius: 5px;
+    color: black
 }
 """
 
@@ -941,7 +942,7 @@ QListWidget#NotesList{
 
 }
 
-QTextEdit#NotesText{
+QTextEdit#NotesText, #Email_text{
     background-color: rgb(255, 255, 255);
     color: rgb(33, 37, 41);
     font-size: 15pt;

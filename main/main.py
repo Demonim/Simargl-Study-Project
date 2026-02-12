@@ -714,12 +714,55 @@ def open_Email(menu_window):
     exit_button.clicked.connect(lambda: open_menu(Email_window))
 
     write_button = Email_window.findChild(QPushButton, "Write_Button")
-
+    write_button.clicked.connect(lambda: open_Compose_Email(Email_window))
     load_ecampus_mail_data(Email_window)
 
     Email_window.show()
     menu_window.close()
     menu_window.courses_window = Email_window
+
+
+def open_Compose_Email(Email_window):
+    global current_active_window
+    window = load_ui("UI/Send_Email.ui")
+    prev_window = current_active_window
+    current_active_window = window
+    mail_client = ecampusmail
+
+    # Поиск элементов интерфейса
+    sender_line = window.findChild(QLineEdit, "Sender_line")
+    receiver_line = window.findChild(QLineEdit, "Receiver_line")
+    subject_line = window.findChild(QLineEdit, "Subject_line")
+    email_text_edit = window.findChild(QTextEdit, "Email_text")
+
+    send_btn = window.findChild(QPushButton, "Send_email")
+    if sender_line:
+        sender_line.setText(f"{current_login}@stud.uni-goettingen.de")
+
+    def handle_send():
+        try:
+            text = email_text_edit.toPlainText()
+            subject = subject_line.text()
+            sender = sender_line.text()
+            receiver = receiver_line.text()
+
+            if not receiver or not text:
+                QMessageBox.warning(window, "Error", "Fill all the fields!")
+                return
+
+            mail_client.send_email(text, subject, sender, receiver)
+            QMessageBox.information(window, "Success", "Email send!")
+
+            open_Email(window)
+        except Exception as e:
+            QMessageBox.critical(window, "Error", f"Could not send Email: {str(e)}")
+
+    if send_btn:
+        send_btn.clicked.connect(handle_send)
+
+    window.show()
+    if prev_window:
+        prev_window.close()
 
 
 def open_Dashboard(menu_window):

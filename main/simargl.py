@@ -339,22 +339,18 @@ class LoginStorage:
         self.base_path = "storage"
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{name}.db")
-        # Инициализируем соединение сразу
         self.con = sql.connect(self.file_path)
         self.cur = self.con.cursor()
         self._create_table()
 
     def _create_table(self):
-        """Внутренний метод для гарантии наличия таблицы"""
         self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT PRIMARY KEY, password TEXT, banned INTEGER)")
         self.con.commit()
 
     def load(self):
-        """Возвращает всех пользователей для списка Админа"""
         return self.cur.execute("SELECT name, password, banned FROM users")
 
     def user_exists(self, login):
-        """Проверка: занято ли имя (нужно для регистрации)"""
         result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
         return result.fetchone() is not None
 
@@ -369,13 +365,11 @@ class LoginStorage:
             return False
 
     def compare(self, login, password):
-        """Только для входа: проверка пары логин-пароль"""
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (login, hashed_password))
         return result.fetchone() is not None
 
     def set_ban_status(self, login, status: int):
-        """Установка конкретного статуса (1 - бан, 0 - разбан)"""
         self.cur.execute("UPDATE users SET banned=? WHERE name=?", (status, login))
         self.con.commit()
 
