@@ -1188,25 +1188,53 @@ def universal_logout():
 
 
 def open_registration(prelogin_window, storage):
+    """
+    Handles the registration UI logic.
+    Loads the UI, collects input, and calls storage to create a new user.
+    """
     reg_window = load_ui("UI/new_user.ui")
 
     def create_user():
         login = reg_window.findChild(QLineEdit, "LoginLine").text().strip()
         password = reg_window.findChild(QLineEdit, "PasswordLine").text().strip()
+        real_name = reg_window.findChild(QLineEdit, "NameLine").text().strip()
 
-        if not login or not password:
-            QMessageBox.warning(reg_window, "Mistake", "Fill every field!")
+        if not login or not password or not real_name:
+            QMessageBox.warning(
+                reg_window,
+                "Input Error",
+                "Please fill in all fields: Name, Login, and Password!"
+            )
             return
 
-        # Используем новый метод проверки существования
         if storage.user_exists(login):
-            QMessageBox.warning(reg_window, "Mistake", "User already exists!")
-        else:
-            storage.create(login, password)
-            QMessageBox.information(reg_window, "Success", f"User {login} created successfully!")
+            QMessageBox.warning(
+                reg_window,
+                "Mistake",
+                f"Login '{login}' is already taken. Please choose another one."
+            )
+            return
+        success = storage.create(login, password, real_name)
+
+        if success:
+            QMessageBox.information(
+                reg_window,
+                "Success",
+                f"User {login} successfully registered!"
+            )
             reg_window.accept()
 
-    reg_window.findChild(QPushButton, "Create").clicked.connect(create_user)
+        else:
+            QMessageBox.critical(
+                reg_window,
+                "Database Error",
+                "Something went wrong while saving to the database."
+            )
+
+    create_btn = reg_window.findChild(QPushButton, "Create")
+    if create_btn:
+        create_btn.clicked.connect(create_user)
+
     reg_window.exec()
 
 def start_main_app(prelogin_window):
@@ -1257,19 +1285,17 @@ def handle_auth(prelogin_window, storage):
     login = prelogin_window.findChild(QLineEdit, "LoginLine").text()
     password = prelogin_window.findChild(QLineEdit, "PasswordLine").text()
 
-
     if not login or not password:
         QMessageBox.warning(prelogin_window, "Caution", "Enter login and password!")
         return
-
 
     if login == "Admin" and password == "Admin":
         open_admin(prelogin_window)
         return
 
-    storage.load()
+
     if storage.compare(login, password):
-        storage.cur.execute("SELECT banned FROM users WHERE name = ?", (login,))
+        storage.cur.execute("SELECT banned FROM users WHERE login = ?", (login,))
         result = storage.cur.fetchone()
 
         if result and result[0] == 1:

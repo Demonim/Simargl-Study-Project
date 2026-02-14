@@ -12,6 +12,7 @@ import os
 import json
 import uuid
 import datetime
+import random
 
 import sqlite3 as sql
 import hashlib
@@ -334,6 +335,7 @@ class ECampusMail:
         if hasattr(self, 'smtp_conn'):
             self.smtp_conn.quit()
 
+
 class LoginStorage:
     """
     A storage manager for user authentication and account status using SQLite.
@@ -364,22 +366,48 @@ class LoginStorage:
         """
         Initializes the 'users' table if it does not already exist.
 
-        The table schema includes:
-        - name (TEXT PRIMARY KEY): The username.
+        The table schema updated to include:
+        - user_id (TEXT PRIMARY KEY): A unique 10-digit numeric identifier.
+        - login (TEXT UNIQUE): The username used for authentication.
         - password (TEXT): The hashed password.
+        - real_name (TEXT): The actual name of the user.
         - banned (INTEGER): A flag indicating if the user is banned (0 or 1).
         """
-        self.cur.execute("CREATE TABLE IF NOT EXISTS users (name TEXT PRIMARY KEY, password TEXT, banned INTEGER)")
+        self.cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id TEXT PRIMARY KEY, 
+                login TEXT UNIQUE, 
+                password TEXT, 
+                real_name TEXT, 
+                banned INTEGER
+            )
+        """)
         self.con.commit()
+
+    def generate_unique_id(self):
+        """
+        Generates a unique 10-digit numeric ID.
+
+        This method ensures that the generated ID does not already exist
+        in the database to maintain primary key integrity.
+        """
+        while True:
+            # Generate a random 10-digit number as a string
+            new_id = str(random.randint(1000000000, 9999999999))
+
+            # Check if this ID is already taken
+            self.cur.execute("SELECT user_id FROM users WHERE user_id=?", (new_id,))
+            if self.cur.fetchone() is None:
+                return new_id
 
     def load(self):
         """
         Retrieves all user records from the database.
 
         Returns:
-            sqlite3.Cursor: An iterable cursor containing tuples of (name, password, banned).
+            sqlite3.Cursor: An iterable cursor containing tuples of (user_id, login, real_name, banned).
         """
-        return self.cur.execute("SELECT name, password, banned FROM users")
+        return self.cur.execute("SELECT user_id, login, real_name, banned FROM users")
 
     def user_exists(self, login):
         """
@@ -391,26 +419,32 @@ class LoginStorage:
         Returns:
             bool: True if the user exists, False otherwise.
         """
-        result = self.cur.execute("SELECT name FROM users WHERE name=?", (login,))
+        result = self.cur.execute("SELECT login FROM users WHERE login=?", (login,))
         return result.fetchone() is not None
 
-    def create(self, login, password):
+    def create(self, login, password, real_name):
         """
-        Registers a new user with a hashed password.
+        Registers a new user with a hashed password, unique ID, and real name.
 
         Args:
-            login (str): The new username.
-            password (str): The plain-text password (will be hashed before storage).
+            login (str): The new login username.
+            password (str): The plain-text password.
+            real_name (str): The user's real name from NameLine.
 
         Returns:
-            bool: True if the user was successfully created. 
-                  False if the username already exists (IntegrityError).
+            bool: True if the user was successfully created.
+                  False if the login already exists.
         """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        user_id = self.generate_unique_id()  # Generating 10-digit unique ID
+
         try:
-            self.cur.execute("INSERT INTO users (name, password, banned) VALUES (?, ?, 0)", (login, hashed_password))
+            self.cur.execute(
+                "INSERT INTO users (user_id, login, password, real_name, banned) VALUES (?, ?, ?, ?, 0)",
+                (user_id, login, hashed_password, real_name)
+            )
             self.con.commit()
-            print(f"User {login} created.")
+            print(f"User {login} created with ID: {user_id}")
             return True
         except sql.IntegrityError:
             return False
@@ -419,7 +453,7 @@ class LoginStorage:
         """
         Verifies login credentials.
 
-        Hashes the provided password and compares it against the stored hash 
+        Hashes the provided password and compares it against the stored hash
         for the given username.
 
         Args:
@@ -430,7 +464,7 @@ class LoginStorage:
             bool: True if the credentials match, False otherwise.
         """
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        result = self.cur.execute("SELECT name FROM users WHERE name=? AND password=?", (login, hashed_password))
+        result = self.cur.execute("SELECT login FROM users WHERE login=? AND password=?", (login, hashed_password))
         return result.fetchone() is not None
 
     def set_ban_status(self, login, status: int):
@@ -438,10 +472,10 @@ class LoginStorage:
         Updates the ban status for a specific user.
 
         Args:
-            login (str): The username to update.
+            login (str): The login username to update.
             status (int): The new status (e.g., 1 for banned, 0 for active).
         """
-        self.cur.execute("UPDATE users SET banned=? WHERE name=?", (status, login))
+        self.cur.execute("UPDATE users SET banned=? WHERE login=?", (status, login))
         self.con.commit()
 
 class NotesStorage:

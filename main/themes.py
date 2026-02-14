@@ -61,7 +61,7 @@ QLabel {
     font-size: 20pt;
 }
 
-QLineEdit#PasswordLine, #LoginLine {
+QLineEdit#PasswordLine, #LoginLine, #NameLine {
     background-color: 255, 255, 255
 }
 
@@ -546,7 +546,7 @@ QLineEdit#PasswordLine {
     background-color: 255, 255, 255
 }
 
-QLineEdit#LoginLine {
+QLineEdit#LoginLine, #NameLine {
     background-color: 255, 255, 255
 }
 
