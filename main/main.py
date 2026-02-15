@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize
+from PySide6.QtCore import QFile, QSize, Qt
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from themes import *
@@ -62,6 +62,15 @@ WEEKDAY_MAP = {
     4: "FR",
     5: "SA",
     6: "SU"
+}
+
+HELP_TEXTS = {
+    "calendar": "<h2>Calendar Help</h2><p>Here you can view your class schedule. Click on a specific day to see the detailed list of lectures.</p>",
+    "courses": "<h2>Courses Help</h2><p>This section lists all your active courses from Stud.IP. You can see the title, subtitle, and status.</p>",
+    "dashboard": "<h2>Dashboard Help</h2><p>Visualize your study progress! <ul><li><b>Pie chart:</b> Distribution of hours.</li><li><b>Heatmap:</b> Activity frequency.</li><li><b>Bar chart:</b> Weekly tracker.</li></ul></p>",
+    "email": "<h2>Email Help</h2><p>Access your ECampus mail. You can read incoming messages and send new emails using the 'Write' button.</p>",
+    "notes": "<h2>Notes Help</h2><p>Manage your personal notes. Create new ones, edit existing text, and don't forget to press 'Save'!</p>",
+    "studip": "<h2>StudIP Help</h2><p>This shows your recent messages from the Stud.IP system. Click on a message to read its full content.</p>"
 }
 
 
@@ -504,6 +513,8 @@ def open_courses(menu_window):
     exit_button.clicked.connect(
         lambda: open_menu(courses_window)
     )
+    help_btn = courses_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(courses_window, "courses"))
     table = courses_window.findChild(QTableWidget, "Table")
 
     if table is not None:
@@ -558,6 +569,9 @@ def open_calendar(menu_window):
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
     )
+
+    help_btn = calendar_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(calendar_window, "calendar"))
 
     # ===== LOADING SAVED DAYS =====
     storage = simargl.CourseDaysStorage(current_login)
@@ -645,6 +659,9 @@ def open_StudIP(menu_window):
         lambda: open_menu(StudIP_window)
     )
 
+    help_btn = StudIP_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(StudIP_window, "studip"))
+
     # ---------- MESSAGES ----------
     messages_list = StudIP_window.findChild(QListWidget, "messagesList")
 
@@ -719,6 +736,9 @@ def open_Email(menu_window):
     write_button = Email_window.findChild(QPushButton, "Write_Button")
     write_button.clicked.connect(lambda: open_Compose_Email(Email_window))
     load_ecampus_mail_data(Email_window)
+
+    help_btn = Email_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(Email_window, "email"))
 
     Email_window.show()
     menu_window.close()
@@ -846,6 +866,9 @@ def open_Dashboard(menu_window):
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
 
+    help_btn = Dashboard_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(Dashboard_window, "dashboard"))
+
     Dashboard_window.show()
     menu_window.close()
     menu_window.courses_window = Dashboard_window
@@ -864,6 +887,8 @@ def open_Notes(menu_window):
     text_edit = Notes_window.findChild(QTextEdit, "NotesText")
     add_button = Notes_window.findChild(QPushButton, "AddNoteButton")
     save_button = Notes_window.findChild(QPushButton, "SaveNoteButton")
+    help_btn = Notes_window.findChild(QPushButton, "Help_Button")
+    help_btn.clicked.connect(lambda: show_universal_help(Notes_window, "notes"))
 
     notes = notes_storage.load_notes()
 
@@ -1009,6 +1034,17 @@ def open_Help(main_window):
     main_window.close()
 
     main_window.courses_window = Help_window
+
+def show_universal_help(parent_window, context_key):
+    help_dialog = load_ui("UI/Universal_Help.ui")
+    help_text_widget = help_dialog.findChild(QTextBrowser, "Helptext")
+
+    if help_text_widget:
+        content = HELP_TEXTS.get(context_key, "No help content available for this section.")
+        help_text_widget.setHtml(content)
+
+    help_dialog.setWindowModality(Qt.WindowModal)
+    help_dialog.exec()
 
 
 def open_menu(main_window):
