@@ -4,14 +4,14 @@ from .subjects_logic import pie_values_labels
 
 def create_pie(subject_hours, text_color='black'):
     """
-    Generates a professional pie chart visualization of study hour distribution.
-   
+    Generates a pie chart showing study hours distribution.
+    
     Args:
-        subject_hours (dict): Analyzed study data (subject: hours).
-        text_color (str): Theme-compliant color for text elements.
-       
+        subject_hours (dict): Subject titles mapping to total hours.
+        text_color (str): Color for labels, legend, and titles.
+        
     Returns:
-        Figure: Matplotlib Figure object ready to be displayed in the UI.
+        Figure: Matplotlib Figure object with the rendered chart.
     """
 
 

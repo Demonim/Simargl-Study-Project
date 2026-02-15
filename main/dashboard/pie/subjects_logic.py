@@ -4,13 +4,13 @@ import re
 
 def subject_hours(schedule) -> dict[str, float]:
     """
-    Analyzes the user's schedule to calculate the total study hours per subject.
-   
+    Calculates the cumulative study hours for each unique subject.
+    
     Args:
-        schedule: The schedule object containing lesson entries with start/end times.
-       
+        schedule: Schedule object containing lesson entries.
+        
     Returns:
-        dict[str, float]: A dictionary mapping subject titles to total hours.
+        dict[str, float]: A dictionary where keys are subject names and values are total hours.
     """
 
     subjects = {}
@@ -26,13 +26,13 @@ def subject_hours(schedule) -> dict[str, float]:
 
 def pie_values_labels(subject_hours: dict[str, float]):
     """
-    Prepares raw study data for visualization by cleaning subject names.
-   
+    Cleans data for visualization by stripping leading numeric prefixes.
+    
     Args:
-        subject_hours: Dictionary of analyzed subject data.
-       
+        subject_hours (dict): Raw data with subject titles and hours.
+        
     Returns:
-        tuple: (values_list, cleaned_labels_list)
+        tuple: (values_list, cleaned_labels_list). Both are empty if input is empty.
     """
 
     if not subject_hours:
