@@ -27,8 +27,7 @@ from PySide6.QtCore import QFile, QSize, Qt
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from .themes import *
-from .dashboard.dashboard_logic import get_pie_chart
-from .dashboard.heatmap.create_heatmap import create_heatmap
+from .dashboard.dashboard_logic import get_pie_chart, get_heatmap
 from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from .dashboard.timer_bar.study_timer import Study_Timer
@@ -803,9 +802,7 @@ def open_Dashboard(menu_window):
 
     target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
     if target_2:
-        subjects_data, dates_data = ecampusmail.show_subjects(last_n=200)
-
-        fig_heat = create_heatmap(subjects_data, dates_data, color=get_plot_colors())
+        fig_heat = get_heatmap(ecampusmail, color=get_plot_colors())
         fig_heat.patch.set_alpha(0.0)
 
         canvas_2 = FigureCanvasQTAgg(fig_heat)
