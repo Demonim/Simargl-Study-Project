@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize, Qt
+from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from themes import *
@@ -93,6 +93,15 @@ def load_ui(path: str):
     window = loader.load(ui_file)
     ui_file.close()
     return window
+
+
+def setup_auto_logout(window):
+    window.auto_logout_timer = QTimer(window)
+    window.auto_logout_timer.setSingleShot(True)
+
+    window.auto_logout_timer.timeout.connect(universal_logout)
+
+    window.auto_logout_timer.start(300000)
 
 
 def save_tracker_data(dashboard_window, canvas_bar, tracker, theme):
@@ -1103,6 +1112,7 @@ def open_menu(main_window):
 
 def back_to_main(menu_window):
     main_window = load_ui("UI/main.ui")
+    setup_auto_logout(main_window)
     global current_active_window
     current_active_window = main_window
 
@@ -1178,6 +1188,8 @@ def login_from_enter(main_window, remember=False):
     else:
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
+        if hasattr(main_window, 'auto_logout_timer'):
+            main_window.auto_logout_timer.stop()
 
         open_menu(main_window)
 
@@ -1279,6 +1291,7 @@ def start_main_app(prelogin_window):
     prelogin_window.hide()
 
     main_window = load_ui("UI/main.ui")
+    setup_auto_logout(main_window)
     app = QApplication.instance()
     global current_active_window
     current_active_window = main_window
