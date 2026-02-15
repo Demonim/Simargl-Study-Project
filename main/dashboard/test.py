@@ -4,7 +4,7 @@ from main.simargl import ECampusMail
 from main.simargl import StudIP
 from main.dashboard.heatmap.messages_logic import topics_week_matrix
 from main.dashboard.heatmap.create_heatmap import create_heatmap
-from main.dashboard.pie.subject_hours import subject_hours
+from main.dashboard.pie.subjects_logic import subject_hours
 
 login = input('Enter your login: ')
 password = input('Enter your password: ')

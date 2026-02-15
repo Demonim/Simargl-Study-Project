@@ -1,6 +1,6 @@
 import sys
 import os
-import simargl
+from . import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,13 +26,12 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from themes import *
-from dashboard.pie.subject_hours import subject_hours
-from dashboard.pie.create_pie import create_pie
-from dashboard.heatmap.create_heatmap import create_heatmap
-from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
-from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
-from dashboard.timer_bar.study_timer import Study_Timer
+from .themes import *
+from .dashboard.dashboard_logic import get_pie_chart
+from .dashboard.heatmap.create_heatmap import create_heatmap
+from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
+from .dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
+from .dashboard.timer_bar.study_timer import Study_Timer
 
 import calendar
 from concurrent.futures import ThreadPoolExecutor
@@ -793,8 +792,7 @@ def open_Dashboard(menu_window):
 
     target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
     if target_1 and schedule:
-        data_pie = subject_hours(schedule)
-        fig_pie = create_pie(data_pie, text_color=get_plot_colors())
+        fig_pie = get_pie_chart(schedule, text_color=get_plot_colors())
         fig_pie.patch.set_alpha(0.0)
 
         canvas_1 = FigureCanvasQTAgg(fig_pie)

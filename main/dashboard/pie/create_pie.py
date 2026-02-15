@@ -1,10 +1,21 @@
 from matplotlib.figure import Figure
-from .pie_val_lab import pie_values_labels
+from .subjects_logic import pie_values_labels
 
 
 def create_pie(subject_hours, text_color='black'):
-    fig = Figure(figsize=(8, 6), tight_layout=True)
+    """
+    Generates a professional pie chart visualization of study hour distribution.
+   
+    Args:
+        subject_hours (dict): Analyzed study data (subject: hours).
+        text_color (str): Theme-compliant color for text elements.
+       
+    Returns:
+        Figure: Matplotlib Figure object ready to be displayed in the UI.
+    """
 
+
+    fig = Figure(figsize=(8, 6), tight_layout=True)
     fig.patch.set_facecolor('none')
 
     ax = fig.add_subplot(111)
@@ -12,9 +23,15 @@ def create_pie(subject_hours, text_color='black'):
 
     values, labels = pie_values_labels(subject_hours)
 
-    wedges, texts, autotexts = ax.pie(
+    if values and labels:
+        sorted_pairs = sorted(zip(values, labels), key=lambda x: x[1])
+        values, labels = zip(*sorted_pairs)
+    else:
+        ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
+        return fig
+
+    wedges, _, autotexts = ax.pie(
         values,
-        labels=None,
         autopct='%1.1f%%',
         startangle=90,
         pctdistance=0.75,
