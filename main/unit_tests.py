@@ -5,7 +5,7 @@ import json
 import email
 import hashlib
 import os
-import simargl 
+from . import simargl
 
 class TestStudIP(unittest.TestCase):
 

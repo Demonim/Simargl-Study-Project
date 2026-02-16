@@ -36,10 +36,3 @@ def update_stacked_bar(fig, study_data):
     
     if fig.canvas:
         fig.canvas.draw_idle()
-
-def show_chart(fig, title="Tracker"):
-    new_manager = plt.figure().canvas.manager
-    new_manager.canvas.figure = fig
-    fig.set_canvas(new_manager.canvas)
-    new_manager.set_window_title(title)
-    plt.show()

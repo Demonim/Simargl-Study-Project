@@ -2,13 +2,11 @@ import json
 import os
 
 class WeeklyStudyTracker:
-    def __init__(self, filename="study_data.json"):
-        self.filename = filename
+    def __init__(self, login, storage_dir="storage"):
+        self.filename = os.path.join(storage_dir, f"{login}_study_data.json")
 
-        # автоматичне створення папки якщо її немає
-        directory = os.path.dirname(self.filename)
-        if directory and not os.path.exists(directory):
-            os.makedirs(directory, exist_ok=True)
+        if not os.path.exists(storage_dir):
+            os.makedirs(storage_dir, exist_ok=True)
 
         self.default_data = {
             "Mon": {'manual': 0.0, 'timer': 0.0}, 
