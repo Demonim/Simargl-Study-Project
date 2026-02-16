@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize, Qt
+from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from .themes import *
@@ -33,7 +33,7 @@ from .dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_b
 from .dashboard.timer_bar.study_timer import Study_Timer
 from .dashboard.dashboard_logic import (
     get_pie_chart, get_heatmap, initialize_tracker, 
-    get_tracker_data, process_manual_input, clear_all_data, stop_study_session, start_study_session
+    process_manual_input, clear_all_data, stop_study_session, start_study_session, get_formatted_placeholders, get_weekly_bar_chart
 )
 
 import calendar
@@ -96,6 +96,13 @@ def load_ui(path: str):
     ui_file.close()
     return window
 
+def setup_auto_logout(window):
+    window.auto_logout_timer = QTimer(window)
+    window.auto_logout_timer.setSingleShot(True)
+
+    window.auto_logout_timer.timeout.connect(universal_logout)
+
+    window.auto_logout_timer.start(300000)
 
 def save_tracker_data(dashboard_window, canvas_bar, theme):
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -782,18 +789,8 @@ def open_Dashboard(menu_window):
 
     target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
     if target_3:
-        current_data = get_tracker_data()
-        for day in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
-            manual_h = int(current_data[day]['manual'])
-            manual_m = int((current_data[day]['manual'] % 1) * 60)
-    
-            h_line = Dashboard_window.findChild(QLineEdit, f"{day}_H")
-            m_line = Dashboard_window.findChild(QLineEdit, f"{day}_M")
-            if h_line and m_line:
-                h_line.setPlaceholderText(str(manual_h))
-                m_line.setPlaceholderText(str(manual_m))
-
-        fig_bar = create_stacked_bar(current_data)
+        
+        fig_bar = get_weekly_bar_chart()    
         canvas_bar = FigureCanvasQTAgg(fig_bar)
         canvas_bar.setStyleSheet("background-color: transparent;")
 
@@ -819,8 +816,8 @@ def open_Dashboard(menu_window):
         if start_btn:
             def run_start():
                 global active_timer_day
-                study_timer.start()
-                active_timer_day = start_study_session() 
+                study_timer.start()                          #
+                active_timer_day = start_study_session()     #new func in dashboard_logic
             start_btn.clicked.connect(run_start)
 
         stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
@@ -1067,6 +1064,7 @@ def open_menu(main_window):
 
 def back_to_main(menu_window):
     main_window = load_ui("UI/main.ui")
+    setup_auto_logout(main_window)
     global current_active_window
     current_active_window = main_window
 
@@ -1142,7 +1140,8 @@ def login_from_enter(main_window, remember=False):
     else:
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
-
+        if hasattr(main_window, 'auto_logout_timer'):
+            main_window.auto_logout_timer.stop()
         open_menu(main_window)
 
         user_courses = studip.get_courses()
@@ -1242,6 +1241,7 @@ def start_main_app(prelogin_window):
     prelogin_window.hide()
 
     main_window = load_ui("UI/main.ui")
+    setup_auto_logout(main_window)
     app = QApplication.instance()
     global current_active_window
     current_active_window = main_window

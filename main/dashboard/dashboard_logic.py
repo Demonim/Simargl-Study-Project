@@ -5,6 +5,7 @@ from main.simargl import ECampusMail
 from .timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from datetime import datetime
+from .timer_bar.create_bar import create_stacked_bar
 
 def get_pie_chart(schedule, text_color='black'):
     """
@@ -58,6 +59,22 @@ _tracker = None
 def initialize_tracker(login: str):
     global _tracker
     _tracker = WeeklyStudyTracker(login=login)
+
+def get_formatted_placeholders():
+    data = get_tracker_data()
+    placeholders = {}
+    
+    for day, values in data.items():
+        manual_val = values.get('manual', 0.0)
+        h = int(manual_val)
+        m = int((manual_val % 1) * 60)
+        placeholders[day] = {"h": str(h), "m": str(m)}
+        
+    return placeholders
+
+def get_weekly_bar_chart():
+    current_data = get_tracker_data()
+    return create_stacked_bar(current_data)
 
 def process_manual_input(day_inputs):
     if not _tracker:
