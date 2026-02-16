@@ -31,6 +31,10 @@ from .dashboard.dashboard_logic import get_pie_chart, get_heatmap
 from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from .dashboard.timer_bar.study_timer import Study_Timer
+from .dashboard.dashboard_logic import (
+    get_pie_chart, get_heatmap, initialize_tracker, 
+    get_tracker_data, process_manual_input, clear_all_data, stop_study_session, start_study_session
+)
 
 import calendar
 from concurrent.futures import ThreadPoolExecutor
@@ -93,70 +97,35 @@ def load_ui(path: str):
     return window
 
 
-def save_tracker_data(dashboard_window, canvas_bar, tracker, theme):
+def save_tracker_data(dashboard_window, canvas_bar, theme):
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    day_inputs = []
 
     for day in days:
         h_line = dashboard_window.findChild(QLineEdit, f"{day}_H")
         m_line = dashboard_window.findChild(QLineEdit, f"{day}_M")
 
         if h_line and m_line:
-            try:
+            day_inputs.append((day, h_line.text().strip(), m_line.text().strip()))
 
-                h = float(h_line.text()) if h_line.text().strip() else 0.0
-                m = float(m_line.text()) if m_line.text().strip() else 0.0
-
-                total_hours = h + (m / 60.0)
-                tracker.set_day(day, total_hours)
-            except ValueError:
-                continue
-
-    update_stacked_bar(canvas_bar.figure, tracker.all())
-    apply_bar_theme(canvas_bar, current_theme_name)
+    updated_data = process_manual_input(day_inputs)
+    update_stacked_bar(canvas_bar.figure, updated_data)
+    apply_bar_theme(canvas_bar, theme)
     canvas_bar.draw()
 
 
-def choose_day_and_start(parent_window):
-    global active_timer_day
-
-    loader = QUiLoader()
-    ui_file = QFile("UI/Dashboard_dialogue.ui")
-    if not ui_file.open(QFile.ReadOnly):
-        return
-    dialog = loader.load(ui_file, parent_window)
-    ui_file.close()
-
-    def handle_selection(day_code):
-        global active_timer_day
-        active_timer_day = day_code
-        study_timer.start()
-        print(f"Таймер запущен для: {day_code}")
-        dialog.accept()
-
-    days_buttons = ["Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue"]
-    for day_name in days_buttons:
-        btn = dialog.findChild(QPushButton, day_name)
-        if btn:
-            btn.clicked.connect(lambda checked, d=day_name: handle_selection(d))
-
-    dialog.exec()
-
-
-def stop_timer_and_save(canvas_bar, tracker, current_theme):
+def stop_timer_and_save(canvas_bar, current_theme):
     global active_timer_day
     if study_timer.running and active_timer_day:
         study_timer.stop()
-        hours = study_timer.hours()
 
-        tracker.add_time(active_timer_day, hours)
+        updated_data = stop_study_session(active_timer_day, study_timer.hours())        
         study_timer.reset()
 
-        update_stacked_bar(canvas_bar.figure, tracker.all())
-
+        update_stacked_bar(canvas_bar.figure, updated_data)
         apply_bar_theme(canvas_bar, current_theme)
-
+        canvas_bar.draw()
         active_timer_day = None
-        print(f"Таймер остановлен. Добавлено {hours:.2f} ч.")
 
 
 def apply_bar_theme(canvas_bar, theme):
@@ -812,11 +781,19 @@ def open_Dashboard(menu_window):
         target_2.setLayout(layout_2)
 
     target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
-
-    tracker_obj = WeeklyStudyTracker(filename="storage/study_data.json")
-
     if target_3:
-        fig_bar = create_stacked_bar(tracker_obj.all())
+        current_data = get_tracker_data()
+        for day in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
+            manual_h = int(current_data[day]['manual'])
+            manual_m = int((current_data[day]['manual'] % 1) * 60)
+    
+            h_line = Dashboard_window.findChild(QLineEdit, f"{day}_H")
+            m_line = Dashboard_window.findChild(QLineEdit, f"{day}_M")
+            if h_line and m_line:
+                h_line.setPlaceholderText(str(manual_h))
+                m_line.setPlaceholderText(str(manual_m))
+
+        fig_bar = create_stacked_bar(current_data)
         canvas_bar = FigureCanvasQTAgg(fig_bar)
         canvas_bar.setStyleSheet("background-color: transparent;")
 
@@ -828,35 +805,27 @@ def open_Dashboard(menu_window):
 
         save_btn = Dashboard_window.findChild(QPushButton, "Save_Button")
         if save_btn:
-            def run_save():
-                save_tracker_data(Dashboard_window, canvas_bar, tracker_obj, current_theme_name)
-                apply_bar_theme(canvas_bar, current_theme_name)
-
-            save_btn.clicked.connect(run_save)
+            save_btn.clicked.connect(lambda: save_tracker_data(Dashboard_window, canvas_bar, current_theme_name))
 
         reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
         if reset_btn:
             def run_reset():
-                tracker_obj.reset_all()
-                for day in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]:
-                    Dashboard_window.findChild(QLineEdit, f"{day}_H").clear()
-                    Dashboard_window.findChild(QLineEdit, f"{day}_M").clear()
-                update_stacked_bar(canvas_bar.figure, tracker_obj.all())
-                apply_bar_theme(canvas_bar, current_theme_name)
-
+                new_data = clear_all_data()
+                update_stacked_bar(canvas_bar.figure, new_data)
+                canvas_bar.draw()
             reset_btn.clicked.connect(run_reset)
 
         start_btn = Dashboard_window.findChild(QPushButton, "Start_Button")
         if start_btn:
-            start_btn.clicked.connect(lambda: choose_day_and_start(Dashboard_window))
+            def run_start():
+                global active_timer_day
+                study_timer.start()
+                active_timer_day = start_study_session() 
+            start_btn.clicked.connect(run_start)
 
         stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
         if stop_btn:
-            def run_stop():
-                stop_timer_and_save(canvas_bar, tracker_obj, current_theme_name)
-                apply_bar_theme(canvas_bar, current_theme_name)
-
-            stop_btn.clicked.connect(run_stop)
+            stop_btn.clicked.connect(lambda: stop_timer_and_save(canvas_bar, current_theme_name))
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
@@ -1161,7 +1130,7 @@ def login_from_enter(main_window, remember=False):
     studip = simargl.StudIP(current_login, password)
     ecampusmail = simargl.ECampusMail(current_login, password)
 
-    tracker = WeeklyStudyTracker(filename=f"storage/{current_login}_study_data.json")
+    initialize_tracker(current_login)
 
     try:
         studip.create_client()
@@ -1180,7 +1149,6 @@ def login_from_enter(main_window, remember=False):
         schedule = studip.get_schedule()
         messages = studip.get_my_messages()
 
-        globals()['tracker_instance'] = tracker
 
 
 # =========================

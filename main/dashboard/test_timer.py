@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from main.dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from main.dashboard.timer_bar.study_timer import Study_Timer
 from main.dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar, show_chart
-import main.dashboard.timer_bar.tracker_controller as actions
+from main.dashboard import actions
 
 
 
