@@ -5,3 +5,4 @@ main/est.py
 main/untitled.ui
 .venv/
 __pycache__/
+main/.idea/dbnavigator.xml

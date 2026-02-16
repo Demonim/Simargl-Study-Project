@@ -379,7 +379,8 @@ class LoginStorage:
                 login TEXT UNIQUE, 
                 password TEXT, 
                 real_name TEXT, 
-                banned INTEGER
+                banned INTEGER,
+                is_admin INTEGER DEFAULT 0
             )
         """)
         self.con.commit()
@@ -407,7 +408,7 @@ class LoginStorage:
         Returns:
             sqlite3.Cursor: An iterable cursor containing tuples of (user_id, login, real_name, banned).
         """
-        return self.cur.execute("SELECT user_id, login, real_name, banned FROM users")
+        return self.cur.execute("SELECT user_id, login, real_name, banned, is_admin FROM users WHERE is_admin = 0")
 
     def user_exists(self, login):
         """
@@ -422,7 +423,7 @@ class LoginStorage:
         result = self.cur.execute("SELECT login FROM users WHERE login=?", (login,))
         return result.fetchone() is not None
 
-    def create(self, login, password, real_name):
+    def create(self, login, password, real_name, is_admin=0):
         """
         Registers a new user with a hashed password, unique ID, and real name.
 
@@ -440,8 +441,8 @@ class LoginStorage:
 
         try:
             self.cur.execute(
-                "INSERT INTO users (user_id, login, password, real_name, banned) VALUES (?, ?, ?, ?, 0)",
-                (user_id, login, hashed_password, real_name)
+                "INSERT INTO users (user_id, login, password, real_name, banned, is_admin) VALUES (?, ?, ?, ?, 0, ?)",
+                (user_id, login, hashed_password, real_name, is_admin)
             )
             self.con.commit()
             print(f"User {login} created with ID: {user_id}")

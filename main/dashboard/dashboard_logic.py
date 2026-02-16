@@ -1,7 +1,7 @@
-from main.dashboard.pie.create_pie import create_pie
-from main.dashboard.pie.subjects_logic import subject_hours
-from main.dashboard.heatmap.create_heatmap import create_heatmap
-from main.simargl import ECampusMail
+from dashboard.pie.create_pie import create_pie
+from dashboard.pie.subjects_logic import subject_hours
+from dashboard.heatmap.create_heatmap import create_heatmap
+from simargl import ECampusMail
 from .timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from datetime import datetime

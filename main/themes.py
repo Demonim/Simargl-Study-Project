@@ -65,7 +65,7 @@ QLineEdit#PasswordLine, #LoginLine, #NameLine {
     background-color: 255, 255, 255
 }
 
-QCheckBox#Check_Remember {
+QCheckBox#Check_Remember, #AdminCheck {
     color: rgb(102, 255, 140);
     background-color: rgb(255, 255, 255, 0);
     font-size: 10pt
@@ -550,7 +550,7 @@ QLineEdit#LoginLine, #NameLine {
     background-color: 255, 255, 255
 }
 
-QCheckBox#Check_Remember {
+QCheckBox#Check_Remember, #AdminCheck {
     color: rgb(79, 149, 255);
     background-color: rgb(255, 255, 255, 0);
     font-size: 10pt
@@ -816,7 +816,7 @@ QLineEdit:focus {
     border: 1px solid rgb(100, 100, 100);
 }
 
-QCheckBox {
+QCheckBox{
     color: rgb(108, 117, 125);
     spacing: 5px;
 }

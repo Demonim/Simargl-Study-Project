@@ -1,6 +1,6 @@
 import sys
 import os
-from . import simargl
+import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,12 +26,12 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from .themes import *
-from .dashboard.dashboard_logic import get_pie_chart, get_heatmap
-from .dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
-from .dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
-from .dashboard.timer_bar.study_timer import Study_Timer
-from .dashboard.dashboard_logic import (
+from themes import *
+from dashboard.dashboard_logic import get_pie_chart, get_heatmap
+from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
+from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
+from dashboard.timer_bar.study_timer import Study_Timer
+from dashboard.dashboard_logic import (
     get_pie_chart, get_heatmap, initialize_tracker, 
     process_manual_input, clear_all_data, stop_study_session, start_study_session, get_formatted_placeholders, get_weekly_bar_chart
 )
@@ -388,8 +388,8 @@ def open_unbanned():
         users_data = storage.load() # Возвращает SELECT * FROM users
         for row in users_data.fetchall():
             # row[0] - name, row[2] - banned_status
-            if row[2] == 0:
-                add_user_item(row[0], user_list_widget, "ban", refresh_list)
+            if row[3] == 0:
+                add_user_item(row[1], user_list_widget, "ban", refresh_list)
 
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
@@ -420,8 +420,8 @@ def open_banned():
         users_data = storage.load()
         if users_data:
             for row in users_data.fetchall():
-                if row[2] == 1:  # Показываем только забаненных
-                    add_user_item(row[0], user_list_widget, "unban", refresh_list)
+                if row[3] == 1:
+                    add_user_item(row[1], user_list_widget, "unban", refresh_list)
 
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
@@ -1193,9 +1193,12 @@ def open_registration(prelogin_window, storage):
     reg_window = load_ui("UI/new_user.ui")
 
     def create_user():
+        admin_checkbox = reg_window.findChild(QCheckBox, "AdminCheck")
         login = reg_window.findChild(QLineEdit, "LoginLine").text().strip()
         password = reg_window.findChild(QLineEdit, "PasswordLine").text().strip()
         real_name = reg_window.findChild(QLineEdit, "NameLine").text().strip()
+
+        is_admin_value = 1 if admin_checkbox and admin_checkbox.isChecked() else 0
 
         if not login or not password or not real_name:
             QMessageBox.warning(
@@ -1212,7 +1215,7 @@ def open_registration(prelogin_window, storage):
                 f"Login '{login}' is already taken. Please choose another one."
             )
             return
-        success = storage.create(login, password, real_name)
+        success = storage.create(login, password, real_name, is_admin=is_admin_value)
 
         if success:
             QMessageBox.information(
@@ -1288,24 +1291,27 @@ def handle_auth(prelogin_window, storage):
         QMessageBox.warning(prelogin_window, "Caution", "Enter login and password!")
         return
 
-    if login == "Admin" and password == "Admin":
-        open_admin(prelogin_window)
-        return
-
-
     if storage.compare(login, password):
-        storage.cur.execute("SELECT banned FROM users WHERE login = ?", (login,))
+        storage.cur.execute("SELECT banned, is_admin FROM users WHERE login = ?", (login,))
         result = storage.cur.fetchone()
 
-        if result and result[0] == 1:
-            QMessageBox.critical(
-                prelogin_window,
-                "Access Denied",
-                f"User {login} was banned!"
-            )
-            return
+        if result:
+            is_banned, is_admin = result
 
-        start_main_app(prelogin_window)
+            if is_banned == 1:
+                QMessageBox.critical(
+                    prelogin_window,
+                    "Access Denied",
+                    f"User {login} was banned!"
+                )
+                return
+
+            if is_admin == 1:
+                print(f"Admin login: {login}")
+                open_admin(prelogin_window)
+            else:
+                print(f"User login: {login}")
+                start_main_app(prelogin_window)
     else:
         QMessageBox.critical(prelogin_window, "Mistake", "Login or password is incorrect!")
 
