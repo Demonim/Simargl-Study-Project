@@ -78,10 +78,13 @@ HELP_TEXTS = {
 
 
 # =========================
-# UI LOADER
+# Helper Functions
 # =========================
 
 def load_ui(path: str):
+    """A utility function that uses QUiLoader to dynamically load .ui files.
+    It ensures the UI file exists and returns the loaded window object for use in the application.
+    """
     loader = QUiLoader()
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -98,6 +101,11 @@ def load_ui(path: str):
     return window
 
 def setup_auto_logout(window):
+    """
+    Initializes a QTimer that monitors user inactivity.
+    If the timer reaches 5 minutes without being reset,
+    it triggers the universal_logout function for security.
+    """
     window.auto_logout_timer = QTimer(window)
     window.auto_logout_timer.setSingleShot(True)
 
@@ -106,6 +114,9 @@ def setup_auto_logout(window):
     window.auto_logout_timer.start(300000)
 
 def save_tracker_data(dashboard_window, canvas_bar, theme):
+    """
+    Scrapes study hour inputs from the UI and updates the weekly study bar chart.
+    """
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     day_inputs = []
 
@@ -123,6 +134,11 @@ def save_tracker_data(dashboard_window, canvas_bar, theme):
 
 
 def stop_timer_and_save(canvas_bar, current_theme):
+    """
+    Stops the active study session,
+    calculates the elapsed time, saves the data to the tracker
+    for the current day, and triggers a refresh of the visual bar chart.
+    """
     global active_timer_day
     if study_timer.running and active_timer_day:
         study_timer.stop()
@@ -137,6 +153,11 @@ def stop_timer_and_save(canvas_bar, current_theme):
 
 
 def apply_bar_theme(canvas_bar, theme):
+    """
+    Dynamically updates the Matplotlib graph styling
+    (axes, ticks, and labels) to ensure visibility by switching
+    between light and dark colors based on the current UI theme.
+    """
     txt_col = 'white' if "Dark" in theme else 'black'
     fig = canvas_bar.figure
     ax = fig.gca()
@@ -152,18 +173,19 @@ def apply_bar_theme(canvas_bar, theme):
 
 
 def load_ecampus_mail_data(Email_window):
+    """
+    Connects to the university mail server to fetch the latest 100 email headers.
+    It clears the existing list in the UI and populates it with clickable subject/date items.
+    """
     global ecampusmail
 
-    # Находим список в интерфейсе
     messages_list = Email_window.findChild(QListWidget, "messagesList")
     if not messages_list:
         return
 
-    # Очищаем список перед загрузкой
     messages_list.clear()
 
     try:
-        # ЗАГРУЗКА: Программа остановится здесь до получения ответа от сервера
         subjects, dates = ecampusmail.show_subjects(100)
         subjects = subjects[::-1]
         dates = dates[::-1]
@@ -195,14 +217,15 @@ def load_ecampus_mail_data(Email_window):
 
 
 def open_mail_content(mail_index):
+    """
+    Extracts and decodes the body of a specific email.
+    It handles multipart MIME messages to find plain
+    text content and displays it in a dedicated pop-up dialog.
+    """
     global ecampusmail
 
     try:
-        # 1. Вызываем ваш метод из simargl.py
-        # Он возвращает объект email.message.Message
         msg = ecampusmail.open_mail(mail_index)
-
-        # 2. Извлекаем текст из этого объекта
         content = ""
         if msg.is_multipart():
             for part in msg.walk():
@@ -227,6 +250,10 @@ def open_mail_content(mail_index):
     except Exception as e:
         print(f"Ошибка: {e}")
 
+
+# =========================
+# Helper Classes
+# =========================
 
 class DayScheduleDialog(QDialog):
     def __init__(self, title, entries, parent=None):
@@ -334,6 +361,10 @@ class CourseDayDialog(QDialog):
 # =========================
 
 def change_theme(app, theme):
+    """
+    Manages the application's visual style. It maps a theme name (e.g., "Dark Theme")
+    to a specific QSS (Qt Style Sheet) and applies it to the entire QApplication instance.
+    """
     global current_theme_name
     current_theme_name = theme
 
@@ -348,16 +379,26 @@ def change_theme(app, theme):
 
 
 def get_plot_colors():
+    """
+    A helper function that returns
+    'white' for dark themes and 'black' for light themes,
+    ensuring that text on dashboard charts remains readable.
+    """
     if "Dark" in current_theme_name:
-        return 'white'  # Цвет текста для темных тем
+        return 'white'
     else:
-        return 'black'  # Цвет текста для светлых тем
+        return 'black'
 
 
 # =========================
-# WINDOW SWITCH
+# Admin Functions
 # =========================
+
 def add_user_item(username, list_widget, mode, refresh_callback):
+    """
+    Creates a custom UI element (button) for a specific user in the admin list.
+    It links the button to the ban/unban logic and handles the refresh callback for the list.
+    """
     item = QListWidgetItem(list_widget)
     item_widget = QWidget()
     layout = QHBoxLayout(item_widget)
@@ -375,6 +416,11 @@ def add_user_item(username, list_widget, mode, refresh_callback):
     list_widget.setItemWidget(item, item_widget)
 
 def open_unbanned():
+    """
+    Loads the admin view for managing active users.
+    It queries the database for users who are not
+    banned and renders them into the management list.
+    """
     global current_active_window
     window = load_ui("UI/Unbanned.ui")
     prev_window = current_active_window
@@ -400,6 +446,11 @@ def open_unbanned():
 
 
 def open_banned():
+    """
+    Loads the admin view for managing restricted users.
+    It specifically filters the database for entries with a
+    "banned" status and allows admins to lift restrictions.
+    """
     global current_active_window
     window = load_ui("UI/Unbanned.ui")
     window.setWindowTitle("Banned Users")
@@ -431,11 +482,14 @@ def open_banned():
 
 
 def show_ban_dialog(username, mode, refresh_callback):
+    """
+    Displays a confirmation dialog that allows an administrator
+    to change a user's status. It directly interacts with the LoginStorage to update the database.
+    """
     dialog = load_ui("UI/Ban_Dialogue.ui")
     ban_btn = dialog.findChild(QPushButton, "Ban")
     unban_btn = dialog.findChild(QPushButton, "Unban")
 
-    # Ссылка на ту же базу, что и в приложении
     storage = simargl.LoginStorage("users_db")
 
     def handle_ban():
@@ -457,6 +511,11 @@ def show_ban_dialog(username, mode, refresh_callback):
     dialog.exec()
 
 def open_admin(main_window):
+    """
+    Opens the main administrator dashboard.
+    It provides navigation to user management sections
+    (Banned/Unbanned) and allows the admin to log out.
+    """
     admin_window = load_ui("UI/Admin.ui")
     global current_active_window
     current_active_window = admin_window
@@ -479,8 +538,14 @@ def open_admin(main_window):
 
     main_window.courses_window = admin_window
 
+# =========================
+# Window Switch
+# =========================
 
 def open_courses(menu_window):
+    """
+    Displays a table populated with the user's active courses fetched from Stud.IP
+    """
     global user_courses
 
     courses_window = load_ui("UI/courses.ui")
@@ -524,6 +589,11 @@ def open_courses(menu_window):
 
 
 def open_calendar_entry(menu_window):
+    """
+    The initialization step for the calendar.
+    It opens a dialog to verify which courses happen
+    on which days before proceeding to show the graphical calendar.
+    """
     storage = simargl.CourseDaysStorage(current_login)
 
     dialog = CourseDayDialog(
@@ -537,6 +607,9 @@ def open_calendar_entry(menu_window):
 
 
 def open_calendar(menu_window):
+    """
+    Generates a monthly calendar view where users can click on specific days to see their scheduled lectures.
+    """
     calendar_window = load_ui("UI/calendar.ui")
 
     # ===== BUTTON BACK =====
@@ -548,11 +621,9 @@ def open_calendar(menu_window):
     help_btn = calendar_window.findChild(QPushButton, "Help_Button")
     help_btn.clicked.connect(lambda: show_universal_help(calendar_window, "calendar"))
 
-    # ===== LOADING SAVED DAYS =====
     storage = simargl.CourseDaysStorage(current_login)
     course_days = storage.load()  # { course_title: "MO" }
 
-    # ===== FORMING WEEKLY_SCHEDULE =====
     weekly_schedule.clear()
 
     for entry in schedule.entries:
@@ -560,18 +631,15 @@ def open_calendar(menu_window):
         if day:
             weekly_schedule[day].append(entry)
 
-    # ===== CALENDAR GRID =====
     calendar_widget = calendar_window.findChild(QWidget, "Calendar")
     grid = calendar_widget.findChild(QGridLayout, "gridLayout_2")
 
-    # ===== BUILD BUTTONS =====
     buttons = []
     for i in range(grid.count()):
         widget = grid.itemAt(i).widget()
         if isinstance(widget, QPushButton):
             buttons.append(widget)
 
-    # ===== SORTING BY POSITION =====
     buttons_with_pos = []
     for btn in buttons:
         index = grid.indexOf(btn)
@@ -589,7 +657,6 @@ def open_calendar(menu_window):
     cal = calendar.Calendar(firstweekday=0)  # Monday
     month_days = list(cal.itermonthdays(year, month))
 
-    # ===== CLICK ON DAY =====
     def on_day_clicked(day):
         clicked_date = datetime(year, month, day).date()
         weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
@@ -603,7 +670,6 @@ def open_calendar(menu_window):
         )
         dialog.exec()
 
-    # ===== FILLING BUTTONS =====
     for btn, day in zip(buttons_sorted, month_days):
         try:
             btn.clicked.disconnect()
@@ -626,6 +692,11 @@ def open_calendar(menu_window):
 
 
 def open_StudIP(menu_window):
+    """
+    Fetches private messages from the Stud.IP platform.
+    It creates a list of buttons where each button
+    represents a message that can be opened for reading.
+    """
     StudIP_window = load_ui("UI/StudIP.ui")
 
     # exit button
@@ -640,7 +711,6 @@ def open_StudIP(menu_window):
     # ---------- MESSAGES ----------
     messages_list = StudIP_window.findChild(QListWidget, "messagesList")
 
-    # settback in the case of not finding the widget
     if messages_list is not None:
         messages_list.clear()
         messages_list.setSpacing(8)
@@ -682,6 +752,10 @@ def open_StudIP(menu_window):
 
 
 def open_message_dialog(message):
+    """
+    Uses the Stud.IP API to fetch the full body and sender
+    details of a selected message and displays them in a formatted window.
+    """
     dialog = load_ui("UI/MessageDialog.ui")
 
     full_msg = studip.client.Messages.view_message(message)
@@ -703,6 +777,9 @@ def open_message_dialog(message):
 
 
 def open_Email(menu_window):
+    """
+    Opens the inbox view, listing recent emails and providing access to the "Compose" feature.
+    """
     Email_window = load_ui("UI/Email.ui")
 
     exit_button = Email_window.findChild(QPushButton, "Back_Button")
@@ -721,6 +798,10 @@ def open_Email(menu_window):
 
 
 def open_Compose_Email(Email_window):
+    """
+    Handles the email creation UI, including logic for selecting file
+    attachments and sending data via the university SMTP server.
+    """
     global current_active_window
     window = load_ui("UI/Send_Email.ui")
     prev_window = current_active_window
@@ -732,18 +813,19 @@ def open_Compose_Email(Email_window):
     subject_line = window.findChild(QLineEdit, "Subject_line")
     email_text_edit = window.findChild(QTextEdit, "Email_text")
     send_btn = window.findChild(QPushButton, "Send_email")
+
     add_files_btn = window.findChild(QPushButton, "Add_files")
     selected_file = None
+
     if sender_line:
         sender_line.setText(f"{current_login}@stud.uni-goettingen.de")
 
     def handle_add_file():
-        nonlocal selected_file_path
-        file_path, _ = QFileDialog.getOpenFileName(window, "Choose File", "", "All Files (*)")
+        nonlocal selected_file
+        file_path, _ = QFileDialog.getOpenFileName(window, "Выберите файл", "", "All Files (*)")
         if file_path:
-            selected_file_path = file_path
-            if add_files_btn:
-                add_files_btn.setText(f"File: {os.path.basename(file_path)}")
+            selected_file = file_path
+            add_files_btn.setText(f"Файл: {os.path.basename(file_path)}")  # Показываем имя файла на кнопке
 
     if add_files_btn:
         add_files_btn.clicked.connect(handle_add_file)
@@ -760,8 +842,8 @@ def open_Compose_Email(Email_window):
                 return
 
             mail_client.send_email(text, subject, sender, receiver, filename=selected_file)
-            QMessageBox.information(window, "Success", "Email send!")
 
+            QMessageBox.information(window, "Success", "Email sent!")
             open_Email(window)
         except Exception as e:
             QMessageBox.critical(window, "Error", f"Could not send Email: {str(e)}")
@@ -775,6 +857,11 @@ def open_Compose_Email(Email_window):
 
 
 def open_Dashboard(menu_window):
+    """
+    Integrates Matplotlib canvases to show visual data, s
+    uch as course distribution (pie chart),
+    email activity (heatmap), and study time (bar chart).
+    """
     Dashboard_window = load_ui("UI/dashboard_test.ui")
 
     target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
@@ -848,6 +935,11 @@ def open_Dashboard(menu_window):
 
 
 def open_Notes(menu_window):
+    """
+    Opens the personal note manager.
+    It loads all existing notes from the user's local storage
+    and provides functionality to create new entries or save edits.
+    """
     global notes_storage
     Notes_window = load_ui("UI/notes.ui")
 
@@ -911,6 +1003,11 @@ def open_Notes(menu_window):
 
 
 def open_Themes(menu_window):
+    """
+    Displays a theme selection window.
+    It captures the user's choice (e.g., "Dark Mini")
+    and calls change_theme to update the entire application's look.
+    """
     theme_dialog = load_ui("UI/Theme.ui")
 
     btn_dark = theme_dialog.findChild(QPushButton, "Dark")
@@ -936,6 +1033,10 @@ def open_Themes(menu_window):
 
 
 def open_Help1(main_window):
+    """
+    Opens the "External Help" window accessible from the menu screen,
+    providing general contact information and developer credits.
+    """
     Help_window1 = load_ui("UI/help_1.ui")
 
     textBrowser = Help_window1.findChild(QTextBrowser, "textBrowser")
@@ -973,6 +1074,10 @@ def open_Help1(main_window):
 
 
 def open_Help(main_window):
+    """
+    Opens the "External Help" window accessible from the pre-login screen,
+    providing general contact information and developer credits.
+    """
     Help_window = load_ui("UI/help.ui")
 
     textBrowser = Help_window.findChild(QTextBrowser, "textBrowser")
@@ -1009,6 +1114,10 @@ def open_Help(main_window):
     main_window.courses_window = Help_window
 
 def show_universal_help(parent_window, context_key):
+    """
+    Displays a modal dialog containing help information.
+    It fetches HTML content from the HELP_TEXTS dictionary based on the provided context_key.
+    """
     help_dialog = load_ui("UI/Universal_Help.ui")
     help_text_widget = help_dialog.findChild(QTextBrowser, "Helptext")
 
@@ -1021,6 +1130,11 @@ def show_universal_help(parent_window, context_key):
 
 
 def open_menu(main_window):
+    """
+    Acts as the main navigation hub.
+    It initializes the dashboard menu, updates mail and Stud.IP message counters using a ThreadPoolExecutor,
+    and connects all sidebar buttons to their respective views.
+    """
     menu_window = load_ui("UI/menu.ui")
     mail_notifications = menu_window.findChild(QLabel, "Ecampus_Mail")
     message_notifications = menu_window.findChild(QLabel, "StudIP_Messages")
@@ -1075,6 +1189,10 @@ def open_menu(main_window):
 
 
 def back_to_main(menu_window):
+    """
+    Handles the transition from the menu back to the login/main screen.
+    It cleans up active mail server connections and checks for "Remember Me" data in the local database.
+    """
     main_window = load_ui("UI/main.ui")
     setup_auto_logout(main_window)
     global current_active_window
@@ -1129,8 +1247,17 @@ def back_to_main(menu_window):
     main_window.show()
     menu_window.close()
 
+# =========================
+# Second Login
+# =========================
+
 
 def login_from_enter(main_window, remember=False):
+    """
+    The core authentication handler.
+    It collects credentials, initializes Stud.IP and ECampusMail clients,
+    loads user courses/schedules, and stops the auto-logout timer upon a successful login.
+    """
     global user_courses, current_login, schedule, ecampusmail, studip, messages
     login_box = main_window.findChild(QLineEdit, "LoginLine")
     password_box = main_window.findChild(QLineEdit, "PasswordLine")
@@ -1160,13 +1287,12 @@ def login_from_enter(main_window, remember=False):
         schedule = studip.get_schedule()
         messages = studip.get_my_messages()
 
-
-
-# =========================
-# MAIN
-# =========================
-
 def check_box_remember(checkbox: QCheckBox):
+    """
+    A toggle handler for the "Remember Me" checkbox.
+    It updates a global boolean flag that determines if
+    login data should be persisted in the local database.
+    """
     global remember
     if checkbox.isChecked():
         remember = True
@@ -1175,6 +1301,11 @@ def check_box_remember(checkbox: QCheckBox):
 
 
 def universal_logout():
+    """
+    Resets the application state by clearing login fields,
+    closing all active windows except the pre-login screen,
+    and displaying a "Thank You" message to the user.
+    """
     global current_active_window, prelogin_window
 
     if not prelogin_window:
@@ -1196,11 +1327,15 @@ def universal_logout():
 
     QMessageBox.information(prelogin_window, "Dialogue", "Thank you very much!")
 
+# =========================
+# Registration
+# =========================
 
 def open_registration(prelogin_window, storage):
     """
-    Handles the registration UI logic.
-    Loads the UI, collects input, and calls storage to create a new user.
+    Loads the user registration UI.
+    It includes a sub-function create_user that validates inputs and saves
+    a new user (including admin status) into the local SQLite database.
     """
     reg_window = load_ui("UI/new_user.ui")
 
@@ -1250,7 +1385,54 @@ def open_registration(prelogin_window, storage):
 
     reg_window.exec()
 
+def handle_auth(prelogin_window, storage):
+    """
+    Validates credentials against the users_db.
+    It specifically checks if a user is banned
+    or if they have administrative privileges to route them
+    to either the Admin panel or the standard App.
+    """
+    login = prelogin_window.findChild(QLineEdit, "LoginLine").text()
+    password = prelogin_window.findChild(QLineEdit, "PasswordLine").text()
+
+    if not login or not password:
+        QMessageBox.warning(prelogin_window, "Caution", "Enter login and password!")
+        return
+
+    if storage.compare(login, password):
+        storage.cur.execute("SELECT banned, is_admin FROM users WHERE login = ?", (login,))
+        result = storage.cur.fetchone()
+
+        if result:
+            is_banned, is_admin = result
+
+            if is_banned == 1:
+                QMessageBox.critical(
+                    prelogin_window,
+                    "Access Denied",
+                    f"User {login} was banned!"
+                )
+                return
+
+            if is_admin == 1:
+                print(f"Admin login: {login}")
+                open_admin(prelogin_window)
+            else:
+                print(f"User login: {login}")
+                start_main_app(prelogin_window)
+    else:
+        QMessageBox.critical(prelogin_window, "Mistake", "Login or password is incorrect!")
+
+
+# =========================
+# Main Start
+# =========================
+
 def start_main_app(prelogin_window):
+    """
+    A setup function that prepares the main.ui window after the initial pre-login phase,
+    ensuring themes, logout buttons, and auto-logout logic are correctly linked.
+    """
     global remember, remember_path
     remember = False
     prelogin_window.hide()
@@ -1295,40 +1477,12 @@ def start_main_app(prelogin_window):
     prelogin_window.main_ref = main_window
 
 
-def handle_auth(prelogin_window, storage):
-    login = prelogin_window.findChild(QLineEdit, "LoginLine").text()
-    password = prelogin_window.findChild(QLineEdit, "PasswordLine").text()
-
-    if not login or not password:
-        QMessageBox.warning(prelogin_window, "Caution", "Enter login and password!")
-        return
-
-    if storage.compare(login, password):
-        storage.cur.execute("SELECT banned, is_admin FROM users WHERE login = ?", (login,))
-        result = storage.cur.fetchone()
-
-        if result:
-            is_banned, is_admin = result
-
-            if is_banned == 1:
-                QMessageBox.critical(
-                    prelogin_window,
-                    "Access Denied",
-                    f"User {login} was banned!"
-                )
-                return
-
-            if is_admin == 1:
-                print(f"Admin login: {login}")
-                open_admin(prelogin_window)
-            else:
-                print(f"User login: {login}")
-                start_main_app(prelogin_window)
-    else:
-        QMessageBox.critical(prelogin_window, "Mistake", "Login or password is incorrect!")
-
-
 def main():
+    """
+    The application entry point.
+    It initializes the QApplication, sets up the user database storage,
+    applies the initial theme, and displays the prelogin.ui window.
+    """
     global prelogin_window, current_active_window
 
     app = QApplication.instance()
