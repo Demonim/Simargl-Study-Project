@@ -318,7 +318,7 @@ class ECampusMail:
                 part = email.mime.multipart.MIMEBase("application", "octet-stream")
                 part.set_payload(attachment.read())
             email.encoders.encode_base64(part)
-            part.add_header("Content-Disposition", f"attachment; filename= {filename}")
+            part.add_header("Content-Disposition", f"attachment; filename= {os.path.basename(filename)}")
             message.attach(part)
 
         try: 

@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QHBoxLayout,
     QCheckBox,
-    QMessageBox
+    QMessageBox,
+    QFileDialog,
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt, QTimer
@@ -32,7 +33,7 @@ from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from dashboard.timer_bar.study_timer import Study_Timer
 from dashboard.dashboard_logic import (
-    get_pie_chart, get_heatmap, initialize_tracker, 
+    get_pie_chart, get_heatmap, initialize_tracker,
     process_manual_input, clear_all_data, stop_study_session, start_study_session, get_formatted_placeholders, get_weekly_bar_chart
 )
 
@@ -126,7 +127,7 @@ def stop_timer_and_save(canvas_bar, current_theme):
     if study_timer.running and active_timer_day:
         study_timer.stop()
 
-        updated_data = stop_study_session(active_timer_day, study_timer.hours())        
+        updated_data = stop_study_session(active_timer_day, study_timer.hours())
         study_timer.reset()
 
         update_stacked_bar(canvas_bar.figure, updated_data)
@@ -394,7 +395,7 @@ def open_unbanned():
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
     window.show()
-    if prev_window: 
+    if prev_window:
         prev_window.close()
 
 
@@ -404,7 +405,7 @@ def open_banned():
     window.setWindowTitle("Banned Users")
 
     label = window.findChild(QLabel, "Users")
-    if label: 
+    if label:
         label.setText("Banned Users")
 
     prev_window = current_active_window
@@ -448,9 +449,9 @@ def show_ban_dialog(username, mode, refresh_callback):
         refresh_callback()
 
     # Привязываем действия к конкретным кнопкам
-    if ban_btn: 
+    if ban_btn:
         ban_btn.clicked.connect(handle_ban)
-    if unban_btn: 
+    if unban_btn:
         unban_btn.clicked.connect(handle_unban)
 
     dialog.exec()
@@ -726,15 +727,26 @@ def open_Compose_Email(Email_window):
     current_active_window = window
     mail_client = ecampusmail
 
-    # Поиск элементов интерфейса
     sender_line = window.findChild(QLineEdit, "Sender_line")
     receiver_line = window.findChild(QLineEdit, "Receiver_line")
     subject_line = window.findChild(QLineEdit, "Subject_line")
     email_text_edit = window.findChild(QTextEdit, "Email_text")
-
     send_btn = window.findChild(QPushButton, "Send_email")
+    add_files_btn = window.findChild(QPushButton, "Add_files")
+    selected_file = None
     if sender_line:
         sender_line.setText(f"{current_login}@stud.uni-goettingen.de")
+
+    def handle_add_file():
+        nonlocal selected_file_path
+        file_path, _ = QFileDialog.getOpenFileName(window, "Choose File", "", "All Files (*)")
+        if file_path:
+            selected_file_path = file_path
+            if add_files_btn:
+                add_files_btn.setText(f"File: {os.path.basename(file_path)}")
+
+    if add_files_btn:
+        add_files_btn.clicked.connect(handle_add_file)
 
     def handle_send():
         try:
@@ -747,7 +759,7 @@ def open_Compose_Email(Email_window):
                 QMessageBox.warning(window, "Error", "Fill all the fields!")
                 return
 
-            mail_client.send_email(text, subject, sender, receiver)
+            mail_client.send_email(text, subject, sender, receiver, filename=selected_file)
             QMessageBox.information(window, "Success", "Email send!")
 
             open_Email(window)
@@ -789,8 +801,8 @@ def open_Dashboard(menu_window):
 
     target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
     if target_3:
-        
-        fig_bar = get_weekly_bar_chart()    
+
+        fig_bar = get_weekly_bar_chart()
         canvas_bar = FigureCanvasQTAgg(fig_bar)
         canvas_bar.setStyleSheet("background-color: transparent;")
 
@@ -1170,9 +1182,9 @@ def universal_logout():
 
     login_box = prelogin_window.findChild(QLineEdit, "LoginLine")
     pass_box = prelogin_window.findChild(QLineEdit, "PasswordLine")
-    if login_box: 
+    if login_box:
         login_box.clear()
-    if pass_box: 
+    if pass_box:
         pass_box.clear()
 
     prelogin_window.show()
