@@ -32,7 +32,19 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="minimumSize">
+    <size>
+     <width>1140</width>
+     <height>860</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>1920</width>
+     <height>1080</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1,10,3">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="4,1,4,1">
       <item>

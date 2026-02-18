@@ -191,12 +191,10 @@ def load_ecampus_mail_data(Email_window):
         dates = dates[::-1]
 
         for i in range(len(subjects)):
-            # Создаем контейнер для строки
             item_widget = QWidget()
             layout = QHBoxLayout(item_widget)
             layout.setContentsMargins(5, 2, 5, 2)
 
-            # Создаем кнопку как в StudIP
             display_text = f"{dates[i]} | {subjects[i]}"
             msg_button = QPushButton(display_text)
             msg_button.setStyleSheet("text-align: left; padding: 10px;")
@@ -234,7 +232,6 @@ def open_mail_content(mail_index):
         else:
             content = msg.get_payload(decode=True).decode('utf-8', errors='ignore')
 
-        # 3. Показываем в окне (как в StudIP)
         dialog = QDialog()
         dialog.setWindowTitle(f"Письмо: {msg['Subject']}")
         dialog.setMinimumSize(600, 400)
@@ -432,9 +429,8 @@ def open_unbanned():
 
     def refresh_list():
         user_list_widget.clear()
-        users_data = storage.load() # Возвращает SELECT * FROM users
+        users_data = storage.load()
         for row in users_data.fetchall():
-            # row[0] - name, row[2] - banned_status
             if row[3] == 0:
                 add_user_item(row[1], user_list_widget, "ban", refresh_list)
 
@@ -502,7 +498,6 @@ def show_ban_dialog(username, mode, refresh_callback):
         dialog.accept()
         refresh_callback()
 
-    # Привязываем действия к конкретным кнопкам
     if ban_btn:
         ban_btn.clicked.connect(handle_ban)
     if unban_btn:
@@ -612,7 +607,6 @@ def open_calendar(menu_window):
     """
     calendar_window = load_ui("UI/calendar.ui")
 
-    # ===== BUTTON BACK =====
     exit_button = calendar_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(calendar_window)
@@ -699,7 +693,6 @@ def open_StudIP(menu_window):
     """
     StudIP_window = load_ui("UI/StudIP.ui")
 
-    # exit button
     exit_button = StudIP_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(
         lambda: open_menu(StudIP_window)
@@ -708,7 +701,6 @@ def open_StudIP(menu_window):
     help_btn = StudIP_window.findChild(QPushButton, "Help_Button")
     help_btn.clicked.connect(lambda: show_universal_help(StudIP_window, "studip"))
 
-    # ---------- MESSAGES ----------
     messages_list = StudIP_window.findChild(QListWidget, "messagesList")
 
     if messages_list is not None:
@@ -845,16 +837,15 @@ def open_Compose_Email(Email_window):
 
             QMessageBox.information(window, "Success", "Email sent!")
             open_Email(window)
+            window.close()
+
         except Exception as e:
             QMessageBox.critical(window, "Error", f"Could not send Email: {str(e)}")
 
     if send_btn:
         send_btn.clicked.connect(handle_send)
-
     window.show()
-    if prev_window:
-        prev_window.close()
-
+    Email_window.close()
 
 def open_Dashboard(menu_window):
     """
@@ -972,7 +963,6 @@ def open_Notes(menu_window):
 
             notes_list.addItem(title)
 
-    # --- load note ---
     def load_note(item):
         title = item.text()
         for note in notes:
@@ -980,7 +970,6 @@ def open_Notes(menu_window):
                 text_edit.setPlainText(note["content"])
                 break
 
-    # --- save note ---
     def save_note():
         item = notes_list.currentItem()
         if not item:
@@ -1206,13 +1195,11 @@ def back_to_main(menu_window):
     except:
         raise Exception
 
-    # Theme combobox
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
     theme_box.currentTextChanged.connect(
         lambda text: change_theme(QApplication.instance(), text)
     )
 
-    # Check box "Remember me"
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
     remember_path = "storage/ecampus_login_data.db"
     if os.path.exists(remember_path):
@@ -1226,10 +1213,8 @@ def back_to_main(menu_window):
         lambda: check_box_remember(remember_check)
     )
 
-    # Theme init
     change_theme(QApplication.instance(), theme_box.currentText())
 
-    # Press Enter to enter the menu
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
         lambda: login_from_enter(main_window, remember)

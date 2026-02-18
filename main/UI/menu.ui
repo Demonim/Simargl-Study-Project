@@ -29,7 +29,19 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="minimumSize">
+    <size>
+     <width>1140</width>
+     <height>860</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>1920</width>
+     <height>1080</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,0">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
