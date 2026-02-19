@@ -1257,12 +1257,12 @@ def back_to_main(menu_window):
     )
 
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/ecampus_login_data.db"
+    remember_path = "storage/remember_database.db"
     if os.path.exists(remember_path):
-        login_database = simargl.LoginStorage("ecampus_login_data")
-        db_data = login_database.load().fetchall()
+        remember_database = simargl.LoginStorage("remember_database")
+        db_data = remember_database.load().fetchall()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
-        login_box.setText(db_data[0][0])
+        login_box.setText(db_data[0][1])
         remember_check.click()
 
     remember_check.clicked.connect(
@@ -1318,6 +1318,11 @@ def login_from_enter(main_window, remember=False):
     except:
         QMessageBox.warning(prelogin_window, "Mistake", "Incorrect Login or Password")
     else:
+        if remember:
+            remember_database = simargl.LoginStorage("remember_database")
+            if not remember_database.user_exists(current_login):
+                remember_database.create(current_login, password, " ")
+
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login)
         if hasattr(main_window, 'auto_logout_timer'):
@@ -1503,12 +1508,12 @@ def start_main_app(prelogin_window):
 
     # Remember Me checkbox
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/ecampus_login_data.db"
+    remember_path = "storage/remember_database.db"
     if os.path.exists(remember_path):
-        login_database = simargl.LoginStorage("ecampus_login_data")
-        db_data = login_database.load().fetchall()
+        remember_database = simargl.LoginStorage("remember_database")
+        db_data = remember_database.load().fetchall()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
-        login_box.setText(db_data[0][0])
+        login_box.setText(db_data[0][1])
         remember_check.click()
 
     remember_check.clicked.connect(
