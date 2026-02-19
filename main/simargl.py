@@ -206,10 +206,19 @@ class ECampusMail:
         Returns:
             int: The count of unseen (unread) emails in the inbox.
         """
-
-        self.mail.select("inbox")
-        result, data = self.mail.search(None, "UNSEEN")
-        return len(data[0].split())
+        try:
+            if not hasattr(self, 'mail') or self.mail is None or self.mail is False:
+                return 0
+            
+            self.mail.select("inbox")
+            result, data = self.mail.search(None, "UNSEEN")
+            if data and data[0]:
+                return len(data[0].split())
+            return 0
+        except (imaplib.IMAP4.abort, ConnectionResetError, OSError, AttributeError):
+            return 0
+        except Exception:
+            return 0
     
     def show_subjects(self, last_n: int):
         """

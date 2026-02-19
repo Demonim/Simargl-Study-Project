@@ -1261,8 +1261,22 @@ def open_menu(main_window):
     mail_notifications = menu_window.findChild(QLabel, "Ecampus_Mail")
     message_notifications = menu_window.findChild(QLabel, "StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(mail_notifications.setText(f"ECampus Mail ({ecampusmail.mail_notifications()})"), 1)
-        executor.submit(message_notifications.setText(f"StudIP ({studip.new_messages_counter()})"), 2)
+        def update_mail_label():
+            try:
+                count = ecampusmail.mail_notifications() if ecampusmail else 0
+                mail_notifications.setText(f"ECampus Mail ({count})")
+            except Exception:
+                mail_notifications.setText("ECampus Mail (?)")
+        
+        def update_studip_label():
+            try:
+                count = studip.new_messages_counter() if studip else 0
+                message_notifications.setText(f"StudIP ({count})")
+            except Exception:
+                message_notifications.setText("StudIP (?)")
+        
+        executor.submit(update_mail_label)
+        executor.submit(update_studip_label)
 
     name_label = menu_window.findChild(QLabel, "Name_label")
     name_label.setText(f"{current_login}")
