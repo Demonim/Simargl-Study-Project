@@ -26,9 +26,9 @@ from PySide6.QtWidgets import (
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from themes import *
-from dashboard.dashboard_logic import get_pie_chart, get_heatmap
+
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from dashboard.timer_bar.study_timer import Study_Timer
@@ -49,8 +49,6 @@ study_timer = Study_Timer()
 active_timer_day = None
 schedule = None
 notes_storage = None
-admin_login = "Admin"
-admin_password = "Admin"
 current_theme_name = "Dark"
 
 # =========================
@@ -700,7 +698,7 @@ def open_calendar(menu_window):
     buttons_with_pos.sort(key=lambda x: (x[0], x[1]))
     buttons_sorted = [b[2] for b in buttons_with_pos]
 
-    # ===== CURRENT MONTH =====
+    # ===== CURRENT DATE =====
     today = datetime.now().date()
     year = today.year
     month = today.month
@@ -963,7 +961,7 @@ def open_Dashboard(menu_window):
             def run_start():
                 global active_timer_day
                 study_timer.start()                          
-                active_timer_day = start_study_session()     #new func in dashboard_logic
+                active_timer_day = start_study_session()
             start_btn.clicked.connect(run_start)
 
         stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
@@ -1100,7 +1098,8 @@ def open_Help1(main_window):
     Instructions_button.clicked.connect(
         lambda: textBrowser.setText("""1. Enter your login details for Stud.Ip. 
         \n2. After logging in, you will have access to a menu with all the application functions. 
-        \n Among them you can use: \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
+        \n Among them you can use: 
+        \n- Active user courses  \n- Current month calendar \n- List of incoming Stud.ip messages \n- Ecampusmail incoming message list \n- Ability to create and edit notes \n- Customize your settings""")
     )
     Support_button = Help_window1.findChild(QPushButton, "Support")
     Support_button.clicked.connect(
@@ -1249,7 +1248,7 @@ def back_to_main(menu_window):
             ecampusmail.server = False
             ecampusmail.mail = False
     except:
-        QMessageBox.warning(prelogin_window, "Mistake", "Incorrect Login or Password")
+        QMessageBox.warning(prelogin_window, "Error", "Incorrect Login or Password")
 
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
     theme_box.currentTextChanged.connect(
@@ -1316,7 +1315,7 @@ def login_from_enter(main_window, remember=False):
             executor.submit(ecampusmail.read_email_init())
             executor.submit(ecampusmail.write_email_init())
     except:
-        QMessageBox.warning(prelogin_window, "Mistake", "Incorrect Login or Password")
+        QMessageBox.warning(prelogin_window, "Error", "Incorrect Login or Password")
     else:
         if remember:
             remember_database = simargl.LoginStorage("remember_database")
@@ -1404,7 +1403,7 @@ def open_registration(prelogin_window, storage):
         if storage.user_exists(login):
             QMessageBox.warning(
                 reg_window,
-                "Mistake",
+                "Error",
                 f"Login '{login}' is already taken. Please choose another one."
             )
             return
@@ -1467,7 +1466,7 @@ def handle_auth(prelogin_window, storage):
                 print(f"User login: {login}")
                 start_main_app(prelogin_window)
     else:
-        QMessageBox.critical(prelogin_window, "Mistake", "Login or password is incorrect!")
+        QMessageBox.critical(prelogin_window, "Error", "Login or password is incorrect!")
 
 
 # =========================

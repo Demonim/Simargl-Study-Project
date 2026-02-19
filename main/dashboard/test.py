@@ -6,6 +6,9 @@ from main.dashboard.heatmap.messages_logic import topics_week_matrix
 from main.dashboard.heatmap.create_heatmap import create_heatmap
 from main.dashboard.pie.subjects_logic import subject_hours
 
+# щоб matplotlib відкрило два окремих вікна 
+import matplotlib.backend_bases
+
 login = input('Enter your login: ')
 password = input('Enter your password: ')
 
@@ -24,8 +27,6 @@ subjects, dates = mail_handler.show_subjects(last_n=200)
 my_pie = create_pie(subject_hours)
 my_heatmap = create_heatmap(subjects, dates)
 
-# щоб matplotlib відкрило два окремих вікна 
-import matplotlib.backend_bases
 
 def show_figure(fig):
     # нове вікно через pyplot і переноситься туди вміст об'єктів

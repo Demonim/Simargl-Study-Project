@@ -38,8 +38,8 @@ def create_heatmap(subjects, dates, color='black'):
         cbar.set_label('Messages', color=color)
         cbar.outline.set_edgecolor(color)
         cbar.ax.yaxis.set_tick_params(color=color, labelcolor=color)
-    except:
-        pass
+    except Exception as e:
+        print("Error:", e)
 
     weeks = ["4 weeks ago", "3 weeks ago", "2 weeks ago", "Last week", "Current week"]
     ax.set_xticks(np.arange(len(weeks)))

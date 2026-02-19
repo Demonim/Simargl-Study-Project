@@ -224,7 +224,7 @@ class ECampusMail:
                   dates_list (list[datetime]): Timezone-aware datetime objects.
         """
 
-        # Fetching searched letters
+        # Fetching searched mails
         self.mail.select("inbox")
         result, data = self.mail.search(None, "ALL")
         self.email_ids = data[0].split()
@@ -236,11 +236,11 @@ class ECampusMail:
         subjects_list = []
         dates_list = []
 
-        # Rightly decode the letters 
+        # Rightly decode the mails
         id_string = b",".join(latest_ids).decode('utf-8')
         result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT DATE)])')
 
-        # For each letter search subjects and dates
+        # For each mail search subjects and dates
         for response_part in msg_data:
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
@@ -332,11 +332,9 @@ class ECampusMail:
     def close_conections(self):
         """Safely closes active connections."""
 
-        if hasattr(self, 'mail'):
-            self.mail.logout()
-        
-        if hasattr(self, 'smtp_conn'):
-            self.smtp_conn.quit()
+        self.mail.logout()
+        self.server.quit()
+        self.server.close()
 
 
 class LoginStorage:
