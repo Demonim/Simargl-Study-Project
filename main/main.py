@@ -29,12 +29,11 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout
 from themes import *
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
-from dashboard.timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from dashboard.timer_bar.study_timer import Study_Timer
 from dashboard.dashboard_logic import (
     get_pie_chart, get_heatmap, initialize_tracker,
-    process_manual_input, clear_all_data, stop_study_session, start_study_session, get_formatted_placeholders, get_weekly_bar_chart
+    clear_all_data, stop_study_session, start_study_session,
+    get_weekly_bar_chart, refresh_stacked_bar
 )
 
 import calendar
@@ -125,8 +124,7 @@ def save_tracker_data(dashboard_window, canvas_bar, theme):
         if h_line and m_line:
             day_inputs.append((day, h_line.text().strip(), m_line.text().strip()))
 
-    updated_data = process_manual_input(day_inputs)
-    update_stacked_bar(canvas_bar.figure, updated_data)
+    refresh_stacked_bar(canvas_bar, manual_inputs=day_inputs)
     apply_bar_theme(canvas_bar, theme)
     canvas_bar.draw()
 
@@ -140,15 +138,15 @@ def stop_timer_and_save(canvas_bar, current_theme):
     global active_timer_day
     if study_timer.running and active_timer_day:
         study_timer.stop()
+        session_hours = study_timer.hours()
 
-        updated_data = stop_study_session(active_timer_day, study_timer.hours())
+        stop_study_session(active_timer_day, session_hours)
         study_timer.reset()
 
-        update_stacked_bar(canvas_bar.figure, updated_data)
+        refresh_stacked_bar(canvas_bar)
         apply_bar_theme(canvas_bar, current_theme)
         canvas_bar.draw()
         active_timer_day = None
-
 
 def apply_bar_theme(canvas_bar, theme):
     """
@@ -961,8 +959,9 @@ def open_Dashboard(menu_window):
         reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
         if reset_btn:
             def run_reset():
-                new_data = clear_all_data()
-                update_stacked_bar(canvas_bar.figure, new_data)
+                clear_all_data()
+                refresh_stacked_bar(canvas_bar)
+                apply_bar_theme(canvas_bar, current_theme_name)
                 canvas_bar.draw()
             reset_btn.clicked.connect(run_reset)
 
@@ -971,7 +970,7 @@ def open_Dashboard(menu_window):
             def run_start():
                 global active_timer_day
                 study_timer.start()                          
-                active_timer_day = start_study_session()
+                active_timer_day = start_study_session()    
             start_btn.clicked.connect(run_start)
 
         stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")

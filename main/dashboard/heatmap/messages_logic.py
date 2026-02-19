@@ -1,10 +1,11 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
+# Configuration dictionary defining study-related topics and their keyword triggers
 TOPICS = {
     "exam": {"keywords": ["klausur", "test", "presentation", "exam",
                      "prüfung", "prüfungsergebnis", "prüfungsleistungen",
-                     "prüfungsanmeldung", "anmeldung", "abmeldung"], "label": "Exams"},
+                     "prüfungsanmeldung", "anmeldung", "abmeldung", "prüfungszulassung"], "label": "Exams"},
     "termin": {"keywords": ["termin", "meeting", "appointment"], "label": "Appointments"},
     "news": {"keywords": ["news", "uninews", "newsletter"], "label": "News"},
     "updates": {"keywords": ["updates", "verschiebung", "neue", "changed"], "label": "Updates"},
@@ -28,31 +29,38 @@ def detect_topic(subject: str) -> str | None:
             return topic_id
     return None
 
-
 def create_messages_df(subjects, dates):
     """
-    Processes raw lists into a cleaned Pandas DataFrame for time-series analysis.
+    Processes raw email data into a cleaned Pandas DataFrame with calendar week offsets.
+
+    This function normalizes timestamps to a Monday-to-Sunday calendar week system
+    and calculates how many weeks ago a message was received relative to today.
 
     Args:
-        subjects (list): List of subject strings.
-        dates (list): List of date strings/objects.
+        subjects (list): A list of email subject strings.
+        dates (list): A list of email date strings or datetime objects.
 
     Returns:
-        DataFrame: A structured dataframe with normalized dates and topic IDs.
+        pd.DataFrame: A processed DataFrame containing cleaned dates, detected topics,
+                      and calculated week offsets.
     """
-
     if not subjects or not dates:
         return pd.DataFrame(columns=['subject', 'date', 'topic_id', 'week_offset'])
-    
-    df = pd.DataFrame({'subject': subjects, 'date': dates})
    
+    df = pd.DataFrame({'subject': subjects, 'date': dates})
     df['date'] = pd.to_datetime(df['date'], utc=True, errors='coerce').dt.tz_localize(None)
     df = df.dropna(subset=['date'])
    
     df['topic_id'] = df['subject'].apply(detect_topic)
    
     now = datetime.now()
-    df['week_offset'] = (now - df['date']).dt.days // 7
+   
+    current_monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+   
+    df['monday_of_week'] = df['date'].apply(lambda x: x - timedelta(days=x.weekday()))
+    df['monday_of_week'] = df['monday_of_week'].dt.normalize()
+   
+    df['week_offset'] = ((current_monday - df['monday_of_week']).dt.days // 7)
    
     return df
 
@@ -67,7 +75,6 @@ def topics_week_matrix_df(subjects, dates):
     Returns:
         DataFrame: A pivot table where rows are topics and columns are week indices.
     """
-    
     df = create_messages_df(subjects, dates)
    
     full_index = list(TOPICS.keys())

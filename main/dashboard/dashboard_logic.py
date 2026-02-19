@@ -24,7 +24,7 @@ def get_heatmap(ecampusmail, color='black'):
     """
     High-level function to generate an activity heatmap based on email metadata.
 
-    Fetches the most recent emails, extracts subject/date pairs, and 
+    Fetches the most recent emails, extracts subject/date pairs, and
     visualizes the frequency of specific topics over the last 5 weeks.
 
     Args:
@@ -52,6 +52,21 @@ def get_new_stacked_bar(tracker):
     new_bar = create_stacked_bar(current_data)
     return new_bar
 
+def refresh_stacked_bar(canvas_bar, manual_inputs=None):
+    """
+    High-level function to refresh the bar chart from UI.
+    Moves visualization calls away from main.py.
+    """
+    if not _tracker:
+        return
+
+    if manual_inputs:
+        process_manual_input(manual_inputs)
+
+    current_data = get_tracker_data()
+
+    update_stacked_bar(canvas_bar.figure, current_data)
+
 _tracker = None
 
 def initialize_tracker(login: str):
@@ -61,13 +76,13 @@ def initialize_tracker(login: str):
 def get_formatted_placeholders():
     data = get_tracker_data()
     placeholders = {}
-    
+   
     for day, values in data.items():
         manual_val = values.get('manual', 0.0)
         h = int(manual_val)
         m = int((manual_val % 1) * 60)
         placeholders[day] = {"h": str(h), "m": str(m)}
-        
+       
     return placeholders
 
 def get_weekly_bar_chart():
@@ -81,16 +96,16 @@ def process_manual_input(day_inputs):
     for day, h, m in day_inputs:
         h_str = h.strip()
         m_str = m.strip()
-        
+       
         if not h_str and not m_str:
             continue
-            
+           
         try:
             total_hours = float(h_str or 0) + (float(m_str or 0) / 60.0)
             _tracker.set_day(day, total_hours)
         except ValueError:
             continue
-            
+           
     return _tracker.all()
 
 def get_tracker_data():
@@ -105,6 +120,9 @@ def stop_study_session(day_code, hours):
     return _tracker.all() if _tracker else {}
 
 def clear_all_data():
+    """
+    Resets all stored study sessions in the tracker and returns the empty state.
+    """
     if _tracker:
         _tracker.reset_all()
-    return _tracker.all() if _tracker else {}
+    return get_tracker_data()
