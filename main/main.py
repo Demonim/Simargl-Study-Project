@@ -847,6 +847,17 @@ def open_Compose_Email(Email_window):
     window.show()
     Email_window.close()
 
+def open_Diagram(Dashboard_window):
+    Diagram_window = load_ui("UI/diagram.ui")
+
+    Back_button = Diagram_window.findChild(QPushButton, "Back_Button")
+    Back_button.clicked.connect(lambda: open_Dashboard(Diagram_window))
+
+    Diagram_window.show()
+    Dashboard_window.close()
+    Dashboard_window.courses_window = Diagram_window
+
+
 def open_Dashboard(menu_window):
     """
     Integrates Matplotlib canvases to show visual data, s
@@ -916,6 +927,9 @@ def open_Dashboard(menu_window):
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
+
+    diagram_button = Dashboard_window.findChild(QPushButton, "Diagram")
+    diagram_button.clicked.connect(lambda: open_Diagram(Dashboard_window))
 
     help_btn = Dashboard_window.findChild(QPushButton, "Help_Button")
     help_btn.clicked.connect(lambda: show_universal_help(Dashboard_window, "dashboard"))
@@ -1497,6 +1511,12 @@ def main():
     if new_user_btn:
         new_user_btn.clicked.connect(
             lambda: open_registration(prelogin_window, storage)
+        )
+
+    off_button = prelogin_window.findChild(QPushButton, "Turnoff")
+    if off_button:
+        off_button.clicked.connect(
+            lambda: app.quit()
         )
 
     prelogin_window.show()
