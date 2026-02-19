@@ -21,6 +21,7 @@ import hashlib
 BASE_URL = "https://studip.uni-goettingen.de/"
 SERVER = "email.stud.uni-goettingen.de"
 
+
 class StudIP:
     """
     A controller class for interacting with the Stud.IP learning management system.
@@ -98,39 +99,38 @@ class StudIP:
         schedule = self.client.Calendar.get_schedule()
         return schedule
 
-    def get_folders(self, clnt, crss):
+    def get_folders(self, courses):
         """
         Retrieves document folders for a specific list of courses.
 
         Args:
-            clnt (studipy.Client): The active studipy client instance.
-            crss (list): A list of course objects to fetch folders for.
+            courses (list): A list of course objects to fetch folders for.
 
         Returns:
             list: A list containing folder structures for the provided courses.
         """
 
         folders = []
-        for f in range(len(crss)):
-            folders.append(clnt.Files.get_folders(crss[f]))
+        for element in range(len(courses)):
+            folders.append(self.client.Files.get_folders(courses[element]))
         return folders
 
-    def get_files(self, clnt, crss):
+    def get_files(self, courses):
         """
         Retrieves files contained within the course folders.
 
         Args:
-            clnt (studipy.Client): The active studipy client instance.
-            crss (list): A list of course objects to fetch files for.
+            courses (list): A list of course objects to fetch folders for.
 
         Returns:
             list: A list of file objects associated with the courses.
         """
 
         files = []
-        for ff in range(len(crss)):
-            files.append(clnt.Files.get_folders(crss[ff]))
+        for element in range(len(courses)):
+            files.append(self.client.Files.get_files(courses[element]))
         return files
+
 
 class ECampusMail:
     """
@@ -224,6 +224,7 @@ class ECampusMail:
                   dates_list (list[datetime]): Timezone-aware datetime objects.
         """
 
+        # Fetching searched letters
         self.mail.select("inbox")
         result, data = self.mail.search(None, "ALL")
         self.email_ids = data[0].split()
@@ -235,9 +236,11 @@ class ECampusMail:
         subjects_list = []
         dates_list = []
 
+        # Rightly decode the letters 
         id_string = b",".join(latest_ids).decode('utf-8')
         result, msg_data = self.mail.fetch(id_string, '(BODY.PEEK[HEADER.FIELDS (SUBJECT DATE)])')
 
+        # For each letter search subjects and dates
         for response_part in msg_data:
             if isinstance(response_part, tuple):
                 msg = email.message_from_bytes(response_part[1])
@@ -393,7 +396,6 @@ class LoginStorage:
         in the database to maintain primary key integrity.
         """
         while True:
-            # Generate a random 10-digit number as a string
             new_id = str(random.randint(1000000000, 9999999999))
 
             # Check if this ID is already taken
@@ -479,6 +481,7 @@ class LoginStorage:
         self.cur.execute("UPDATE users SET banned=? WHERE login=?", (status, login))
         self.con.commit()
 
+
 class NotesStorage:
     """
     A storage manager for user-specific notes using JSON files.
@@ -552,6 +555,7 @@ class NotesStorage:
             "content": content,
             "created": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         }
+
 
 class CourseDaysStorage:
     """
