@@ -332,9 +332,17 @@ class ECampusMail:
     def close_conections(self):
         """Safely closes active connections."""
 
-        self.mail.logout()
-        self.server.quit()
-        self.server.close()
+        if hasattr(self, 'mail') and self.mail and hasattr(self.mail, 'logout'):
+            try:
+                self.mail.logout()
+            except Exception:
+                pass
+        if hasattr(self, 'server') and self.server and hasattr(self.server, 'quit'):
+            try:
+                self.server.quit()
+                self.server.close()
+            except Exception:
+                pass
 
 
 class LoginStorage:
