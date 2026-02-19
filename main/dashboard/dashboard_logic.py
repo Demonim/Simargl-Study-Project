@@ -67,20 +67,6 @@ def get_heatmap(ecampusmail, color='black'):
         ax.set_axis_off()
         return fig
 
-def get_new_stacked_bar(tracker):
-    """
-    High-level function to generate an updated stacked bar chart of weekly study hours.
-
-    Args:
-        tracker (WeeklyStudyTracker): The tracker instance containing current study data.
-    Returns:
-        Figure: Matplotlib Figure object representing the updated study hours.
-    """
-    if tracker is None:
-        return create_stacked_bar({})
-    current_data = tracker.all()
-    return create_stacked_bar(current_data)
-
 def refresh_stacked_bar(canvas_bar, manual_inputs=None):
     """
     High-level function to refresh the bar chart from UI.
@@ -106,22 +92,6 @@ _tracker = None
 def initialize_tracker(login: str):
     global _tracker
     _tracker = WeeklyStudyTracker(login=login)
-
-def get_formatted_placeholders():
-    data = get_tracker_data()
-    placeholders = {}
-   
-    for day, values in data.items():
-        try:
-            manual_val = values.get('manual', 0.0)
-            manual_val = float(manual_val) if manual_val is not None else 0.0
-            h = int(manual_val)
-            m = int((manual_val % 1) * 60)
-            placeholders[day] = {"h": str(h), "m": str(m)}
-        except (ValueError, TypeError, AttributeError):
-            placeholders[day] = {"h": "0", "m": "0"}
-   
-    return placeholders
 
 def get_weekly_bar_chart():
     current_data = get_tracker_data()
@@ -166,7 +136,9 @@ def get_tracker_data():
     return _tracker.all() if _tracker else {}
 
 def start_study_session():
-    return datetime.now().strftime('%a')
+    """Returns the current day of week in English format (Mon, Tue, etc.)"""
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    return days[datetime.now().weekday()]
 
 def stop_study_session(day_code, hours):
     try:

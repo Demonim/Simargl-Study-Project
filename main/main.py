@@ -152,12 +152,18 @@ def stop_timer_and_save(canvas_bar, current_theme):
         if not (study_timer.running and active_timer_day):
             return
 
-        study_timer.stop()
+        # Calculate session hours before reset
         try:
-            session_hours = study_timer.hours()
+            # Get the time of current session before stopping
+            if study_timer.start_time:
+                delta = datetime.now() - study_timer.start_time
+                session_hours = delta.total_seconds() / 3600.0
+            else:
+                session_hours = 0.0
         except Exception:
             session_hours = 0.0
-
+        
+        study_timer.stop()
         stop_study_session(active_timer_day, session_hours)
         study_timer.reset()
 
