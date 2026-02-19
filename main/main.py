@@ -187,10 +187,8 @@ def load_ecampus_mail_data(Email_window):
 
     try:
         subjects, dates = ecampusmail.show_subjects(100)
-        subjects = subjects[::-1]
-        dates = dates[::-1]
 
-        for i in range(len(subjects)):
+        for i in range(len(subjects)-1, 0, -1):
             item_widget = QWidget()
             layout = QHBoxLayout(item_widget)
             layout.setContentsMargins(5, 2, 5, 2)
@@ -199,19 +197,19 @@ def load_ecampus_mail_data(Email_window):
             msg_button = QPushButton(display_text)
             msg_button.setStyleSheet("text-align: left; padding: 10px;")
 
-            # Привязываем открытие письма по индексу i
-            msg_button.clicked.connect(lambda ch=False, idx=i: open_mail_content(idx))
+            # Link the opening of a letter to index i
+            msg_button.clicked.connect(lambda ch=False, idx=(i): open_mail_content(idx))
 
             layout.addWidget(msg_button)
 
-            # Добавляем виджет в QListWidget
+            # Add a widget to QListWidget
             list_item = QListWidgetItem(messages_list)
             list_item.setSizeHint(item_widget.sizeHint())
             messages_list.addItem(list_item)
             messages_list.setItemWidget(list_item, item_widget)
 
     except Exception as e:
-        print(f"Ошибка при получении почты: {e}")
+        print(f"Error when getting the mail: {e}")
 
 
 def open_mail_content(mail_index):
@@ -233,7 +231,7 @@ def open_mail_content(mail_index):
             content = msg.get_payload(decode=True).decode('utf-8', errors='ignore')
 
         dialog = QDialog()
-        dialog.setWindowTitle(f"Письмо: {msg['Subject']}")
+        dialog.setWindowTitle(f"Mail: {msg['Subject']}")
         dialog.setMinimumSize(600, 400)
         layout = QVBoxLayout(dialog)
 
@@ -245,7 +243,7 @@ def open_mail_content(mail_index):
         dialog.exec()
 
     except Exception as e:
-        print(f"Ошибка: {e}")
+        print(f"Error: {e}")
 
 
 # =========================
@@ -253,7 +251,23 @@ def open_mail_content(mail_index):
 # =========================
 
 class DayScheduleDialog(QDialog):
+    """
+    A dialog window displaying the user's class schedule for a specific day.
+
+    This dialog takes a list of calendar entries for a selected date, sorts them 
+    by their start times, and displays them in a simple list format.
+    """
+
     def __init__(self, title, entries, parent=None):
+        """
+        Initializes the daily schedule dialog.
+
+        Args:
+            title (str): The title of the dialog, typically formatted as the date (e.g., "Monday 15.05.2023").
+            entries (list): A list of schedule entry objects containing 'start', 'end', and 'title' attributes.
+            parent (QWidget, optional): The parent widget for this dialog. Defaults to None.
+        """
+
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setMinimumSize(450, 300)
@@ -273,7 +287,21 @@ class DayScheduleDialog(QDialog):
 
 
 class AddNoteDialog(QDialog):
+    """
+    A modal dialog that prompts the user to enter a title for a new note.
+
+    It provides a simple text input field and a confirmation button to create 
+    the basic structure of a note before opening it in the editor.
+    """
+
     def __init__(self, parent=None):
+        """
+        Initializes the note creation dialog and sets up the UI layout.
+
+        Args:
+            parent (QWidget, optional): The parent widget for this dialog. Defaults to None.
+        """
+
         super().__init__(parent)
         self.setWindowTitle("Add new Note")
         self.setFixedSize(300, 120)
@@ -292,11 +320,35 @@ class AddNoteDialog(QDialog):
         layout.addWidget(self.ok_button)
 
     def get_name(self):
+        """
+        Retrieves the trimmed text entered by the user in the input field.
+
+        Returns:
+            str: The sanitized string representing the new note's title.
+        """
+
         return self.line_edit.text().strip()
 
 
 class CourseDayDialog(QDialog):
+    """
+    A dialog window allowing the user to map their enrolled courses to specific days of the week.
+
+    This acts as an initial configuration step for the calendar view, loading any 
+    previously saved mappings and allowing the user to input abbreviations 
+    (e.g., MO, TU, WE) for when each course takes place.
+    """
+
     def __init__(self, courses, storage, parent=None):
+        """
+        Initializes the course day assignment dialog.
+
+        Args:
+            courses (list): A list of course objects fetched from Stud.IP.
+            storage (CourseDaysStorage): The storage manager handling the persistence of course day data.
+            parent (QWidget, optional): The parent widget for this dialog. Defaults to None.
+        """
+
         super().__init__(parent)
         self.setWindowTitle("Set course days")
         self.setMinimumSize(600, 400)
@@ -343,6 +395,11 @@ class CourseDayDialog(QDialog):
         self.layout.addWidget(save_btn)
 
     def save_and_close(self):
+        """
+        Extracts the entered day abbreviations for each course, saves them 
+        to the local JSON storage via the storage manager, and closes the dialog.
+        """
+
         result = {}
         for course_id, input_day in self.inputs.items():
             day = input_day.text().strip().upper()
@@ -814,11 +871,10 @@ def open_Compose_Email(Email_window):
 
     def handle_add_file():
         nonlocal selected_file
-        file_path, _ = QFileDialog.getOpenFileName(window, "Выберите файл", "", "All Files (*)")
+        file_path, _ = QFileDialog.getOpenFileName(window, "Choose File", "", "All Files (*)")
         if file_path:
             selected_file = file_path
-            add_files_btn.setText(f"Файл: {os.path.basename(file_path)}")  # Показываем имя файла на кнопке
-
+            add_files_btn.setText(f"File: {os.path.basename(file_path)}")  # Display the file name on the button
     if add_files_btn:
         add_files_btn.clicked.connect(handle_add_file)
 
@@ -847,17 +903,6 @@ def open_Compose_Email(Email_window):
     window.show()
     Email_window.close()
 
-def open_Diagram(Dashboard_window):
-    Diagram_window = load_ui("UI/diagram.ui")
-
-    Back_button = Diagram_window.findChild(QPushButton, "Back_Button")
-    Back_button.clicked.connect(lambda: open_Dashboard(Diagram_window))
-
-    Diagram_window.show()
-    Dashboard_window.close()
-    Dashboard_window.courses_window = Diagram_window
-
-
 def open_Dashboard(menu_window):
     """
     Integrates Matplotlib canvases to show visual data, s
@@ -866,7 +911,7 @@ def open_Dashboard(menu_window):
     """
     Dashboard_window = load_ui("UI/dashboard_test.ui")
 
-    target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
+    target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1") # Pie chart of course distribution
     if target_1 and schedule:
         fig_pie = get_pie_chart(schedule, text_color=get_plot_colors())
         fig_pie.patch.set_alpha(0.0)
@@ -877,7 +922,7 @@ def open_Dashboard(menu_window):
         layout_1.addWidget(canvas_1)
         target_1.setLayout(layout_1)
 
-    target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
+    target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2") # Heat map of email activity
     if target_2:
         fig_heat = get_heatmap(ecampusmail, color=get_plot_colors())
         fig_heat.patch.set_alpha(0.0)
@@ -888,7 +933,7 @@ def open_Dashboard(menu_window):
         layout_2.addWidget(canvas_2)
         target_2.setLayout(layout_2)
 
-    target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
+    target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3") # Bar chart of study time + timer with it buttons
     if target_3:
 
         fig_bar = get_weekly_bar_chart()
@@ -917,7 +962,7 @@ def open_Dashboard(menu_window):
         if start_btn:
             def run_start():
                 global active_timer_day
-                study_timer.start()                          #
+                study_timer.start()                          
                 active_timer_day = start_study_session()     #new func in dashboard_logic
             start_btn.clicked.connect(run_start)
 
@@ -927,9 +972,6 @@ def open_Dashboard(menu_window):
 
     exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
     exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
-
-    diagram_button = Dashboard_window.findChild(QPushButton, "Diagram")
-    diagram_button.clicked.connect(lambda: open_Diagram(Dashboard_window))
 
     help_btn = Dashboard_window.findChild(QPushButton, "Help_Button")
     help_btn.clicked.connect(lambda: show_universal_help(Dashboard_window, "dashboard"))
@@ -1207,7 +1249,7 @@ def back_to_main(menu_window):
             ecampusmail.server = False
             ecampusmail.mail = False
     except:
-        raise Exception
+        QMessageBox.warning(prelogin_window, "Mistake", "Incorrect Login or Password")
 
     theme_box = main_window.findChild(QComboBox, "ThemeBox")
     theme_box.currentTextChanged.connect(
@@ -1324,7 +1366,7 @@ def universal_logout():
 
     current_active_window = prelogin_window
 
-    QMessageBox.information(prelogin_window, "Dialogue", "Thank you very much!")
+    QMessageBox.information(prelogin_window, "Dialogue", "Thank you for using Simargl")
 
 # =========================
 # Registration
@@ -1459,6 +1501,7 @@ def start_main_app(prelogin_window):
     if help_btn:
         help_btn.clicked.connect(lambda: open_Help(main_window))
 
+    # Remember Me checkbox
     remember_check = main_window.findChild(QCheckBox, "Check_Remember")
     remember_path = "storage/ecampus_login_data.db"
     if os.path.exists(remember_path):
@@ -1488,7 +1531,6 @@ def main():
     if not app:
         app = QApplication(sys.argv)
 
-    app.setQuitOnLastWindowClosed(False)
 
     storage = simargl.LoginStorage("users_db")
 
@@ -1513,11 +1555,8 @@ def main():
             lambda: open_registration(prelogin_window, storage)
         )
 
-    off_button = prelogin_window.findChild(QPushButton, "Turnoff")
-    if off_button:
-        off_button.clicked.connect(
-            lambda: app.quit()
-        )
+    # When quitting disconnect the ecampusmail for safety
+    app.aboutToQuit.connect(lambda: ecampusmail.close_conections() if 'ecampusmail' in globals() else None)
 
     prelogin_window.show()
     sys.exit(app.exec())
