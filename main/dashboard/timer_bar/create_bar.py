@@ -28,6 +28,9 @@ def update_stacked_bar(fig, study_data):
         fig (Figure): The existing Matplotlib Figure object to be updated.
         study_data (dict): Updated dictionary containing study hours per day.
     """
+    if fig is None:
+        return
+    
     fig.clear()
     fig.patch.set_facecolor('none')
 
@@ -37,14 +40,28 @@ def update_stacked_bar(fig, study_data):
         timer = [0] * 7
     else:
         days = list(study_data.keys())
-        manual = [study_data[d].get("manual", 0) for d in days]
-        timer = [study_data[d].get("timer", 0) for d in days]
+        manual = []
+        timer = []
+        
+        for d in days:
+            try:
+                day_data = study_data.get(d, {})
+                manual_val = day_data.get("manual", 0)
+                timer_val = day_data.get("timer", 0)
+                manual.append(float(manual_val) if manual_val is not None else 0.0)
+                timer.append(float(timer_val) if timer_val is not None else 0.0)
+            except (ValueError, TypeError, AttributeError):
+                manual.append(0.0)
+                timer.append(0.0)
    
     ax = fig.add_subplot(111)
     ax.set_facecolor('none')
    
     x = np.arange(len(days))
     width = 0.6
+
+    manual = [max(0, m) for m in manual]
+    timer = [max(0, t) for t in timer]
 
     ax.bar(x, manual, width, label='Manual', color='#87CEEB', linewidth=0)
     ax.bar(x, timer, width, bottom=manual, label='Timer', color='#FFA500', linewidth=0)

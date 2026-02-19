@@ -22,10 +22,12 @@ def detect_topic(subject: str) -> str | None:
     Returns:
         str | None: The topic ID if a match is found, otherwise None.
     """
-
+    if subject is None:
+        return None
+    
     subject = str(subject).lower()
     for topic_id, data in TOPICS.items():
-        if any(word in subject for word in data["keywords"]):
+        if "keywords" in data and any(word in subject for word in data["keywords"]):
             return topic_id
     return None
 
@@ -46,10 +48,18 @@ def create_messages_df(subjects, dates):
     """
     if not subjects or not dates:
         return pd.DataFrame(columns=['subject', 'date', 'topic_id', 'week_offset'])
+    
+    if len(subjects) != len(dates):
+        min_len = min(len(subjects), len(dates))
+        subjects = subjects[:min_len]
+        dates = dates[:min_len]
    
     df = pd.DataFrame({'subject': subjects, 'date': dates})
     df['date'] = pd.to_datetime(df['date'], utc=True, errors='coerce').dt.tz_localize(None)
     df = df.dropna(subset=['date'])
+   
+    if df.empty:
+        return pd.DataFrame(columns=['subject', 'date', 'topic_id', 'week_offset'])
    
     df['topic_id'] = df['subject'].apply(detect_topic)
    

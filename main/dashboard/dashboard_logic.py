@@ -15,10 +15,23 @@ def get_pie_chart(schedule, text_color='black'):
     Returns:
         Figure: Matplotlib Figure object ready for UI integration.
     """
-
-    subject_data = subject_hours(schedule)
-    pie_chart = create_pie(subject_data, text_color)
-    return pie_chart
+    try:
+        if schedule is None:
+            from matplotlib.figure import Figure
+            fig = Figure(figsize=(8, 6), tight_layout=True)
+            ax = fig.add_subplot(111)
+            ax.text(0.5, 0.5, 'No schedule data available', ha='center', va='center', color=text_color)
+            return fig
+        
+        subject_data = subject_hours(schedule)
+        pie_chart = create_pie(subject_data, text_color)
+        return pie_chart
+    except Exception as e:
+        from matplotlib.figure import Figure
+        fig = Figure(figsize=(8, 6), tight_layout=True)
+        ax = fig.add_subplot(111)
+        ax.text(0.5, 0.5, f'Error generating pie chart: {str(e)}', ha='center', va='center', color=text_color)
+        return fig
 
 def get_heatmap(ecampusmail, color='black'):
     """
@@ -34,10 +47,25 @@ def get_heatmap(ecampusmail, color='black'):
     Returns:
         Figure: A Matplotlib Figure object representing topic activity.
     """
-
-    subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)
-    heatmap_chart = create_heatmap(subjects_data, dates_data, color)
-    return heatmap_chart
+    try:
+        if ecampusmail is None:
+            from matplotlib.figure import Figure
+            fig = Figure(figsize=(8, 6), tight_layout=True)
+            ax = fig.add_subplot(111)
+            ax.text(0.5, 0.5, 'No email data available', ha='center', va='center', color=color, transform=ax.transAxes)
+            ax.set_axis_off()
+            return fig
+        
+        subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)
+        heatmap_chart = create_heatmap(subjects_data, dates_data, color)
+        return heatmap_chart
+    except Exception as e:
+        from matplotlib.figure import Figure
+        fig = Figure(figsize=(8, 6), tight_layout=True)
+        ax = fig.add_subplot(111)
+        ax.text(0.5, 0.5, f'Error generating heatmap: {str(e)}', ha='center', va='center', color=color, transform=ax.transAxes)
+        ax.set_axis_off()
+        return fig
 
 def get_new_stacked_bar(tracker):
     """
@@ -48,24 +76,30 @@ def get_new_stacked_bar(tracker):
     Returns:
         Figure: Matplotlib Figure object representing the updated study hours.
     """
+    if tracker is None:
+        return create_stacked_bar({})
     current_data = tracker.all()
-    new_bar = create_stacked_bar(current_data)
-    return new_bar
+    return create_stacked_bar(current_data)
 
 def refresh_stacked_bar(canvas_bar, manual_inputs=None):
     """
     High-level function to refresh the bar chart from UI.
     Moves visualization calls away from main.py.
     """
-    if not _tracker:
-        return
+    try:
+        if not _tracker:
+            return
 
-    if manual_inputs:
-        process_manual_input(manual_inputs)
+        if canvas_bar is None or not hasattr(canvas_bar, 'figure') or canvas_bar.figure is None:
+            return
 
-    current_data = get_tracker_data()
+        if manual_inputs:
+            process_manual_input(manual_inputs)
 
-    update_stacked_bar(canvas_bar.figure, current_data)
+        current_data = get_tracker_data()
+        update_stacked_bar(canvas_bar.figure, current_data)
+    except Exception:
+        pass
 
 _tracker = None
 
@@ -78,11 +112,15 @@ def get_formatted_placeholders():
     placeholders = {}
    
     for day, values in data.items():
-        manual_val = values.get('manual', 0.0)
-        h = int(manual_val)
-        m = int((manual_val % 1) * 60)
-        placeholders[day] = {"h": str(h), "m": str(m)}
-       
+        try:
+            manual_val = values.get('manual', 0.0)
+            manual_val = float(manual_val) if manual_val is not None else 0.0
+            h = int(manual_val)
+            m = int((manual_val % 1) * 60)
+            placeholders[day] = {"h": str(h), "m": str(m)}
+        except (ValueError, TypeError, AttributeError):
+            placeholders[day] = {"h": "0", "m": "0"}
+   
     return placeholders
 
 def get_weekly_bar_chart():
@@ -90,23 +128,39 @@ def get_weekly_bar_chart():
     return create_stacked_bar(current_data)
 
 def process_manual_input(day_inputs):
-    if not _tracker:
-        return {}
+    try:
+        if not _tracker:
+            return {}
 
-    for day, h, m in day_inputs:
-        h_str = h.strip()
-        m_str = m.strip()
-       
-        if not h_str and not m_str:
-            continue
+        if not isinstance(day_inputs, (list, tuple)):
+            return _tracker.all() if _tracker else {}
+
+        for day_input in day_inputs:
+            if not isinstance(day_input, (list, tuple)) or len(day_input) < 3:
+                continue
+            
+            day, h, m = day_input[0], day_input[1], day_input[2]
+            
+            try:
+                h_str = str(h).strip() if h is not None else ""
+                m_str = str(m).strip() if m is not None else ""
+            except Exception:
+                continue
            
-        try:
-            total_hours = float(h_str or 0) + (float(m_str or 0) / 60.0)
-            _tracker.set_day(day, total_hours)
-        except ValueError:
-            continue
-           
-    return _tracker.all()
+            if not h_str and not m_str:
+                continue
+               
+            try:
+                total_hours = float(h_str or 0) + (float(m_str or 0) / 60.0)
+                if total_hours < 0:
+                    total_hours = 0
+                _tracker.set_day(day, total_hours)
+            except (ValueError, TypeError):
+                continue
+               
+        return _tracker.all()
+    except Exception:
+        return _tracker.all() if _tracker else {}
 
 def get_tracker_data():
     return _tracker.all() if _tracker else {}
@@ -115,9 +169,18 @@ def start_study_session():
     return datetime.now().strftime('%a')
 
 def stop_study_session(day_code, hours):
-    if _tracker and day_code:
-        _tracker.add_time(day_code, hours)
-    return _tracker.all() if _tracker else {}
+    try:
+        if _tracker and day_code:
+            try:
+                hours = float(hours) if hours is not None else 0.0
+                if hours < 0:
+                    hours = 0.0
+                _tracker.add_time(day_code, hours)
+            except (ValueError, TypeError):
+                pass
+        return _tracker.all() if _tracker else {}
+    except Exception:
+        return _tracker.all() if _tracker else {}
 
 def clear_all_data():
     """

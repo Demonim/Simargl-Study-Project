@@ -13,22 +13,30 @@ def create_pie(subject_hours, text_color='black'):
     Returns:
         Figure: Matplotlib Figure object with the rendered chart.
     """
-
-
     fig = Figure(figsize=(8, 6), tight_layout=True)
     fig.patch.set_facecolor('none')
 
     ax = fig.add_subplot(111)
     ax.set_facecolor('none')
 
-    values, labels = pie_values_labels(subject_hours)
-
-    if values and labels:
-        sorted_pairs = sorted(zip(values, labels), key=lambda x: x[1])
-        values, labels = zip(*sorted_pairs)
-    else:
+    if not subject_hours:
         ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
         return fig
+
+    values, labels = pie_values_labels(subject_hours)
+
+    if not values or not labels:
+        ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
+        return fig
+
+    # Filter out zero values
+    filtered_pairs = [(v, l) for v, l in zip(values, labels) if v > 0]
+    if not filtered_pairs:
+        ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
+        return fig
+    
+    sorted_pairs = sorted(filtered_pairs, key=lambda x: x[1])
+    values, labels = zip(*sorted_pairs)
 
     wedges, _, autotexts = ax.pie(
         values,

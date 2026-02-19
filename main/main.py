@@ -114,19 +114,31 @@ def save_tracker_data(dashboard_window, canvas_bar, theme):
     """
     Scrapes study hour inputs from the UI and updates the weekly study bar chart.
     """
-    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    day_inputs = []
+    try:
+        if dashboard_window is None or canvas_bar is None:
+            return
 
-    for day in days:
-        h_line = dashboard_window.findChild(QLineEdit, f"{day}_H")
-        m_line = dashboard_window.findChild(QLineEdit, f"{day}_M")
+        days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        day_inputs = []
 
-        if h_line and m_line:
-            day_inputs.append((day, h_line.text().strip(), m_line.text().strip()))
+        for day in days:
+            try:
+                h_line = dashboard_window.findChild(QLineEdit, f"{day}_H")
+                m_line = dashboard_window.findChild(QLineEdit, f"{day}_M")
 
-    refresh_stacked_bar(canvas_bar, manual_inputs=day_inputs)
-    apply_bar_theme(canvas_bar, theme)
-    canvas_bar.draw()
+                if h_line and m_line:
+                    h_text = h_line.text()
+                    m_text = m_line.text()
+                    day_inputs.append((day, h_text.strip() if h_text else "", m_text.strip() if m_text else ""))
+            except Exception:
+                continue
+
+        refresh_stacked_bar(canvas_bar, manual_inputs=day_inputs)
+        apply_bar_theme(canvas_bar, theme)
+        if hasattr(canvas_bar, 'draw'):
+            canvas_bar.draw()
+    except Exception:
+        pass  
 
 
 def stop_timer_and_save(canvas_bar, current_theme):
@@ -136,16 +148,26 @@ def stop_timer_and_save(canvas_bar, current_theme):
     for the current day, and triggers a refresh of the visual bar chart.
     """
     global active_timer_day
-    if study_timer.running and active_timer_day:
+    try:
+        if not (study_timer.running and active_timer_day):
+            return
+
         study_timer.stop()
-        session_hours = study_timer.hours()
+        try:
+            session_hours = study_timer.hours()
+        except Exception:
+            session_hours = 0.0
 
         stop_study_session(active_timer_day, session_hours)
         study_timer.reset()
 
-        refresh_stacked_bar(canvas_bar)
-        apply_bar_theme(canvas_bar, current_theme)
-        canvas_bar.draw()
+        if canvas_bar is not None:
+            refresh_stacked_bar(canvas_bar)
+            apply_bar_theme(canvas_bar, current_theme)
+            if hasattr(canvas_bar, 'draw'):
+                canvas_bar.draw()
+        active_timer_day = None
+    except Exception:
         active_timer_day = None
 
 def apply_bar_theme(canvas_bar, theme):
@@ -154,18 +176,25 @@ def apply_bar_theme(canvas_bar, theme):
     (axes, ticks, and labels) to ensure visibility by switching
     between light and dark colors based on the current UI theme.
     """
-    txt_col = 'white' if "Dark" in theme else 'black'
-    fig = canvas_bar.figure
-    ax = fig.gca()
+    try:
+        if canvas_bar is None or not hasattr(canvas_bar, 'figure') or canvas_bar.figure is None:
+            return
 
-    ax.tick_params(colors=txt_col)
-    ax.xaxis.label.set_color(txt_col)
-    ax.yaxis.label.set_color(txt_col)
+        txt_col = 'white' if (theme and "Dark" in str(theme)) else 'black'
+        fig = canvas_bar.figure
+        ax = fig.gca()
 
-    for spine in ax.spines.values():
-        spine.set_edgecolor(txt_col)
+        ax.tick_params(colors=txt_col)
+        ax.xaxis.label.set_color(txt_col)
+        ax.yaxis.label.set_color(txt_col)
 
-    canvas_bar.draw()
+        for spine in ax.spines.values():
+            spine.set_edgecolor(txt_col)
+
+        if hasattr(canvas_bar, 'draw'):
+            canvas_bar.draw()
+    except Exception:
+        pass 
 
 
 def load_ecampus_mail_data(Email_window):
@@ -434,9 +463,11 @@ def get_plot_colors():
     'white' for dark themes and 'black' for light themes,
     ensuring that text on dashboard charts remains readable.
     """
-    if "Dark" in current_theme_name:
-        return 'white'
-    else:
+    try:
+        if current_theme_name and "Dark" in str(current_theme_name):
+            return 'white'
+        return 'black'
+    except Exception:
         return 'black'
 
 
@@ -911,84 +942,113 @@ def open_Diagram(Dashboard_window):
 
 def open_Dashboard(menu_window):
     """
-    Integrates Matplotlib canvases to show visual data, s
-    uch as course distribution (pie chart),
+    Integrates Matplotlib canvases to show visual data, such as course distribution (pie chart),
     email activity (heatmap), and study time (bar chart).
     """
-    Dashboard_window = load_ui("UI/dashboard_test.ui")
+    try:
+        Dashboard_window = load_ui("UI/dashboard_test.ui")
+    except Exception as e:
+        QMessageBox.warning(menu_window, "Error", f"Failed to load dashboard: {str(e)}")
+        return
 
-    target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1") # Pie chart of course distribution
-    if target_1 and schedule:
-        fig_pie = get_pie_chart(schedule, text_color=get_plot_colors())
-        fig_pie.patch.set_alpha(0.0)
+    # Pie chart of course distribution
+    target_1 = Dashboard_window.findChild(QWidget, "Dashboard_1")
+    if target_1:
+        try:
+            fig_pie = get_pie_chart(schedule, text_color=get_plot_colors())
+            if fig_pie:
+                fig_pie.patch.set_alpha(0.0)
+                canvas_1 = FigureCanvasQTAgg(fig_pie)
+                canvas_1.setStyleSheet("background-color: transparent;")
+                layout_1 = QVBoxLayout(target_1)
+                layout_1.addWidget(canvas_1)
+                target_1.setLayout(layout_1)
+        except Exception:
+            pass  # Pie chart optional, continue without it
 
-        canvas_1 = FigureCanvasQTAgg(fig_pie)
-        canvas_1.setStyleSheet("background-color: transparent;")
-        layout_1 = QVBoxLayout(target_1)
-        layout_1.addWidget(canvas_1)
-        target_1.setLayout(layout_1)
-
-    target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2") # Heat map of email activity
+    # Heat map of email activity
+    target_2 = Dashboard_window.findChild(QWidget, "Dashboard_2")
     if target_2:
-        fig_heat = get_heatmap(ecampusmail, color=get_plot_colors())
-        fig_heat.patch.set_alpha(0.0)
+        try:
+            fig_heat = get_heatmap(ecampusmail, color=get_plot_colors())
+            if fig_heat:
+                fig_heat.patch.set_alpha(0.0)
+                canvas_2 = FigureCanvasQTAgg(fig_heat)
+                canvas_2.setStyleSheet("background-color: transparent;")
+                layout_2 = QVBoxLayout(target_2)
+                layout_2.addWidget(canvas_2)
+                target_2.setLayout(layout_2)
+        except Exception:
+            pass  # Heatmap optional, continue without it
 
-        canvas_2 = FigureCanvasQTAgg(fig_heat)
-        canvas_2.setStyleSheet("background-color: transparent;")
-        layout_2 = QVBoxLayout(target_2)
-        layout_2.addWidget(canvas_2)
-        target_2.setLayout(layout_2)
-
-    target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3") # Bar chart of study time + timer with it buttons
+    # Bar chart of study time + timer with its buttons
+    canvas_bar = None
+    target_3 = Dashboard_window.findChild(QWidget, "Dashboard_3")
     if target_3:
+        try:
+            fig_bar = get_weekly_bar_chart()
+            if fig_bar:
+                canvas_bar = FigureCanvasQTAgg(fig_bar)
+                canvas_bar.setStyleSheet("background-color: transparent;")
 
-        fig_bar = get_weekly_bar_chart()
-        canvas_bar = FigureCanvasQTAgg(fig_bar)
-        canvas_bar.setStyleSheet("background-color: transparent;")
+                if not target_3.layout():
+                    QVBoxLayout(target_3).setContentsMargins(0, 0, 0, 0)
+                target_3.layout().addWidget(canvas_bar)
 
-        if not target_3.layout():
-            QVBoxLayout(target_3).setContentsMargins(0, 0, 0, 0)
-        target_3.layout().addWidget(canvas_bar)
-
-        apply_bar_theme(canvas_bar, current_theme_name)
-
-        save_btn = Dashboard_window.findChild(QPushButton, "Save_Button")
-        if save_btn:
-            save_btn.clicked.connect(lambda: save_tracker_data(Dashboard_window, canvas_bar, current_theme_name))
-
-        reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
-        if reset_btn:
-            def run_reset():
-                clear_all_data()
-                refresh_stacked_bar(canvas_bar)
                 apply_bar_theme(canvas_bar, current_theme_name)
-                canvas_bar.draw()
-            reset_btn.clicked.connect(run_reset)
 
-        start_btn = Dashboard_window.findChild(QPushButton, "Start_Button")
-        if start_btn:
-            def run_start():
-                global active_timer_day
-                study_timer.start()                          
-                active_timer_day = start_study_session()    
-            start_btn.clicked.connect(run_start)
+                save_btn = Dashboard_window.findChild(QPushButton, "Save_Button")
+                if save_btn:
+                    save_btn.clicked.connect(lambda: save_tracker_data(Dashboard_window, canvas_bar, current_theme_name))
 
-        stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
-        if stop_btn:
-            stop_btn.clicked.connect(lambda: stop_timer_and_save(canvas_bar, current_theme_name))
+                reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
+                if reset_btn:
+                    def run_reset():
+                        try:
+                            clear_all_data()
+                            refresh_stacked_bar(canvas_bar)
+                            apply_bar_theme(canvas_bar, current_theme_name)
+                            if canvas_bar and hasattr(canvas_bar, 'draw'):
+                                canvas_bar.draw()
+                        except Exception:
+                            pass
+                    reset_btn.clicked.connect(run_reset)
 
-    exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
-    exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
+                start_btn = Dashboard_window.findChild(QPushButton, "Start_Button")
+                if start_btn:
+                    def run_start():
+                        try:
+                            global active_timer_day
+                            study_timer.start()
+                            active_timer_day = start_study_session()
+                        except Exception:
+                            pass
+                    start_btn.clicked.connect(run_start)
 
-    diagram_button = Dashboard_window.findChild(QPushButton, "Diagram")
-    diagram_button.clicked.connect(lambda: open_Diagram(Dashboard_window))
+                stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
+                if stop_btn:
+                    stop_btn.clicked.connect(lambda: stop_timer_and_save(canvas_bar, current_theme_name))
+        except Exception:
+            pass  # Bar chart optional, continue without it
 
-    help_btn = Dashboard_window.findChild(QPushButton, "Help_Button")
-    help_btn.clicked.connect(lambda: show_universal_help(Dashboard_window, "dashboard"))
+    try:
+        exit_button = Dashboard_window.findChild(QPushButton, "Back_Button")
+        if exit_button:
+            exit_button.clicked.connect(lambda: open_menu(Dashboard_window))
 
-    Dashboard_window.show()
-    menu_window.close()
-    menu_window.courses_window = Dashboard_window
+        diagram_button = Dashboard_window.findChild(QPushButton, "Diagram")
+        if diagram_button:
+            diagram_button.clicked.connect(lambda: open_Diagram(Dashboard_window))
+
+        help_btn = Dashboard_window.findChild(QPushButton, "Help_Button")
+        if help_btn:
+            help_btn.clicked.connect(lambda: show_universal_help(Dashboard_window, "dashboard"))
+
+        Dashboard_window.show()
+        menu_window.close()
+        menu_window.courses_window = Dashboard_window
+    except Exception as e:
+        QMessageBox.warning(menu_window, "Error", f"Failed to open dashboard: {str(e)}")
 
 
 def open_Notes(menu_window):
@@ -1319,7 +1379,10 @@ def login_from_enter(main_window, remember=False):
     studip = simargl.StudIP(current_login, password)
     ecampusmail = simargl.ECampusMail(current_login, password)
 
-    initialize_tracker(current_login)
+    try:
+        initialize_tracker(current_login)
+    except Exception:
+        pass 
 
     try:
         studip.create_client()

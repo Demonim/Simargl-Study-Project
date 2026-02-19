@@ -48,8 +48,11 @@ class WeeklyStudyTracker:
 
     def save_to_disk(self):
         """Saves the current state of self.data to the JSON file."""
-        with open(self.filename, 'w') as f:
-            json.dump(self.data, f, indent=4)
+        try:
+            with open(self.filename, 'w') as f:
+                json.dump(self.data, f, indent=4)
+        except (IOError, OSError, json.JSONEncodeError):
+            pass
 
     def set_day(self, day, hours):
         """
@@ -59,9 +62,22 @@ class WeeklyStudyTracker:
             day (str): The key (e.g., "Mon").
             hours (float): The amount of study time to set.
         """
-        if day in self.data:
-            self.data[day]['manual'] = hours
-            self.save_to_disk()
+        try:
+            if day not in self.data:
+                return
+            
+            try:
+                hours = float(hours) if hours is not None else 0.0
+                if hours < 0:
+                    hours = 0.0
+            except (ValueError, TypeError):
+                hours = 0.0
+            
+            if day in self.data and isinstance(self.data[day], dict):
+                self.data[day]['manual'] = hours
+                self.save_to_disk()
+        except Exception:
+            pass
 
     def add_time(self, day, hours):
         """
@@ -71,9 +87,28 @@ class WeeklyStudyTracker:
             day (str): The key (e.g., "Tue").
             hours (float): The amount of study time to add.
         """
-        if day in self.data:
-            self.data[day]['timer'] += hours
-            self.save_to_disk()
+        try:
+            if day not in self.data:
+                return
+            
+            try:
+                hours = float(hours) if hours is not None else 0.0
+                if hours < 0:
+                    hours = 0.0
+            except (ValueError, TypeError):
+                hours = 0.0
+            
+            if day in self.data and isinstance(self.data[day], dict):
+                current_timer = self.data[day].get('timer', 0.0)
+                try:
+                    current_timer = float(current_timer) if current_timer is not None else 0.0
+                except (ValueError, TypeError):
+                    current_timer = 0.0
+                
+                self.data[day]['timer'] = current_timer + hours
+                self.save_to_disk()
+        except Exception:
+            pass
 
     def reset_all(self):
         """
