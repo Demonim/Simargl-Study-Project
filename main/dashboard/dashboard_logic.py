@@ -1,11 +1,14 @@
-from dashboard.pie.create_pie import create_pie
-from dashboard.pie.subjects_logic import subject_hours
-from dashboard.heatmap.create_heatmap import create_heatmap
+from main.dashboard.pie.create_pie import create_pie
+from main.dashboard.pie.subjects_logic import subject_hours
+from main.dashboard.heatmap.create_heatmap import create_heatmap
 from .timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .timer_bar.create_bar import create_stacked_bar, update_stacked_bar
+from .scatter_plot.scatter_logic import prepare_scatter_data
+from .scatter_plot.create_scatter_plot import generate_scatter_figure 
 from datetime import datetime
 
 def get_pie_chart(schedule, text_color='black'):
+    global subject_data
     """
     High-level function to generate a pie chart of study hours per subject.
    
@@ -32,6 +35,23 @@ def get_pie_chart(schedule, text_color='black'):
         ax = fig.add_subplot(111)
         ax.text(0.5, 0.5, f'Error generating pie chart: {str(e)}', ha='center', va='center', color=text_color)
         return fig
+
+def get_scatter_plot(schedule, messages):
+    """
+    High-level function to prepare data and generate a scatter plot of course activity.
+   
+    Args:
+        schedule: The user's schedule object with lesson entries.
+        messages: List of tuples with course names and message counts.
+
+
+    Returns:
+        Figure: A Matplotlib Figure object representing the scatter plot.  
+    """
+   
+    df, medians, excluded = prepare_scatter_data(subject_data, messages)
+    scatter_chart = generate_scatter_figure(df, medians, excluded)
+    return scatter_chart
 
 def get_heatmap(ecampusmail, color='black'):
     """
