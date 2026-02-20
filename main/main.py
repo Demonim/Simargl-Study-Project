@@ -219,7 +219,10 @@ def load_ecampus_mail_data(Email_window):
     try:
         subjects, dates = ecampusmail.show_subjects(100)
 
-        for i in range(len(subjects)-1, 0, -1):
+        total_emails = len(ecampusmail.email_ids)
+        start_offset = total_emails - len(subjects)
+
+        for i in range(len(subjects)-1, -1, -1):
             item_widget = QWidget()
             layout = QHBoxLayout(item_widget)
             layout.setContentsMargins(5, 2, 5, 2)
@@ -229,7 +232,8 @@ def load_ecampus_mail_data(Email_window):
             msg_button.setStyleSheet("text-align: left; padding: 10px;")
 
             # Link the opening of a letter to index i
-            msg_button.clicked.connect(lambda ch=False, idx=(i): open_mail_content(idx))
+            global_idx = start_offset + i
+            msg_button.clicked.connect(lambda ch=False, idx=global_idx: open_mail_content(idx))
 
             layout.addWidget(msg_button)
 
