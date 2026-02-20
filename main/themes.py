@@ -33,7 +33,9 @@ font-family: Unispace;
 }
 
 
-
+QTextEdit {
+    color: white
+}
 
 
 
@@ -513,7 +515,9 @@ font-family: Unispace;
 }
 
 
-
+QTextEdit {
+    color: black
+}
 
 
 
