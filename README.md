@@ -30,6 +30,11 @@ After starting you should once create your local account and provide login and p
 - Group team leader: Dmytro "Demonim" Kutsak
 - Group members: Nichita "Nikityu2" Licov, Diana "dibardyk" Bardyk
 --- ---
+# Contributiuons
+- Demonim: Formulated StudIP, ECampusMail and the base of login storage. Provided numerous fixes to code, comment etc. Wrote docstrings and unit tests to main and simargl modules. Provided ideas for two new themes.
+- Nikityu2: Full GUI interface with UI, logic and design. Some storage classes was designed (Notes and CourseDays), also made changes to login storage. 
+- dibardyk: Made the core requirement to visualization and all of its code. Also did some fixes in many areas
+--- ---
 # Acknowlegdments
 ### Websites
 - StudIP Göttingen: https://www.studip.uni-goettingen.de/dispatch.php/start

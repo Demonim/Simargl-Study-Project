@@ -344,14 +344,14 @@ class ECampusMail:
         if hasattr(self, 'mail') and self.mail and hasattr(self.mail, 'logout'):
             try:
                 self.mail.logout()
-            except Exception:
-                pass
+            except Exception as e:
+                print("Error:", e)
         if hasattr(self, 'server') and self.server and hasattr(self.server, 'quit'):
             try:
                 self.server.quit()
                 self.server.close()
-            except Exception:
-                pass
+            except Exception as e:
+                print("Error:", e)
 
 
 class LoginStorage:
