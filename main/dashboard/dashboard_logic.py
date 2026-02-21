@@ -32,6 +32,7 @@ def get_pie_chart(schedule, text_color='black'):
         pie_chart = create_pie(subject_data, text_color)
         return pie_chart
     except Exception as e:
+        print(f"[dashboard_logic] Error in get_pie_chart: {e}")
         return error_chart(f'Error generating pie chart: {str(e)}', text_color)
 
 def get_scatter_plot(messages, color='black'):
@@ -53,6 +54,7 @@ def get_scatter_plot(messages, color='black'):
         scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color)
         return scatter_chart
     except Exception as e:
+        print(f"[dashboard_logic] Error in get_scatter_plot: {e}")
         return error_chart(f'Error generating scatter plot: {str(e)}', color)
 
 def get_heatmap(ecampusmail, color='black'):
@@ -76,6 +78,7 @@ def get_heatmap(ecampusmail, color='black'):
         heatmap_chart = create_heatmap(subjects_data, dates_data, color)
         return heatmap_chart
     except Exception as e:
+        print(f"[dashboard_logic] Error in get_heatmap: {e}")
         return error_chart(f'Error generating heatmap: {str(e)}', color)
 
 def refresh_stacked_bar(canvas_bar, manual_inputs=None):
@@ -95,8 +98,8 @@ def refresh_stacked_bar(canvas_bar, manual_inputs=None):
 
         current_data = get_tracker_data()
         update_stacked_bar(canvas_bar.figure, current_data)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[dashboard_logic] Error in refresh_stacked_bar: {e}")
 
 _tracker = None
 
@@ -139,7 +142,8 @@ def process_manual_input(day_inputs):
             try:
                 h_str = str(h).strip() if h is not None else ""
                 m_str = str(m).strip() if m is not None else ""
-            except Exception:
+            except Exception as e:
+                print(f"[dashboard_logic] Error parsing manual input: {e}")
                 continue
            
             if not h_str and not m_str:
@@ -150,11 +154,13 @@ def process_manual_input(day_inputs):
                 if total_hours < 0:
                     total_hours = 0
                 _tracker.set_day(day, total_hours)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
+                print(f"[dashboard_logic] Error converting manual input: {e}")
                 continue
                
         return _tracker.all()
-    except Exception:
+    except Exception as e:
+        print(f"[dashboard_logic] Error in process_manual_input: {e}")
         return _tracker.all() if _tracker else {}
 
 def get_tracker_data():
@@ -175,10 +181,11 @@ def stop_study_session(day_code, hours):
                 if hours < 0:
                     hours = 0.0
                 _tracker.add_time(day_code, hours)
-            except (ValueError, TypeError):
-                pass
+            except (ValueError, TypeError) as e:
+                print(f"[dashboard_logic] Error converting hours in stop_study_session: {e}")
         return _tracker.all() if _tracker else {}
-    except Exception:
+    except Exception as e:
+        print(f"[dashboard_logic] Error in stop_study_session: {e}")
         return _tracker.all() if _tracker else {}
 
 def clear_all_data():

@@ -33,7 +33,6 @@ class WeeklyStudyTracker:
     def load_from_disk(self):
         """
         Reads the study data from the local JSON file.
-       
         Returns:
             dict: The loaded data or default_data if the file is missing/corrupt.
         """
@@ -42,7 +41,8 @@ class WeeklyStudyTracker:
                 with open(self.filename, 'r') as f:
                     loaded_data = json.load(f)
                     return loaded_data if loaded_data else self.default_data
-            except (json.JSONDecodeError, IOError):
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"[WeeklyStudyTracker] Error loading file: {e}")
                 return self.default_data
         return self.default_data
 
@@ -51,64 +51,57 @@ class WeeklyStudyTracker:
         try:
             with open(self.filename, 'w') as f:
                 json.dump(self.data, f, indent=4)
-        except (IOError, OSError, json.JSONEncodeError):
-            pass
+        except (IOError, OSError, TypeError) as e:
+            print(f"[WeeklyStudyTracker] Error saving file: {e}")
 
     def set_day(self, day, hours):
         """
         Overwrites the 'manual' input hours for a specific day.
-       
         Args:
             day (str): The key (e.g., "Mon").
             hours (float): The amount of study time to set.
         """
+        if day not in self.data:
+            return
         try:
-            if day not in self.data:
-                return
-            
-            try:
-                hours = float(hours) if hours is not None else 0.0
-                if hours < 0:
-                    hours = 0.0
-            except (ValueError, TypeError):
+            hours = float(hours) if hours is not None else 0.0
+            if hours < 0:
                 hours = 0.0
-            
-            if day in self.data and isinstance(self.data[day], dict):
-                self.data[day]['manual'] = hours
+        except (ValueError, TypeError):
+            hours = 0.0
+        if day in self.data and isinstance(self.data[day], dict):
+            self.data[day]['manual'] = hours
+            try:
                 self.save_to_disk()
-        except Exception:
-            pass
+            except Exception as e:
+                print(f"[WeeklyStudyTracker] Error saving after set_day: {e}")
 
     def add_time(self, day, hours):
         """
         Accumulates time onto the 'timer' record for a specific day.
-       
         Args:
             day (str): The key (e.g., "Tue").
             hours (float): The amount of study time to add.
         """
+        if day not in self.data:
+            return
         try:
-            if day not in self.data:
-                return
-            
-            try:
-                hours = float(hours) if hours is not None else 0.0
-                if hours < 0:
-                    hours = 0.0
-            except (ValueError, TypeError):
+            hours = float(hours) if hours is not None else 0.0
+            if hours < 0:
                 hours = 0.0
-            
-            if day in self.data and isinstance(self.data[day], dict):
-                current_timer = self.data[day].get('timer', 0.0)
-                try:
-                    current_timer = float(current_timer) if current_timer is not None else 0.0
-                except (ValueError, TypeError):
-                    current_timer = 0.0
-                
-                self.data[day]['timer'] = current_timer + hours
+        except (ValueError, TypeError):
+            hours = 0.0
+        if day in self.data and isinstance(self.data[day], dict):
+            current_timer = self.data[day].get('timer', 0.0)
+            try:
+                current_timer = float(current_timer) if current_timer is not None else 0.0
+            except (ValueError, TypeError):
+                current_timer = 0.0
+            self.data[day]['timer'] = current_timer + hours
+            try:
                 self.save_to_disk()
-        except Exception:
-            pass
+            except Exception as e:
+                print(f"[WeeklyStudyTracker] Error saving after add_time: {e}")
 
     def reset_all(self):
         """
