@@ -25,7 +25,7 @@ def get_pie_chart(schedule, text_color='black'):
             ax = fig.add_subplot(111)
             ax.text(0.5, 0.5, 'No schedule data available', ha='center', va='center', color=text_color)
             return fig
-        
+       
         subject_data = subject_hours(schedule)
         pie_chart = create_pie(subject_data, text_color)
         return pie_chart
@@ -36,21 +36,22 @@ def get_pie_chart(schedule, text_color='black'):
         ax.text(0.5, 0.5, f'Error generating pie chart: {str(e)}', ha='center', va='center', color=text_color)
         return fig
 
-def get_scatter_plot(schedule, messages):
+def get_scatter_plot(messages, color='black'):
     """
-    High-level function to prepare data and generate a scatter plot of course activity.
+    High-level orchestrator for the Study Intensity Matrix.
+    Uses globally stored subject_data to correlate hours with message counts.
    
     Args:
-        schedule: The user's schedule object with lesson entries.
-        messages: List of tuples with course names and message counts.
+        messages: List of message objects containing subject lines and metadata.
+        color (str): Theme-compliant color for text, labels, and plot boundaries.
 
 
     Returns:
-        Figure: A Matplotlib Figure object representing the scatter plot.  
+        Figure: A Matplotlib Figure object representing the interactive scatter plot.  
     """
    
-    df, medians, excluded = prepare_scatter_data(subject_data, messages)
-    scatter_chart = generate_scatter_figure(df, medians, excluded)
+    df, medians, math_stats = prepare_scatter_data(subject_data, messages)
+    scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color)
     return scatter_chart
 
 def get_heatmap(ecampusmail, color='black'):
@@ -75,7 +76,7 @@ def get_heatmap(ecampusmail, color='black'):
             ax.text(0.5, 0.5, 'No email data available', ha='center', va='center', color=color, transform=ax.transAxes)
             ax.set_axis_off()
             return fig
-        
+       
         subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)
         heatmap_chart = create_heatmap(subjects_data, dates_data, color)
         return heatmap_chart
@@ -89,8 +90,8 @@ def get_heatmap(ecampusmail, color='black'):
 
 def refresh_stacked_bar(canvas_bar, manual_inputs=None):
     """
-    High-level function to refresh the bar chart from UI.
-    Moves visualization calls away from main.py.
+    Triggers a live update of the weekly study tracker bar chart.
+    Useful for real-time timer updates or manual input synchronization.
     """
     try:
         if not _tracker:
@@ -110,14 +111,28 @@ def refresh_stacked_bar(canvas_bar, manual_inputs=None):
 _tracker = None
 
 def initialize_tracker(login: str):
+    """Initializes the database-backed tracker for study sessions."""
     global _tracker
     _tracker = WeeklyStudyTracker(login=login)
 
 def get_weekly_bar_chart():
+    """Returns a newly generated stacked bar chart for the current week."""
     current_data = get_tracker_data()
     return create_stacked_bar(current_data)
 
 def process_manual_input(day_inputs):
+    """
+    High-level Input/Output function to synchronize manual time entries with the persistent tracker.
+   
+    This function processes raw user input from UI fields (hours and minutes) and updates
+    the underlying study database.
+
+    Args:
+        day_inputs (list/tuple): A collection of tuples in the format (day_code, hours, minutes).
+
+    Returns:
+        dict: The updated state of all study sessions across the week.
+    """
     try:
         if not _tracker:
             return {}
@@ -128,9 +143,9 @@ def process_manual_input(day_inputs):
         for day_input in day_inputs:
             if not isinstance(day_input, (list, tuple)) or len(day_input) < 3:
                 continue
-            
+           
             day, h, m = day_input[0], day_input[1], day_input[2]
-            
+           
             try:
                 h_str = str(h).strip() if h is not None else ""
                 m_str = str(m).strip() if m is not None else ""
@@ -153,6 +168,7 @@ def process_manual_input(day_inputs):
         return _tracker.all() if _tracker else {}
 
 def get_tracker_data():
+    """Fetches all raw study time data from the current session."""
     return _tracker.all() if _tracker else {}
 
 def start_study_session():
@@ -161,6 +177,7 @@ def start_study_session():
     return days[datetime.now().weekday()]
 
 def stop_study_session(day_code, hours):
+    """Adds a newly recorded time session to the tracker's persistent storage."""
     try:
         if _tracker and day_code:
             try:
@@ -175,9 +192,7 @@ def stop_study_session(day_code, hours):
         return _tracker.all() if _tracker else {}
 
 def clear_all_data():
-    """
-    Resets all stored study sessions in the tracker and returns the empty state.
-    """
+    """Resets all stored study sessions in the tracker and returns the empty state."""
     if _tracker:
         _tracker.reset_all()
     return get_tracker_data()

@@ -941,6 +941,11 @@ def open_Compose_Email(Email_window):
     Email_window.close()
 
 def open_Diagram(Dashboard_window):
+    """
+    Transition from the Dashboard to the diagram.
+    Manages the lifecycle of the Diagram window and integrates 
+    the interactive Scatter Plot into the Qt layout.
+    """
     Diagram_window = load_ui("UI/Diagram.ui")
     Back_button = Diagram_window.findChild(QPushButton, "Back_Button")
     if Back_button:
@@ -949,7 +954,7 @@ def open_Diagram(Dashboard_window):
     target_widget = Diagram_window.findChild(QWidget, "Dashboard_1")
     if target_widget:
         try:
-            fig_scatter = get_scatter_plot(schedule, messages)
+            fig_scatter = get_scatter_plot(messages, color=get_plot_colors())
             if fig_scatter:
                 fig_scatter.patch.set_alpha(0.0)
                 canvas = FigureCanvasQTAgg(fig_scatter)
@@ -961,8 +966,7 @@ def open_Diagram(Dashboard_window):
             import traceback
             error_details = traceback.format_exc()
             print(error_details)
-            QMessageBox.warning(Diagram_window, "Аналітика", f"Помилка: {str(e)}\n\nCheck console.")
-
+            QMessageBox.warning(Diagram_window, "Analytics", f"Error: {str(e)}\n\nCheck console.")
 
     Diagram_window.show()
     Dashboard_window.close()
