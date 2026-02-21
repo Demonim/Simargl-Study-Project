@@ -2,6 +2,9 @@ import sys
 import os
 import simargl
 
+# Define absolute storage path for consistent usage
+STORAGE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'storage'))
+
 from PySide6.QtWidgets import (
     QListWidgetItem,
     QGridLayout,
@@ -683,7 +686,7 @@ def open_calendar_entry(menu_window):
     It opens a dialog to verify which courses happen
     on which days before proceeding to show the graphical calendar.
     """
-    storage = simargl.CourseDaysStorage(current_login)
+    storage = simargl.CourseDaysStorage(current_login, storage_dir=STORAGE_DIR)
 
     dialog = CourseDayDialog(
         courses=user_courses,
@@ -709,7 +712,7 @@ def open_calendar(menu_window):
     help_btn = calendar_window.findChild(QPushButton, "Help_Button")
     help_btn.clicked.connect(lambda: show_universal_help(calendar_window, "calendar"))
 
-    storage = simargl.CourseDaysStorage(current_login)
+    storage = simargl.CourseDaysStorage(current_login, storage_dir=STORAGE_DIR)
     course_days = storage.load()  # { course_title: "MO" }
 
     weekly_schedule.clear()
@@ -1453,7 +1456,7 @@ def login_from_enter(main_window, remember=False):
                 remember_database.create(current_login, password, " ")
 
         global notes_storage
-        notes_storage = simargl.NotesStorage(current_login)
+        notes_storage = simargl.NotesStorage(current_login, storage_dir=STORAGE_DIR)
         if hasattr(main_window, 'auto_logout_timer'):
             main_window.auto_logout_timer.stop()
         open_menu(main_window)

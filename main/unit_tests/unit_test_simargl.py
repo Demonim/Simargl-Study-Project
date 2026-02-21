@@ -244,7 +244,8 @@ class TestNotesStorage(unittest.TestCase):
 class TestCourseDaysStorage(unittest.TestCase):
     def setUp(self):
         self.login = "test_course_user"
-        self.storage = CourseDaysStorage(self.login)
+        abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'storage'))
+        self.storage = CourseDaysStorage(self.login, storage_dir=abs_storage_dir)
 
     def tearDown(self):
         if os.path.exists(self.storage.path):

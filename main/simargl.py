@@ -373,7 +373,7 @@ class LoginStorage:
             name (str): The identifier for the database file (e.g., 'users' or a specific group).
                         The file will be created at 'storage/{name}.db'.
         """
-        self.base_path = "storage"
+        self.base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'storage'))
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{name}.db")
         self.con = sql.connect(self.file_path)
@@ -505,17 +505,21 @@ class NotesStorage:
     data persistence across sessions for individual users.
     """
 
-    def __init__(self, login: str):
+    def __init__(self, login: str, storage_dir=None):
         """
         Initialize the notes storage for a specific user.
 
         Args:
             login (str): The username of the current user. Used to generate 
                          a unique filename (e.g., 'username.json').
+            storage_dir (str, optional): Absolute path to storage directory. If None, uses default.
         """
 
         self.login = login
-        self.base_path = "storage/data"
+        if storage_dir is None:
+            self.base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'storage', 'data'))
+        else:
+            self.base_path = os.path.join(storage_dir, 'data')
         os.makedirs(self.base_path, exist_ok=True)
         self.file_path = os.path.join(self.base_path, f"{login}.json")
 

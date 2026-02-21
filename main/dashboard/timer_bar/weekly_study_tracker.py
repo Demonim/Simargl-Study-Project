@@ -14,10 +14,10 @@ class WeeklyStudyTracker:
             login (str): The username used to name the data file.
             storage_dir (str): The directory where JSON files are stored.
         """
-        self.filename = os.path.join(storage_dir, f"{login}_study_data.json")
-
-        if not os.path.exists(storage_dir):
-            os.makedirs(storage_dir, exist_ok=True)
+        abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'storage'))
+        self.filename = os.path.join(abs_storage_dir, f"{login}_study_data.json")
+        if not os.path.exists(abs_storage_dir):
+            os.makedirs(abs_storage_dir, exist_ok=True)
 
         self.default_data = {
             "Mon": {'manual': 0.0, 'timer': 0.0},

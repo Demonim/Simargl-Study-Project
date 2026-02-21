@@ -8,13 +8,14 @@ class TestWeeklyStudyTracker(unittest.TestCase):
     def setUp(self):
         self.login = "testuser"
         self.storage_dir = "test_storage"
-        self.filename = os.path.join(self.storage_dir, f"{self.login}_study_data.json")
+        abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'storage'))
+        self.filename = os.path.join(abs_storage_dir, f"{self.login}_study_data.json")
         # Ensure test storage dir is clean
         if os.path.exists(self.filename):
             os.remove(self.filename)
-        if os.path.exists(self.storage_dir):
+        if os.path.exists(abs_storage_dir):
             try:
-                os.rmdir(self.storage_dir)
+                os.rmdir(abs_storage_dir)
             except OSError:
                 pass
 

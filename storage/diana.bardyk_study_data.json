@@ -1,30 +1,30 @@
 {
     "Mon": {
-        "manual": 1.0,
+        "manual": 0.0,
         "timer": 0.0
     },
     "Tue": {
-        "manual": 1.0,
+        "manual": 0.0,
         "timer": 0.0
     },
     "Wed": {
-        "manual": 1.0,
+        "manual": 0.5,
         "timer": 0.0
     },
     "Thu": {
-        "manual": 1.0,
+        "manual": 4.0,
         "timer": 0.0
     },
     "Fri": {
-        "manual": 1.0,
+        "manual": 0.0,
         "timer": 0.0
     },
     "Sat": {
-        "manual": 2.0,
-        "timer": 0.0007879691666666666
+        "manual": 0.0,
+        "timer": 0.0
     },
     "Sun": {
-        "manual": 1.0,
+        "manual": 0.0,
         "timer": 0.0
     }
 }
