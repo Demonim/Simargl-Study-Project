@@ -1,6 +1,6 @@
 import sys
 import os
-from simargl
+import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,

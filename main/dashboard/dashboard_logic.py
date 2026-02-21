@@ -1,6 +1,6 @@
-from main.dashboard.pie.create_pie import create_pie
-from main.dashboard.pie.subjects_logic import subject_hours
-from main.dashboard.heatmap.create_heatmap import create_heatmap
+from dashboard.pie.create_pie import create_pie
+from dashboard.pie.subjects_logic import subject_hours
+from dashboard.heatmap.create_heatmap import create_heatmap
 from .timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from .scatter_plot.scatter_logic import prepare_scatter_data
