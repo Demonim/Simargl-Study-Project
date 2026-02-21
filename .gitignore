@@ -1,8 +1,6 @@
 *.pyc
-*.json
-*.db
-main/est.py
 main/untitled.ui
 .venv/
 __pycache__/
 main/.idea/dbnavigator.xml
+main/dashboard/storage/nichita.licov_study_data.json
