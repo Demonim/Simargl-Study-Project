@@ -25,7 +25,6 @@ def generate_scatter_figure(df, medians, math_stats, color='black'):
                 complete with interactive tooltips and statistical footer.
     """
 
-    # Error handling: check DataFrame and parameters
     required_columns = {'name', 'hours', 'messages', 'insight', 'engagement_score', 'quadrant'}
     if df is None or not hasattr(df, 'empty') or df.empty or not required_columns.issubset(df.columns):
         fig = Figure(figsize=(8, 6), tight_layout=True)

@@ -1,46 +1,78 @@
-# A God-Like ECampus helper
-Study project in comfortising experience of using ECampus.
+
+# Simargl: A God-Like ECampus Helper
+
+Simargl is a study project aimed at enhancing and streamlining the ECampus experience for students. It provides a modern, customizable interface and powerful tools for managing digital academic routines.
+
 ### Description
-The interface of ECampus is somewhat overloaded, slow and may be confusing. At the same time, there is no possibility to deeply customize it and save only what you need. With the Simargl it is possible to track essential aspects of digital routine: ECampusMail and StudIP. Retrieving data from these websites using their API or IMAP/SMTP protocols, defining it in modern GUI and implementing other key libraries to render most useful information delivers a powerful instrument to each student.
+The default ECampus interface is often overloaded, slow, and lacks customization. Simargl addresses these issues by allowing users to track essential aspects of their digital routine, such as ECampusMail and StudIP, through a modern GUI. Data is retrieved using APIs or IMAP/SMTP protocols and presented in a user-friendly, customizable dashboard. Key libraries are used to render the most useful information, making Simargl a valuable tool for every student.
+
 ### How To Install
-Download an .exe file, start it and instllation packet will guide you through. Simple as that!
+Download the .exe file, run it, and follow the installation wizard. The process is straightforward and user-friendly.
+
 ### How To Use
-After starting you should once create your local account and provide login and password for above mentioned services. You will be also guided through every section of the app with some explanations.
---- ---
+Upon first launch, create your local account and provide login credentials for ECampusMail and StudIP. The application will guide you through each section with helpful explanations and tooltips. All features are accessible via an intuitive menu.
+
+---
+
 # Functionalities
+
 ### Data Storage
-- Some data will be handled in SQL, like: local user data, calender from studip etc.
-- The login credintials are in hash-form and SQL-databases will be protected.
+- Uses SQL databases to securely store local user data, calendar events from StudIP, notes, and more.
+- Login credentials are hashed and databases are protected for user security.
+- Supports both persistent and session-based data storage.
+
 ### User Management
-- Local user stores login credentials for their ECampusMail and StudIP accounts.
-- User should provide their email and password for above mentioned services so that the program could functionate.
-- It is possible to switch or delete local accounts.
+- Local user profiles store credentials for ECampusMail and StudIP accounts.
+- Users can add, switch, or delete local accounts at any time.
+- Secure authentication and credential management.
+
 ### Interface
-- Modern GUI interface using PySide lib.
-- Switchable dark and light themes in settings.
-- Help button is easy to find everywhere.
+- Modern, responsive GUI built with PySide.
+- Switchable dark and light themes, with additional theme options.
+- Help button and contextual guidance available throughout the app.
+- UI templates and layouts designed for clarity and ease of use.
+
 ### Visualizations
-- PySide will be used to visualize some functionalities, like calender from StudIP.
-- It is possible to choose a period and some basic filtering options for graphs.
---- ---
+- Advanced visualizations for calendar, study statistics, and more using PySide and custom plotting modules.
+- Interactive graphs: heatmap, pie chart, scatter plot, timer bar, and others.
+- Flexible period selection and filtering options for all visualizations.
+- Visualization modules are extensible for future features.
+
+---
+
 # Group Details
-- Group name: Data Sorcerers
-- Group repository: https://github.com/Demonim/Simargl
-- Tutor Responsible: Tobias Kristoffer Mark
-- Group team leader: Dmytro "Demonim" Kutsak
-- Group members: Nichita "Nikityu2" Licov, Diana "dibardyk" Bardyk
---- ---
-# Contributiuons
-- Demonim: Formulated StudIP, ECampusMail and the base of login storage. Provided numerous fixes to code, comment etc. Wrote docstrings and unit tests to main and simargl modules. Provided ideas for two new themes.
-- Nikityu2: Full GUI interface with UI, logic and design. Some storage classes was designed (Notes and CourseDays), also made changes to login storage. 
-- dibardyk: Made the core requirement to visualization and all of its code. Also did some fixes in many areas
---- ---
-# Acknowlegdments
+- **Group name:** Data Sorcerers
+- **Repository:** https://github.com/Demonim/Simargl
+- **Tutor Responsible:** Tobias Kristoffer Mark
+- **Team Leader:** Dmytro "Demonim" Kutsak
+- **Group Members:** Nichita "Nikityu2" Licov, Diana "dibardyk" Bardyk
+
+---
+
+# Contributions
+**Demonim:** Led backend development, including the integration with StudIP and ECampusMail, and architected the login storage system. Implemented ECampusMail notification features, database management, and core backend logic. Provided numerous code and comment fixes, wrote docstrings and unit tests for the main and simargl modules, and contributed ideas for new themes. Handled localization updates, and ensured code quality through frequent refactoring and bug fixes.
+**Nikityu2:** Designed and implemented the full GUI interface, including UI logic, visual design, and user experience improvements. Created and organized UI templates and styles, developed storage classes (Notes and CourseDays), and contributed to login storage improvements. Integrated calendar features, managed theme switching, and optimized interface responsiveness. Developed and refined multiple windows (Admin, Email, Help, Notes, Courses, etc.), and ensured seamless integration of all UI components. Enhanced error handling and user guidance throughout the application.
+**dibardyk:** Developed and implemented all dashboard features, being fully responsible for the dashboard’s logic, structure, and every visualization module (heatmap, pie chart, scatter plot, timer bar). Designed templates and layouts for the program. Improved data handling and error management, refactored and optimized code for readability and maintainability, and added comprehensive comments and docstrings. Enhanced user interaction by refining the interface and ensuring robust connections between UI components and backend logic. Introduced new functions for timer and diagram features, and contributed to the overall improvement of data visualization and user experience in the application.
+
+---
+
+# Acknowledgments
 ### Websites
 - StudIP Göttingen: https://www.studip.uni-goettingen.de/dispatch.php/start
 - ECampusMail Göttingen: https://email.gwdg.de/owa/auth/logon.aspx
 ...
+
 ### Libraries
-- PySide6: https://github.com/PySide
-- studipy: https://github.com/FrederikRichter/studipy
-...
+- **PySide6**: For building the modern, cross-platform graphical user interface (GUI).
+- **studipy**: Used for interacting with StudIP, retrieving calendar events, course information, and user data. See: https://github.com/FrederikRichter/studipy
+- **matplotlib**: Used for creating advanced visualizations such as heatmaps, pie charts, scatter plots, and timer bars.
+- **pandas**: For efficient data manipulation, analysis, and handling of tabular data.
+- **requests**: To interact with web APIs and retrieve data from external services.
+- **sqlite3**: For secure and lightweight local SQL database storage.
+- **email, imaplib, smtplib**: For handling ECampusMail integration and communication.
+- **json**: For configuration, data storage, and communication between modules.
+- **datetime**: For managing and processing time-related data, especially in calendar and timer features.
+- **numpy**: Used for numerical operations and supporting data analysis in visualizations.
+- **os, sys**: For file and environment management, and application control.
+
+Other standard and third-party libraries may be used for specific features, error handling, and performance optimization.
