@@ -1,6 +1,6 @@
 import sys
 import os
-from . import simargl
+from simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,11 +26,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
-from .themes import *
+from themes import *
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from .dashboard.timer_bar.study_timer import Study_Timer
-from .dashboard.dashboard_logic import (
+from dashboard.timer_bar.study_timer import Study_Timer
+from dashboard.dashboard_logic import (
     get_pie_chart, get_heatmap, initialize_tracker,
     clear_all_data, stop_study_session, start_study_session,
     get_weekly_bar_chart, refresh_stacked_bar, get_scatter_plot
