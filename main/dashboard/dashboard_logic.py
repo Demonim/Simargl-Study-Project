@@ -1,11 +1,18 @@
-from dashboard.pie.create_pie import create_pie
-from dashboard.pie.subjects_logic import subject_hours
-from dashboard.heatmap.create_heatmap import create_heatmap
+from .pie.create_pie import create_pie
+from .pie.subjects_logic import subject_hours
+from .heatmap.create_heatmap import create_heatmap
 from .timer_bar.weekly_study_tracker import WeeklyStudyTracker
 from .timer_bar.create_bar import create_stacked_bar, update_stacked_bar
 from .scatter_plot.scatter_logic import prepare_scatter_data
 from .scatter_plot.create_scatter_plot import generate_scatter_figure 
 from datetime import datetime
+
+def error_chart(message, color='black'):
+    from matplotlib.figure import Figure
+    fig = Figure(figsize=(8, 6), tight_layout=True)
+    ax = fig.add_subplot(111)
+    ax.text(0.5, 0.5, message, ha='center', va='center', color=color)
+    return fig
 
 def get_pie_chart(schedule, text_color='black'):
     global subject_data
@@ -20,21 +27,12 @@ def get_pie_chart(schedule, text_color='black'):
     """
     try:
         if schedule is None:
-            from matplotlib.figure import Figure
-            fig = Figure(figsize=(8, 6), tight_layout=True)
-            ax = fig.add_subplot(111)
-            ax.text(0.5, 0.5, 'No schedule data available', ha='center', va='center', color=text_color)
-            return fig
-       
+            return error_chart('No schedule data available', text_color)
         subject_data = subject_hours(schedule)
         pie_chart = create_pie(subject_data, text_color)
         return pie_chart
     except Exception as e:
-        from matplotlib.figure import Figure
-        fig = Figure(figsize=(8, 6), tight_layout=True)
-        ax = fig.add_subplot(111)
-        ax.text(0.5, 0.5, f'Error generating pie chart: {str(e)}', ha='center', va='center', color=text_color)
-        return fig
+        return error_chart(f'Error generating pie chart: {str(e)}', text_color)
 
 def get_scatter_plot(messages, color='black'):
     """
@@ -50,9 +48,12 @@ def get_scatter_plot(messages, color='black'):
         Figure: A Matplotlib Figure object representing the interactive scatter plot.  
     """
    
-    df, medians, math_stats = prepare_scatter_data(subject_data, messages)
-    scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color)
-    return scatter_chart
+    try:
+        df, medians, math_stats = prepare_scatter_data(subject_data, messages)
+        scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color)
+        return scatter_chart
+    except Exception as e:
+        return error_chart(f'Error generating scatter plot: {str(e)}', color)
 
 def get_heatmap(ecampusmail, color='black'):
     """
@@ -70,23 +71,12 @@ def get_heatmap(ecampusmail, color='black'):
     """
     try:
         if ecampusmail is None:
-            from matplotlib.figure import Figure
-            fig = Figure(figsize=(8, 6), tight_layout=True)
-            ax = fig.add_subplot(111)
-            ax.text(0.5, 0.5, 'No email data available', ha='center', va='center', color=color, transform=ax.transAxes)
-            ax.set_axis_off()
-            return fig
-       
+            return error_chart('No email data available', color)
         subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)
         heatmap_chart = create_heatmap(subjects_data, dates_data, color)
         return heatmap_chart
     except Exception as e:
-        from matplotlib.figure import Figure
-        fig = Figure(figsize=(8, 6), tight_layout=True)
-        ax = fig.add_subplot(111)
-        ax.text(0.5, 0.5, f'Error generating heatmap: {str(e)}', ha='center', va='center', color=color, transform=ax.transAxes)
-        ax.set_axis_off()
-        return fig
+        return error_chart(f'Error generating heatmap: {str(e)}', color)
 
 def refresh_stacked_bar(canvas_bar, manual_inputs=None):
     """

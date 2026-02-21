@@ -25,42 +25,56 @@ def generate_scatter_figure(df, medians, math_stats, color='black'):
                 complete with interactive tooltips and statistical footer.
     """
 
-    med_x, med_y = medians
-    mu = math_stats.get('mean_ratio', 0)
-    sigma = math_stats.get('std_dev', 0)
-    fig = Figure(figsize=(10, 8), facecolor='none')
-    ax = fig.add_subplot(111)
-    ax.set_facecolor('none')
+    # Error handling: check DataFrame and parameters
+    required_columns = {'name', 'hours', 'messages', 'insight', 'engagement_score', 'quadrant'}
+    if df is None or not hasattr(df, 'empty') or df.empty or not required_columns.issubset(df.columns):
+        fig = Figure(figsize=(8, 6), tight_layout=True)
+        ax = fig.add_subplot(111)
+        ax.text(0.5, 0.5, 'No valid data for scatter plot', ha='center', va='center', color=color)
+        return fig
 
-    quadrant_colors = {
-        "Active Ecosystem": "#FF6B81",
-        "Live Discussion": "#6AB04C",  
-        "Routine Lectures": "#4834D4",
-        "Inactive Course": "#F0932B",  
-    }
+    try:
+        med_x, med_y = medians
+        mu = math_stats.get('mean_ratio', 0)
+        sigma = math_stats.get('std_dev', 0)
+        fig = Figure(figsize=(10, 8), facecolor='none')
+        ax = fig.add_subplot(111)
+        ax.set_facecolor('none')
 
-    scatters = []
-    for q_type, q_color in quadrant_colors.items():
-        sub = df[df['quadrant'] == q_type]
-        if not sub.empty:
-            point_sizes = 150 + (sub['engagement_score'] * 80).clip(-100, 300)
-            sc = ax.scatter(sub['hours'], sub['messages'], c=q_color, s=point_sizes,
-                           label=q_type, edgecolors='white', linewidth=0.6, alpha=0.9, zorder=3)
-           
-            sc.course_data = sub[['name', 'hours', 'messages', 'insight', 'engagement_score']].values
-            scatters.append(sc)
+        quadrant_colors = {
+            "Active Ecosystem": "#FF6B81",
+            "Live Discussion": "#6AB04C",  
+            "Routine Lectures": "#4834D4",
+            "Inactive Course": "#F0932B",  
+        }
 
-    ax.axhline(y=med_y, color=color, linestyle='--', alpha=0.6, zorder=1)
-    ax.axvline(x=med_x, color=color, linestyle='--', alpha=0.6, zorder=1)
+        scatters = []
+        for q_type, q_color in quadrant_colors.items():
+            sub = df[df['quadrant'] == q_type]
+            if not sub.empty:
+                point_sizes = 150 + (sub['engagement_score'] * 80).clip(-100, 300)
+                sc = ax.scatter(sub['hours'], sub['messages'], c=q_color, s=point_sizes,
+                               label=q_type, edgecolors='white', linewidth=0.6, alpha=0.9, zorder=3)
+               
+                sc.course_data = sub[['name', 'hours', 'messages', 'insight', 'engagement_score']].values
+                scatters.append(sc)
 
-    for spine in ax.spines.values():
-        spine.set_edgecolor(color)
+        ax.axhline(y=med_y, color=color, linestyle='--', alpha=0.6, zorder=1)
+        ax.axvline(x=med_x, color=color, linestyle='--', alpha=0.6, zorder=1)
 
-    annot = ax.annotate("", xy=(0,0), xytext=(10, 10),
-                        textcoords="offset points",
-                        bbox=dict(boxstyle="round,pad=0.5", fc="#333333", ec="white", lw=1),
-                        color="white", fontsize=9, fontweight='bold', zorder=10)
-    annot.set_visible(False)
+        for spine in ax.spines.values():
+            spine.set_edgecolor(color)
+
+        annot = ax.annotate("", xy=(0,0), xytext=(10, 10),
+                            textcoords="offset points",
+                            bbox=dict(boxstyle="round,pad=0.5", fc="#333333", ec="white", lw=1),
+                            color="white", fontsize=9, fontweight='bold', zorder=10)
+        annot.set_visible(False)
+    except Exception as e:
+        fig = Figure(figsize=(8, 6), tight_layout=True)
+        ax = fig.add_subplot(111)
+        ax.text(0.5, 0.5, f'Error in scatter plot: {str(e)}', ha='center', va='center', color=color)
+        return fig
 
     def update_annot(sc, ind):
         """
@@ -133,7 +147,8 @@ def generate_scatter_figure(df, medians, math_stats, color='black'):
 
     ax.text(ax.get_xlim()[1]*0.7, ax.get_ylim()[1]*0.9, 'ECOSYSTEMS',
             color='#FF6B81', alpha=0.3, fontsize=12, fontweight='bold')
-    ax.text(ax.get_xlim()[0], ax.get_ylim()[1]*0.9, 'DISCUSSIONS',
+    discussions_x = ax.get_xlim()[0] + (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.07
+    ax.text(discussions_x, ax.get_ylim()[1]*0.9, 'DISCUSSIONS',
             color='#6AB04C', alpha=0.3, fontsize=12, fontweight='bold')
 
     ax.set_title('Study Intensity Matrix (Hours vs Messages)', color=color, fontsize=14, pad=5)

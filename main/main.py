@@ -1,6 +1,6 @@
 import sys
 import os
-import simargl
+from main import simargl
 
 from PySide6.QtWidgets import (
     QListWidgetItem,
@@ -26,11 +26,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, Qt, QTimer
 from PySide6.QtWidgets import QApplication, QVBoxLayout
-from themes import *
+from main.themes import *
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from dashboard.timer_bar.study_timer import Study_Timer
-from dashboard.dashboard_logic import (
+from .dashboard.timer_bar.study_timer import Study_Timer
+from .dashboard.dashboard_logic import (
     get_pie_chart, get_heatmap, initialize_tracker,
     clear_all_data, stop_study_session, start_study_session,
     get_weekly_bar_chart, refresh_stacked_bar, get_scatter_plot
@@ -808,7 +808,7 @@ def open_StudIP(menu_window):
             messages = []
 
         for msg in messages:
-            title = msg.subject if msg.subject else "Без темы"
+            title = msg.subject if msg.subject else "No subject"
 
             btn = QPushButton(title)
             btn.setMinimumHeight(48)
@@ -854,7 +854,7 @@ def open_message_dialog(message):
 
     sender_label.setText(f"From: {full_msg.sender_id}")
     date_label.setText(f"Date: {full_msg.creation_date}")
-    subject_label.setText(full_msg.subject or "Без темы")
+    subject_label.setText(full_msg.subject or "No subject")
     body_text.setHtml(full_msg.body)
 
     close_button.clicked.connect(dialog.close)
@@ -1047,19 +1047,28 @@ def open_Dashboard(menu_window):
                     reset_btn.clicked.connect(run_reset)
 
                 start_btn = Dashboard_window.findChild(QPushButton, "Start_Button")
+                timer_label = Dashboard_window.findChild(QLabel, "Timer")
                 if start_btn:
                     def run_start():
                         try:
                             global active_timer_day
                             study_timer.start()
                             active_timer_day = start_study_session()
+                            if timer_label:
+                                timer_label.setText("<span style='font-size:10pt'>Timer started</span>")
+                                timer_label.setTextFormat(Qt.RichText)
                         except Exception:
                             pass
                     start_btn.clicked.connect(run_start)
 
                 stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
                 if stop_btn:
-                    stop_btn.clicked.connect(lambda: stop_timer_and_save(canvas_bar, current_theme_name))
+                    def run_stop():
+                        stop_timer_and_save(canvas_bar, current_theme_name)
+                        if timer_label:
+                            timer_label.setText("<span style='font-size:10pt'>Timer stopped</span>")
+                            timer_label.setTextFormat(Qt.RichText)
+                    stop_btn.clicked.connect(run_stop)
         except Exception:
             pass  # Bar chart optional, continue without it
 
