@@ -777,6 +777,7 @@ def open_calendar_entry(menu_window):
     on which days before proceeding to show the graphical calendar.
     """
     storage = simargl.CourseDaysStorage(current_login, storage_dir=STORAGE_DIR)
+    
 
     dialog = CourseDayDialog(
         courses=user_courses,

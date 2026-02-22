@@ -589,7 +589,7 @@ class CourseDaysStorage:
     a user's courses to a local JSON file.
     """
 
-    def __init__(self, login):
+    def __init__(self, login, storage_dir="storage"):
         """
         Initialize the course days storage for a specific user.
 
@@ -598,7 +598,11 @@ class CourseDaysStorage:
                          a unique filename (e.g., 'course_days_username.json').
         """
 
-        self.path = f"storage/course_days_{login}.json"
+        if not os.path.isabs(storage_dir):
+            pass
+
+        self.storage_dir = storage_dir
+        self.path = os.path.join(self.storage_dir, f"course_days_{login}.json")
 
     def load(self):
         """
@@ -623,5 +627,9 @@ class CourseDaysStorage:
                          to be stored.
         """
 
+        if not os.path.exists(self.storage_dir):
+            os.makedirs(self.storage_dir)
+
         with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=4)
+
