@@ -697,6 +697,11 @@ def open_admin(main_window):
         lambda: universal_logout()
     )
 
+    continue_button = admin_window.findChild(QPushButton, "Continue")
+    continue_button.clicked.connect(
+        lambda: start_main_app(admin_window)
+    )
+
     new_user_btn = admin_window.findChild(QPushButton, "NewUser")
     new_user_btn.clicked.connect(
         lambda: open_registration(admin_window, storage)
