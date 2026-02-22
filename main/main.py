@@ -611,6 +611,7 @@ def open_admin(main_window):
     admin_window = load_ui("UI/Admin.ui")
     global current_active_window
     current_active_window = admin_window
+    storage = simargl.LoginStorage("users_db")
 
     ban_button = admin_window.findChild(QPushButton, "Ban_Button")
     ban_button.clicked.connect(
@@ -623,6 +624,11 @@ def open_admin(main_window):
     back_button = admin_window.findChild(QPushButton, "Back_Button")
     back_button.clicked.connect(
         lambda: universal_logout()
+    )
+
+    new_user_btn = admin_window.findChild(QPushButton, "NewUser")
+    new_user_btn.clicked.connect(
+        lambda: open_registration(admin_window, storage)
     )
 
     admin_window.show()
@@ -1684,12 +1690,6 @@ def main():
     if enter_btn:
         enter_btn.clicked.connect(
             lambda: handle_auth(prelogin_window, storage)
-        )
-
-    new_user_btn = prelogin_window.findChild(QPushButton, "NewUser")
-    if new_user_btn:
-        new_user_btn.clicked.connect(
-            lambda: open_registration(prelogin_window, storage)
         )
 
     off_button = prelogin_window.findChild(QPushButton, "Turnoff")

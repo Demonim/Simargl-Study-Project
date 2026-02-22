@@ -32,9 +32,9 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,9">
+   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,10">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,2,10,2,2">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
@@ -126,29 +126,64 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="Ecampus">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>550</width>
-          <height>140</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>930</width>
-          <height>200</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Ecampus Helper</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QLabel" name="Ecampus">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>550</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>930</width>
+            <height>140</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Ecampus Helper</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Ecampus_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>550</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>930</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>You are successfully loged in.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <spacer name="horizontalSpacer_3">
