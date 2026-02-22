@@ -33,7 +33,7 @@ The default ECampus interface is often overloaded, slow, and lacks customization
 
 ---
 
-#### Table for self-check
+# Table for self-check
 
 4 out of the 7 categories are fulfilled.
 
@@ -62,7 +62,7 @@ The default ECampus interface is often overloaded, slow, and lacks customization
 
 ----
 
-## Installation
+# Installation
 
 1. **Clone the repository:**
 	```bash
@@ -85,7 +85,7 @@ The default ECampus interface is often overloaded, slow, and lacks customization
 	pip install -r requirements.txt
 	```
 
-## Running the Project
+# Running the Project
 
 To start the application, run:
 
@@ -104,6 +104,28 @@ python main/main.py
 ---
 
 For any issues, please open an issue on the repository or contact the maintainer.
+
+----
+
+# Project Timeline
+
+Week-by-week schedule:
+
+**Week 1-2:** Project proposal, repository setup, initial planning, requirements gathering, initial design, UI improvements.
+
+**Week 3-4** ECampus and StudIP integration, implementation of local login and database.
+
+**Weeks 5-8:** Dashboard core logic and main visualizations (heatmap, pie, scatter, timer bar).
+
+**Week 4-10:** UI improvements, styles, and themes.
+
+**Week 4-5:** Admin features and user management.
+
+**Week 5-6:** Calendar, notes, and courses modules. Help, localization, and support windows.
+
+**Week 7-8:** Unit tests and bug fixes.
+
+**Week 9-10:** Final polish and presentation preparation, and visualization (scatter plot). Final README updates.
 
 ----
 
