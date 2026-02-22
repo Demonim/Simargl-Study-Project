@@ -40,6 +40,35 @@ Upon first launch, create your local account and provide login credentials for E
 
 ---
 
+#### Table for self-check
+
+4 out of the 7 categories are fulfilled.
+
+| Category                     | Details                                                                           | Mark with ✔️ |
+|:-----------------------------|:----------------------------------------------------------------------------------|--------------|
+| 1. Data Storage and Handling | Management system                                                                 |      ✔️      |
+|                              | No plaintext passwords                                                            |      ✔️      |
+| 2. User Management           | Login with username, pw                                                           |      ✔️      |
+|                              | Four user accounts userID, name, user_name, and password, one admin               |      ✔️      |
+|                              | Logout with timeout                                                               |      ✔️      |
+|                              | Admin privileges                                                                  |      ✔️      |
+| 3. Interface                 | CLI, GUI or Web interface for users                                               |      ✔️      |
+|                              | Extensive interface functions (account management, queries, analysis, help)       |      ✔️      |
+|                              | Visualizations in the interface, dashboard style                                  |      ✔️      |
+| 4. Visualisations            | Visualizations displayed                                                          |      ✔️      |
+|                              | Dashboard with several graphs composed together                                   |      ✔️      |
+|                              | The visualizations offer interactivity                                            |      ✔️      |
+| Always mandatory             | Project proposal with incorporated feedback from tutor                            |      ✔️      |
+|                              | GitHub repo with sensible commit messages, template README, contributions section |      ✔️      |
+|                              | Frequent commenting                                                               |      ✔️      |
+|                              | Docstrings for every function/class                                               |      ✔️      |
+|                              | Testing of relevant functionalities to avoid crashing                             |      ✔️      |
+|                              | Help page for system                                                              |      ✔️      |
+|                              | Milestone presentation                                                            |      ✔️      |
+|                              | AI-Usage Cards                                                                    |      ✔️      |
+
+----
+
 # Group Details
 - **Group name:** Data Sorcerers
 - **Repository:** https://github.com/Demonim/Simargl
