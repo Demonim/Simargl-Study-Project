@@ -349,7 +349,6 @@ class ECampusMail:
         if hasattr(self, 'server') and self.server and hasattr(self.server, 'quit'):
             try:
                 self.server.quit()
-                self.server.close()
             except Exception as e:
                 print("Error:", e)
 

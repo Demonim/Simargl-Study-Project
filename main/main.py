@@ -1471,7 +1471,7 @@ def back_to_main(menu_window):
     remember_path = "storage/remember_database.db"
     if os.path.exists(remember_path):
         remember_database = simargl.LoginStorage("remember_database")
-        db_data = remember_database.fetchall()
+        db_data = remember_database.load()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
         login_box.setText(db_data[0][1])
         remember_check.click()

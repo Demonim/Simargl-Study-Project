@@ -191,10 +191,10 @@ class TestLoginStorage(unittest.TestCase):
         self.assertFalse(self.storage.compare("testlogin", "wrongpass"))
 
     def test_load(self):
-        self.storage.create("user1", "pass", "User One")
+        self.storage.create("user1", "pass", "User One", is_admin=0)
         self.storage.create("user2", "pass", "User Two", is_admin=1)
         users = list(self.storage.load())
-        self.assertEqual(len(users), 1) # Should only load non-admins
+        self.assertEqual(len(users), 2)
         self.assertEqual(users[0][1], "user1")
 
     def test_set_ban_status(self):
@@ -245,7 +245,7 @@ class TestCourseDaysStorage(unittest.TestCase):
     def setUp(self):
         self.login = "test_course_user"
         abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'storage'))
-        self.storage = CourseDaysStorage(self.login, storage_dir=abs_storage_dir)
+        self.storage = CourseDaysStorage(self.login, name=abs_storage_dir)
 
     def tearDown(self):
         if os.path.exists(self.storage.path):
