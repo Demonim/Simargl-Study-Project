@@ -490,9 +490,9 @@ def get_plot_colors():
 
 def add_user_item(username, list_widget, mode, refresh_callback):
     """
-    Creates a custom UI element (button) for a specific user in the admin list.
-    It links the button to the ban/unban logic and handles the refresh callback for the list.
-    """
+     Creates a custom UI element (button) for a specific user in the admin list.
+     It links the button to the delete or ban/unban logic and handles the refresh callback for the list.
+     """
     item = QListWidgetItem(list_widget)
     item_widget = QWidget()
     layout = QHBoxLayout(item_widget)
@@ -501,10 +501,12 @@ def add_user_item(username, list_widget, mode, refresh_callback):
     btn = QPushButton(f"User: {username}")
     btn.setStyleSheet("text-align: left; padding: 8px; font-size: 14px;")
 
-    btn.clicked.connect(lambda: show_ban_dialog(username, mode, refresh_callback))
+    if mode == "delete":
+        btn.clicked.connect(lambda: show_delete_confirm(username, refresh_callback))
+    else:
+        btn.clicked.connect(lambda: show_ban_dialog(username, mode, refresh_callback))
 
     layout.addWidget(btn)
-
     item.setSizeHint(item_widget.sizeHint())
     list_widget.addItem(item)
     list_widget.setItemWidget(item, item_widget)
@@ -522,14 +524,17 @@ def open_unbanned():
 
     user_list_widget = window.findChild(QListWidget, "User_list")
     back_button = window.findChild(QPushButton, "pushButton")
-    storage = simargl.LoginStorage("users_db")
 
     def refresh_list():
+        storage = simargl.LoginStorage("users_db")
         user_list_widget.clear()
         users_data = storage.load()
-        for row in users_data.fetchall():
-            if row[3] == 0:
-                add_user_item(row[1], user_list_widget, "ban", refresh_list)
+        for row in users_data:
+            username = row[1]
+            if username.lower() == "admin":
+                continue
+            if row[4] == 0:
+                add_user_item(username, user_list_widget, "ban", refresh_list)
 
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
@@ -558,21 +563,59 @@ def open_banned():
     user_list_widget = window.findChild(QListWidget, "User_list")
     back_button = window.findChild(QPushButton, "pushButton")
 
-    storage = simargl.LoginStorage("users_db")
-
     def refresh_list():
+        storage = simargl.LoginStorage("users_db")
         user_list_widget.clear()
         users_data = storage.load()
-        if users_data:
-            for row in users_data.fetchall():
-                if row[3] == 1:
-                    add_user_item(row[1], user_list_widget, "unban", refresh_list)
+        for row in users_data:
+            username = row[1]
+            if username.lower() == "admin":
+                continue
+            if row[4] == 1:
+                add_user_item(username, user_list_widget, "unban", refresh_list)
 
     refresh_list()
     back_button.clicked.connect(lambda: open_admin(window))
     window.show()
     prev_window.close()
 
+
+def open_delete_list(admin_window):
+    """
+    Opens a list of all users that can be deleted.
+    Uses the same logic and UI as the ban/unban lists.
+    """
+    global current_active_window
+    window = load_ui("UI/Unbanned.ui")
+    window.setWindowTitle("Delete Users")
+    label = window.findChild(QLabel, "Users")
+    if label:
+        label.setText("Select user to delete")
+
+    prev_window = current_active_window
+    current_active_window = window
+
+    user_list_widget = window.findChild(QListWidget, "User_list")
+    back_button = window.findChild(QPushButton, "pushButton")
+
+    def refresh_list():
+        user_list_widget.clear()
+        storage = simargl.LoginStorage("users_db")
+        users_data = storage.load()
+
+        for row in users_data:
+            username = row[1]
+            if username.lower() == "admin":
+                continue
+            add_user_item(username, user_list_widget, "delete", refresh_list)
+
+    refresh_list()
+    if back_button:
+        back_button.clicked.connect(lambda: open_admin(window))
+
+    window.show()
+    if prev_window:
+        prev_window.close()
 
 def show_ban_dialog(username, mode, refresh_callback):
     """
@@ -599,6 +642,34 @@ def show_ban_dialog(username, mode, refresh_callback):
         ban_btn.clicked.connect(handle_ban)
     if unban_btn:
         unban_btn.clicked.connect(handle_unban)
+
+    dialog.exec()
+
+def show_delete_confirm(username, refresh_callback):
+    """
+    User delete confirmation window.
+    """
+    dialog = load_ui("UI/Del_Dialogue.ui")
+
+    del_btn = dialog.findChild(QPushButton, "Delete")
+    cancel_btn = dialog.findChild(QPushButton, "Cancel")
+
+    if del_btn:
+        def perform_delete():
+            storage = simargl.LoginStorage("users_db")
+            storage.delete_user(username)
+
+            dialog.accept()
+            refresh_callback()
+            QMessageBox.information(
+                dialog,
+                "Success",
+                f"User {username} successfully deleted!"
+            )
+        del_btn.clicked.connect(perform_delete)
+
+    if cancel_btn:
+        cancel_btn.clicked.connect(dialog.reject)
 
     dialog.exec()
 
@@ -629,6 +700,11 @@ def open_admin(main_window):
     new_user_btn = admin_window.findChild(QPushButton, "NewUser")
     new_user_btn.clicked.connect(
         lambda: open_registration(admin_window, storage)
+    )
+
+    delete_user_btn = admin_window.findChild(QPushButton, "DelUser")
+    delete_user_btn.clicked.connect(
+        lambda: open_delete_list(admin_window)
     )
 
     admin_window.show()

@@ -420,12 +420,18 @@ class LoginStorage:
 
     def load(self):
         """
-        Retrieves all user records from the database.
-
-        Returns:
-            sqlite3.Cursor: An iterable cursor containing tuples of (user_id, login, real_name, banned).
+        Returns all users data from the database.
         """
-        return self.cur.execute("SELECT user_id, login, real_name, banned, is_admin FROM users WHERE is_admin = 0")
+        self.cur.execute("SELECT * FROM users")
+        data = self.cur.fetchall()
+        return data
+
+    def delete_user(self, username):
+        """
+        Deletes User from database using his login.
+        """
+        self.cur.execute("DELETE FROM users WHERE login = ?", (username,))
+        self.con.commit()
 
     def user_exists(self, login):
         """
