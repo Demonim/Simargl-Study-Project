@@ -1,63 +1,9 @@
-
-# Simargl
-
-Simargl is a study tracker and dashboard application. This guide will help you install and run the project on your local machine.
-
-## Installation
-
-1. **Clone the repository:**
-	```bash
-	git clone https://github.com/Demonim/Simargl.git
-	cd Simargl
-	```
-
-2. **Create a virtual environment:**
-	```bash
-	python -m venv venv
-	# Activate the virtual environment:
-	# On Windows:
-	venv\Scripts\activate
-	# On macOS/Linux:
-	source venv/bin/activate
-	```
-
-3. **Install dependencies:**
-	```bash
-	pip install -r requirements.txt
-	```
-
-## Running the Project
-
-To start the application, run:
-
-```bash
-python main/main.py
-```
-
-## Project Structure
-
-- `main/` — Main application code
-- `main/UI/` — UI files (.ui)
-- `main/dashboard/` — Dashboard logic and visualizations
-- `main/storage/` — Data storage
-- `unit_tests/` — Unit tests
-
----
-
-For any issues, please open an issue on the repository or contact the maintainer.
-
-# Simargl: A God-Like ECampus Helper
+# Simargl: A ECampus Helper
 
 Simargl is a study project aimed at enhancing and streamlining the ECampus experience for students. It provides a modern, customizable interface and powerful tools for managing digital academic routines.
 
 ### Description
 The default ECampus interface is often overloaded, slow, and lacks customization. Simargl addresses these issues by allowing users to track essential aspects of their digital routine, such as ECampusMail and StudIP, through a modern GUI. Data is retrieved using APIs or IMAP/SMTP protocols and presented in a user-friendly, customizable dashboard. Key libraries are used to render the most useful information, making Simargl a valuable tool for every student.
-
-### How To Install
-Download the .exe file, run it, and follow the installation wizard. The process is straightforward and user-friendly.
-
-### How To Use
-Upon first launch, create your local account and provide login credentials for ECampusMail and StudIP. The application will guide you through each section with helpful explanations and tooltips. All features are accessible via an intuitive menu.
 
 ---
 
@@ -116,6 +62,51 @@ Upon first launch, create your local account and provide login credentials for E
 
 ----
 
+## Installation
+
+1. **Clone the repository:**
+	```bash
+	git clone https://github.com/Demonim/Simargl.git
+	cd Simargl
+	```
+
+2. **Create a virtual environment:**
+	```bash
+	python -m venv venv
+	# Activate the virtual environment:
+	# On Windows:
+	venv\Scripts\activate
+	# On macOS/Linux:
+	source venv/bin/activate
+	```
+
+3. **Install dependencies:**
+	```bash
+	pip install -r requirements.txt
+	```
+
+## Running the Project
+
+To start the application, run:
+
+```bash
+python main/main.py
+```
+
+## Project Structure
+
+- `main/` — Main application code
+- `main/UI/` — UI files (.ui)
+- `main/dashboard/` — Dashboard logic and visualizations
+- `main/storage/` — Data storage
+- `unit_tests/` — Unit tests
+
+---
+
+For any issues, please open an issue on the repository or contact the maintainer.
+
+----
+
 # Group Details
 - **Group name:** Data Sorcerers
 - **Repository:** https://github.com/Demonim/Simargl
@@ -151,4 +142,4 @@ Upon first launch, create your local account and provide login credentials for E
 - **numpy**: Used for numerical operations and supporting data analysis in visualizations.
 - **os, sys**: For file and environment management, and application control.
 
-Other standard and third-party libraries may be used for specific features, error handling, and performance optimization.
+For more detailed infomation check requirements.txt.
