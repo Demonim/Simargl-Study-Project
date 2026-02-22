@@ -1476,24 +1476,11 @@ def back_to_main(menu_window):
         lambda text: change_theme(QApplication.instance(), text)
     )
 
-    remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/remember_database.db"
-    if os.path.exists(remember_path):
-        remember_database = simargl.LoginStorage("remember_database")
-        db_data = remember_database.load()
-        login_box = main_window.findChild(QLineEdit, "LoginLine")
-        login_box.setText(db_data[0][1])
-        remember_check.click()
-
-    remember_check.clicked.connect(
-        lambda: check_box_remember(remember_check)
-    )
-
     change_theme(QApplication.instance(), theme_box.currentText())
 
     enter_button = main_window.findChild(QPushButton, "Enter")
     enter_button.clicked.connect(
-        lambda: login_from_enter(main_window, remember)
+        lambda: login_from_enter(main_window)
     )
 
     help_button = main_window.findChild(QPushButton, "Help")
@@ -1513,7 +1500,7 @@ def back_to_main(menu_window):
 # =========================
 
 
-def login_from_enter(main_window, remember=False):
+def login_from_enter(main_window):
     """
     The core authentication handler.
     It collects credentials, initializes Stud.IP and ECampusMail clients,
@@ -1541,14 +1528,6 @@ def login_from_enter(main_window, remember=False):
     except:
         QMessageBox.warning(prelogin_window, "Error", "Incorrect Login or Password")
     else:
-        if remember:
-            remember_database = simargl.LoginStorage("remember_database")
-            if not remember_database.user_exists(current_login):
-                remember_database.create(current_login, password, " ")
-        if not remember:
-            if os.path.exists(remember_path):
-                os.remove(remember_path)
-
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login, storage_dir=STORAGE_DIR)
         if hasattr(main_window, 'auto_logout_timer'):
@@ -1558,19 +1537,6 @@ def login_from_enter(main_window, remember=False):
         user_courses = studip.get_courses()
         schedule = studip.get_schedule()
         messages = studip.get_my_messages()
-
-def check_box_remember(checkbox: QCheckBox):
-    """
-    A toggle handler for the "Remember Me" checkbox.
-    It updates a global boolean flag that determines if
-    login data should be persisted in the local database.
-    """
-    global remember
-    if checkbox.isChecked():
-        remember = True
-    if not checkbox.isChecked():
-        remember = False
-
 
 def universal_logout():
     """
@@ -1705,8 +1671,6 @@ def start_main_app(prelogin_window):
     A setup function that prepares the main.ui window after the initial pre-login phase,
     ensuring themes, logout buttons, and auto-logout logic are correctly linked.
     """
-    global remember, remember_path
-    remember = False
     prelogin_window.hide()
 
     main_window = load_ui("UI/main.ui")
@@ -1726,25 +1690,11 @@ def start_main_app(prelogin_window):
 
     enter_btn = main_window.findChild(QPushButton, "Enter")
     if enter_btn:
-        enter_btn.clicked.connect(lambda: login_from_enter(main_window, remember))
+        enter_btn.clicked.connect(lambda: login_from_enter(main_window))
 
     help_btn = main_window.findChild(QPushButton, "Help")
     if help_btn:
         help_btn.clicked.connect(lambda: open_Help(main_window))
-
-    # Remember Me checkbox
-    remember_check = main_window.findChild(QCheckBox, "Check_Remember")
-    remember_path = "storage/remember_database.db"
-    if os.path.exists(remember_path):
-        remember_database = simargl.LoginStorage("remember_database")
-        db_data = remember_database.load()
-        login_box = main_window.findChild(QLineEdit, "LoginLine")
-        login_box.setText(db_data[0][1])
-        remember_check.click()
-
-    remember_check.clicked.connect(
-        lambda: check_box_remember(remember_check)
-    )
 
     main_window.show()
     prelogin_window.main_ref = main_window

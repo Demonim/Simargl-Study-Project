@@ -501,34 +501,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QCheckBox" name="Check_Remember">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>170</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>290</width>
-            <height>35</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Remember me</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="verticalSpacer_6">
           <property name="orientation">
            <enum>Qt::Orientation::Vertical</enum>
