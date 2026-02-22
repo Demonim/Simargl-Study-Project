@@ -658,9 +658,6 @@ def show_delete_confirm(username, refresh_callback):
         def perform_delete():
             storage = simargl.LoginStorage("users_db")
             storage.delete_user(username)
-            if os.path.exists(remember_path):
-                os.remove(remember_path)
-            
 
             dialog.accept()
             refresh_callback()
