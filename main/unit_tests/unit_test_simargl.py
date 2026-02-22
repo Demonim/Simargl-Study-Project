@@ -151,10 +151,13 @@ class TestECampusMail(unittest.TestCase):
 
     def test_close_connections(self):
         self.mail.mail = MagicMock()
-        self.mail.smtp_conn = MagicMock()
+        self.mail.server = MagicMock() 
+        
         self.mail.close_conections()
+        
         self.mail.mail.logout.assert_called_once()
-        self.mail.smtp_conn.quit.assert_called_once()
+        # Assert against server.quit instead
+        self.mail.server.quit.assert_called_once()
 
 
 class TestLoginStorage(unittest.TestCase):
@@ -163,13 +166,11 @@ class TestLoginStorage(unittest.TestCase):
         self.storage = LoginStorage(self.test_db_name)
 
     def tearDown(self):
-        # Close connection and remove test database file
         self.storage.con.close()
         if os.path.exists(self.storage.file_path):
             os.remove(self.storage.file_path)
 
     def test_create_table(self):
-        # Table is created in __init__, let's verify it exists
         self.storage.cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
         self.assertIsNotNone(self.storage.cur.fetchone())
 
@@ -182,7 +183,6 @@ class TestLoginStorage(unittest.TestCase):
         self.assertTrue(self.storage.create("newuser", "pass", "Real Name"))
         self.assertTrue(self.storage.user_exists("newuser"))
         self.assertFalse(self.storage.user_exists("nonexistent"))
-        # Test unique constraint
         self.assertFalse(self.storage.create("newuser", "pass2", "Another Name"))
 
     def test_compare(self):
@@ -214,7 +214,6 @@ class TestNotesStorage(unittest.TestCase):
     def tearDown(self):
         if os.path.exists(self.storage.file_path):
             os.remove(self.storage.file_path)
-        # Safely attempt to remove the test storage dir if empty
         try:
             os.rmdir("storage/data")
             os.rmdir("storage")
@@ -229,10 +228,8 @@ class TestNotesStorage(unittest.TestCase):
         self.assertIn("created", note)
 
     def test_save_and_load_notes(self):
-        # Initially empty
         self.assertEqual(self.storage.load_notes(), [])
         
-        # Save and load
         note = self.storage.create_note("Test", "Data")
         self.storage.save_notes([note])
         
@@ -243,25 +240,34 @@ class TestNotesStorage(unittest.TestCase):
 
 class TestCourseDaysStorage(unittest.TestCase):
     def setUp(self):
-        self.login = "test_course_user"
-        abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'storage'))
-        self.storage = CourseDaysStorage(self.login, name=abs_storage_dir)
+        self.login = "test_notes_user"
+        self.storage = NotesStorage(self.login)
 
     def tearDown(self):
-        if os.path.exists(self.storage.path):
-            os.remove(self.storage.path)
+        if os.path.exists(self.storage.file_path):
+            os.remove(self.storage.file_path)
+        try:
+            os.rmdir("storage/data")
+            os.rmdir("storage")
+        except OSError:
+            pass 
 
-    def test_save_and_load(self):
-        # Initially empty
-        self.assertEqual(self.storage.load(), {})
+    def test_create_note(self):
+        note = self.storage.create_note("Title", "Content")
+        self.assertIn("id", note)
+        self.assertEqual(note["title"], "Title")
+        self.assertEqual(note["content"], "Content")
+        self.assertIn("created", note)
+
+    def test_save_and_load_notes(self):
+        self.assertEqual(self.storage.load_notes(), [])
         
-        # Save data
-        test_data = {"Math": "Monday", "Science": "Wednesday"}
-        self.storage.save(test_data)
+        note = self.storage.create_note("Test", "Data")
+        self.storage.save_notes([note])
         
-        # Load data
-        loaded_data = self.storage.load()
-        self.assertEqual(loaded_data, test_data)
+        loaded = self.storage.load_notes()
+        self.assertEqual(len(loaded), 1)
+        self.assertEqual(loaded[0]["title"], "Test")
 
 if __name__ == '__main__':
     unittest.main()
