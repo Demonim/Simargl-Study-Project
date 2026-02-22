@@ -34,6 +34,10 @@ def get_pie_chart(schedule, text_color='black'):
         pie_chart = create_pie(subject_data, text_color)
         return pie_chart
     except Exception as e:
+        # If connection/socket error, logout to login screen
+        if 'WinError 10060' in str(e) or 'WinError 10054' in str(e) or 'connection was forcibly closed' in str(e):
+            from main.main import universal_logout
+            universal_logout()
         print(f"[dashboard_logic] Error in get_pie_chart: {e}")
         return error_chart(f'Error generating pie chart: {str(e)}', text_color)
 
@@ -56,6 +60,10 @@ def get_scatter_plot(messages, color='black'):
         scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color) 
         return scatter_chart
     except Exception as e:
+        # If connection/socket error, logout to login screen
+        if 'WinError 10060' in str(e) or 'WinError 10054' in str(e) or 'connection was forcibly closed' in str(e):
+            from main.main import universal_logout
+            universal_logout()
         print(f"[dashboard_logic] Error in get_scatter_plot: {e}")
         return error_chart(f'Error generating scatter plot: {str(e)}', color)
 
@@ -80,6 +88,10 @@ def get_heatmap(ecampusmail, color='black'):
         heatmap_chart = create_heatmap(subjects_data, dates_data, color)  # Generate heatmap
         return heatmap_chart
     except Exception as e:
+        # If connection/socket error, logout to login screen
+        if 'WinError 10060' in str(e) or 'WinError 10054' in str(e) or 'connection was forcibly closed' in str(e):
+            from main.main import universal_logout
+            universal_logout()
         print(f"[dashboard_logic] Error in get_heatmap: {e}")
         return error_chart(f'Error generating heatmap: {str(e)}', color)
 
