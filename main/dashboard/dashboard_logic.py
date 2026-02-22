@@ -28,6 +28,8 @@ def get_pie_chart(schedule, text_color='black'):
     try:
         if schedule is None:
             return error_chart('No schedule data available', text_color)
+        
+        # Calculate subject hours and create pie chart
         subject_data = subject_hours(schedule)
         pie_chart = create_pie(subject_data, text_color)
         return pie_chart
@@ -50,8 +52,8 @@ def get_scatter_plot(messages, color='black'):
     """
    
     try:
-        df, medians, math_stats = prepare_scatter_data(subject_data, messages)
-        scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color)
+        df, medians, math_stats = prepare_scatter_data(subject_data, messages)  
+        scatter_chart = generate_scatter_figure(df, medians, math_stats, color=color) 
         return scatter_chart
     except Exception as e:
         print(f"[dashboard_logic] Error in get_scatter_plot: {e}")
@@ -74,8 +76,8 @@ def get_heatmap(ecampusmail, color='black'):
     try:
         if ecampusmail is None:
             return error_chart('No email data available', color)
-        subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)
-        heatmap_chart = create_heatmap(subjects_data, dates_data, color)
+        subjects_data, dates_data = ecampusmail.show_subjects(last_n=300)  # Get recent subjects and dates
+        heatmap_chart = create_heatmap(subjects_data, dates_data, color)  # Generate heatmap
         return heatmap_chart
     except Exception as e:
         print(f"[dashboard_logic] Error in get_heatmap: {e}")
@@ -94,10 +96,9 @@ def refresh_stacked_bar(canvas_bar, manual_inputs=None):
             return
 
         if manual_inputs:
-            process_manual_input(manual_inputs)
-
-        current_data = get_tracker_data()
-        update_stacked_bar(canvas_bar.figure, current_data)
+            process_manual_input(manual_inputs)  # Update tracker with manual input
+        current_data = get_tracker_data()  # Get current tracker data
+        update_stacked_bar(canvas_bar.figure, current_data)  # Update the bar chart
     except Exception as e:
         print(f"[dashboard_logic] Error in refresh_stacked_bar: {e}")
 
@@ -106,12 +107,12 @@ _tracker = None
 def initialize_tracker(login: str):
     """Initializes the database-backed tracker for study sessions."""
     global _tracker
-    _tracker = WeeklyStudyTracker(login=login)
+    _tracker = WeeklyStudyTracker(login=login)  # Create tracker instance
 
 def get_weekly_bar_chart():
     """Returns a newly generated stacked bar chart for the current week."""
-    current_data = get_tracker_data()
-    return create_stacked_bar(current_data)
+    current_data = get_tracker_data()  # Get current tracker data
+    return create_stacked_bar(current_data)  # Create and return bar chart
 
 def process_manual_input(day_inputs):
     """
@@ -150,10 +151,10 @@ def process_manual_input(day_inputs):
                 continue
                
             try:
-                total_hours = float(h_str or 0) + (float(m_str or 0) / 60.0)
+                total_hours = float(h_str or 0) + (float(m_str or 0) / 60.0)  # Calculate total hours
                 if total_hours < 0:
                     total_hours = 0
-                _tracker.set_day(day, total_hours)
+                _tracker.set_day(day, total_hours)  # Update tracker for the day
             except (ValueError, TypeError) as e:
                 print(f"[dashboard_logic] Error converting manual input: {e}")
                 continue
@@ -170,6 +171,7 @@ def get_tracker_data():
 def start_study_session():
     """Returns the current day of week in English format (Mon, Tue, etc.)"""
     days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    # Get current weekday as string
     return days[datetime.now().weekday()]
 
 def stop_study_session(day_code, hours):
@@ -180,7 +182,7 @@ def stop_study_session(day_code, hours):
                 hours = float(hours) if hours is not None else 0.0
                 if hours < 0:
                     hours = 0.0
-                _tracker.add_time(day_code, hours)
+                _tracker.add_time(day_code, hours)  # Add time to tracker for the day
             except (ValueError, TypeError) as e:
                 print(f"[dashboard_logic] Error converting hours in stop_study_session: {e}")
         return _tracker.all() if _tracker else {}
@@ -191,5 +193,5 @@ def stop_study_session(day_code, hours):
 def clear_all_data():
     """Resets all stored study sessions in the tracker and returns the empty state."""
     if _tracker:
-        _tracker.reset_all()
+        _tracker.reset_all()  # Reset all tracker data
     return get_tracker_data()

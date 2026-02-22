@@ -19,7 +19,7 @@ def duration_hours(start: str, end: str) -> float:
         end_dt = parse_hhmm(end)
         
         duration = (end_dt - start_dt).total_seconds() / 3600
-        return max(0.0, duration)  # Ensure non-negative
+        return max(0.0, duration)
     except (ValueError, TypeError):
         return 0.0
     

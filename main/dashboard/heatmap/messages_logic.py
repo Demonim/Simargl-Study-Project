@@ -25,7 +25,10 @@ def detect_topic(subject: str) -> str | None:
     if subject is None:
         return None
     
+    # Normalize subject to lowercase string
     subject = str(subject).lower()
+
+    # Check each topic for keyword match
     for topic_id, data in TOPICS.items():
         if "keywords" in data and any(word in subject for word in data["keywords"]):
             return topic_id
@@ -49,29 +52,36 @@ def create_messages_df(subjects, dates):
     if not subjects or not dates:
         return pd.DataFrame(columns=['subject', 'date', 'topic_id', 'week_offset'])
     
+    # Ensure subjects and dates are same length
     if len(subjects) != len(dates):
         min_len = min(len(subjects), len(dates))
         subjects = subjects[:min_len]
         dates = dates[:min_len]
-   
+        
+    # Build DataFrame from subjects and dates
     df = pd.DataFrame({'subject': subjects, 'date': dates})
+
+    # Convert date column to datetime, drop invalid
     df['date'] = pd.to_datetime(df['date'], utc=True, errors='coerce').dt.tz_localize(None)
     df = df.dropna(subset=['date'])
    
     if df.empty:
         return pd.DataFrame(columns=['subject', 'date', 'topic_id', 'week_offset'])
-   
+    
+    # Detect topic for each subject
     df['topic_id'] = df['subject'].apply(detect_topic)
-   
+
+    # Get current week's Monday
     now = datetime.now()
-   
     current_monday = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
-   
+
+    # Calculate Monday of each message's week
     df['monday_of_week'] = df['date'].apply(lambda x: x - timedelta(days=x.weekday()))
     df['monday_of_week'] = df['monday_of_week'].dt.normalize()
-   
+
+    # Calculate week offset from current week
     df['week_offset'] = ((current_monday - df['monday_of_week']).dt.days // 7)
-   
+
     return df
 
 def topics_week_matrix_df(subjects, dates):
@@ -86,25 +96,29 @@ def topics_week_matrix_df(subjects, dates):
         DataFrame: A pivot table where rows are topics and columns are week indices.
     """
     df = create_messages_df(subjects, dates)
-   
+
+    # Define all possible topic rows and week columns
     full_index = list(TOPICS.keys())
     full_columns = range(5)
 
+    # Filter messages to last 5 weeks and valid topics
     mask = (df['week_offset'] >= 0) & (df['week_offset'] < 5) & (df['topic_id'].notna())
-    filtered_df = df[mask].copy()
 
+    filtered_df = df[mask].copy()
     if filtered_df.empty:
         return pd.DataFrame(0, index=full_index, columns=full_columns)
-
+    
+    # Calculate week index for heatmap (0 = oldest, 4 = current)
     filtered_df['week_idx'] = 4 - filtered_df['week_offset']
-   
+
+    # Build pivot table: rows=topic, columns=week, values=count
     matrix_df = filtered_df.pivot_table(
         index='topic_id',
         columns='week_idx',
         aggfunc='size',
         fill_value=0
     )
-   
+    # Ensure all topics and weeks are present, fill missing with zero
     matrix_df = matrix_df.reindex(index=full_index, columns=full_columns, fill_value=0)
-   
+
     return matrix_df

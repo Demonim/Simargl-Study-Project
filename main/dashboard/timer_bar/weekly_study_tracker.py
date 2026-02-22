@@ -14,8 +14,10 @@ class WeeklyStudyTracker:
             login (str): The username used to name the data file.
             storage_dir (str): The directory where JSON files are stored.
         """
+        # Set up storage directory and file path
         abs_storage_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'storage'))
         self.filename = os.path.join(abs_storage_dir, f"{login}_study_data.json")
+        # Create storage directory if it doesn't exist
         if not os.path.exists(abs_storage_dir):
             os.makedirs(abs_storage_dir, exist_ok=True)
 
@@ -28,6 +30,7 @@ class WeeklyStudyTracker:
             "Sat": {'manual': 0.0, 'timer': 0.0},
             "Sun": {'manual': 0.0, 'timer': 0.0}
         }
+        # Load data from disk or use default
         self.data = self.load_from_disk()
        
     def load_from_disk(self):
@@ -36,6 +39,7 @@ class WeeklyStudyTracker:
         Returns:
             dict: The loaded data or default_data if the file is missing/corrupt.
         """
+        # Attempt to load study data from disk
         if os.path.exists(self.filename):
             try:
                 with open(self.filename, 'r') as f:
@@ -64,6 +68,7 @@ class WeeklyStudyTracker:
         if day not in self.data:
             return
         try:
+            # Validate and sanitize input hours
             hours = float(hours) if hours is not None else 0.0
             if hours < 0:
                 hours = 0.0
@@ -86,6 +91,7 @@ class WeeklyStudyTracker:
         if day not in self.data:
             return
         try:
+            # Validate and sanitize input hours
             hours = float(hours) if hours is not None else 0.0
             if hours < 0:
                 hours = 0.0
@@ -94,6 +100,7 @@ class WeeklyStudyTracker:
         if day in self.data and isinstance(self.data[day], dict):
             current_timer = self.data[day].get('timer', 0.0)
             try:
+                # Validate current timer value
                 current_timer = float(current_timer) if current_timer is not None else 0.0
             except (ValueError, TypeError):
                 current_timer = 0.0

@@ -6,12 +6,16 @@ class Study_Timer:
     """
     def __init__(self):
         """Initializes the timer state."""
+        # Start time of current session
         self.start_time = None
+        # Total accumulated seconds
         self.total_seconds = 0
+        # Timer running state
         self.running = False
    
     def start(self):
         """Starts the timer by recording the current timestamp."""
+        # Start timer only if not already running
         if not self.running:
             self.start_time = datetime.now()
             self.running = True
@@ -20,6 +24,7 @@ class Study_Timer:
         """
         Stops the current session and records the elapsed time.
         """
+        # Stop timer and accumulate elapsed time
         if self.running:
             delta = datetime.now() - self.start_time
             self.total_seconds += delta.total_seconds()
@@ -32,6 +37,7 @@ class Study_Timer:
             float: Fractional hours.
         """
         if self.start_time and not self.running:
+            # Calculate hours for the most recent session
             delta = datetime.now() - self.start_time
             return delta.total_seconds() / 3600.0
         return 0.0

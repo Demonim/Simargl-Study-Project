@@ -15,6 +15,7 @@ def create_heatmap(subjects, dates, color='black'):
     Returns:
         Figure: Matplotlib Figure object containing the rendered heatmap.
     """
+
     fig = Figure(figsize=(8, 6), dpi=120, tight_layout=True)
     fig.patch.set_facecolor('none')
     ax = fig.add_subplot(111)
@@ -25,6 +26,7 @@ def create_heatmap(subjects, dates, color='black'):
         ax.set_axis_off()
         return fig
 
+    # Create matrix DataFrame for heatmap from subjects and dates
     matrix_df = topics_week_matrix_df(subjects, dates)
     
     if matrix_df.empty or matrix_df.shape[0] == 0:
@@ -32,8 +34,8 @@ def create_heatmap(subjects, dates, color='black'):
         ax.set_axis_off()
         return fig
     
+    # Extract data array and topic labels for heatmap axes
     data = matrix_df.values  
-   
     labels = []
     for tid in matrix_df.index:
         if tid in TOPICS:
@@ -46,8 +48,10 @@ def create_heatmap(subjects, dates, color='black'):
         ax.set_axis_off()
         return fig
 
+    # Render heatmap with YlGn colormap
     im = ax.imshow(data, cmap='YlGn', aspect='auto')
 
+    # Add colorbar for message count, style for theme
     try:
         cbar = fig.colorbar(im, ax=ax)
         cbar.set_label('Messages', color=color)
@@ -56,13 +60,15 @@ def create_heatmap(subjects, dates, color='black'):
     except Exception:
         pass
 
+    # Set x-axis ticks and labels for weeks
     weeks = ["4 weeks ago", "3 weeks ago", "2 weeks ago", "Last week", "Current week"]
     ax.set_xticks(np.arange(len(weeks)))
     ax.set_xticklabels(weeks, color=color, rotation=25, ha='right')
-   
+    # Set y-axis ticks and labels for topics
     ax.set_yticks(np.arange(len(labels)))
     ax.set_yticklabels(labels, color=color)
 
+    # Annotate each cell with value, use white text for high values
     max_val = data.max() if data.size > 0 else 0
     for i in range(len(labels)):
         for j in range(min(len(weeks), data.shape[1] if len(data.shape) > 1 else 0)):
@@ -73,9 +79,9 @@ def create_heatmap(subjects, dates, color='black'):
             except (IndexError, ValueError):
                 continue
 
+    # Set plot title and style axes for theme
     fig.suptitle("Topic Activity (Last 5 Weeks)",
                  fontsize=12, fontweight='bold', color=color)
-   
     for spine in ax.spines.values():
         spine.set_edgecolor(color)
 

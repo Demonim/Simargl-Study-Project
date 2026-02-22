@@ -8,11 +8,11 @@
         "timer": 0.0
     },
     "Wed": {
-        "manual": 0.5,
+        "manual": 0.0,
         "timer": 0.0
     },
     "Thu": {
-        "manual": 4.0,
+        "manual": 3.0,
         "timer": 0.0
     },
     "Fri": {

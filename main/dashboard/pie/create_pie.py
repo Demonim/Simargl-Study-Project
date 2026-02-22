@@ -23,21 +23,24 @@ def create_pie(subject_hours, text_color='black'):
         ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
         return fig
 
+    # Prepare values and labels for pie chart
     values, labels = pie_values_labels(subject_hours)
 
     if not values or not labels:
         ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
         return fig
 
-    # Filter out zero values
+    # Filter out zero values for cleaner chart
     filtered_pairs = [(v, l) for v, l in zip(values, labels) if v > 0]
     if not filtered_pairs:
         ax.text(0.5, 0.5, 'No study data available', ha='center', va='center', color=text_color)   
         return fig
     
+    # Sort pairs alphabetically for consistent display
     sorted_pairs = sorted(filtered_pairs, key=lambda x: x[1])
     values, labels = zip(*sorted_pairs)
 
+    # Draw pie chart with subject hours
     wedges, _, autotexts = ax.pie(
         values,
         autopct='%1.1f%%',
@@ -46,6 +49,7 @@ def create_pie(subject_hours, text_color='black'):
         textprops={'color': text_color}
     )
 
+    # Add legend for subjects, style for theme
     leg = ax.legend(
         wedges,
         labels,
@@ -60,6 +64,7 @@ def create_pie(subject_hours, text_color='black'):
     for text in leg.get_texts():
         text.set_color(text_color)
 
+    # Set plot title and return figure
     fig.suptitle("Subject Hours Distribution",
                  fontsize=14,
                  fontweight='bold',
