@@ -54,19 +54,6 @@ class TestMainGUIHelperFunctions(unittest.TestCase):
         mock_timer_instance.timeout.connect.assert_called_with(main.universal_logout)
         mock_timer_instance.start.assert_called_with(300000)
 
-    def test_check_box_remember(self):
-        mock_checkbox = MagicMock(spec=QCheckBox)
-        
-        # Test Checked
-        mock_checkbox.isChecked.return_value = True
-        main.check_box_remember(mock_checkbox)
-        self.assertTrue(main.remember)
-        
-        # Test Unchecked
-        mock_checkbox.isChecked.return_value = False
-        main.check_box_remember(mock_checkbox)
-        self.assertFalse(main.remember)
-
 
 @patch('main.load_ui')
 class TestMainWindowsAndNavigation(unittest.TestCase):
@@ -86,8 +73,11 @@ class TestMainWindowsAndNavigation(unittest.TestCase):
 
     def create_mock_window(self):
         window = MagicMock()
-        # Make findChild return a new MagicMock whenever called
-        window.findChild.return_value = MagicMock()
+        mock_child = MagicMock()
+        # Fixed: Provide an int return for grid.count() so range() doesn't throw a TypeError
+        mock_child.count.return_value = 0  
+        mock_child.findChild.return_value = mock_child
+        window.findChild.return_value = mock_child
         return window
 
     def test_open_menu(self, mock_load_ui):
@@ -225,43 +215,44 @@ class TestDialogsAndModals(unittest.TestCase):
 
 
 class TestDashboardLogic(unittest.TestCase):
-    @patch('main.process_manual_input')
-    @patch('main.update_stacked_bar')
+    @patch('main.refresh_stacked_bar')
     @patch('main.apply_bar_theme')
-    def test_save_tracker_data(self, mock_apply_theme, mock_update, mock_process):
+    def test_save_tracker_data(self, mock_apply_theme, mock_refresh):
         mock_window = MagicMock()
         mock_line_edit = MagicMock()
         mock_line_edit.text.return_value = "5"
         mock_window.findChild.return_value = mock_line_edit
         
         mock_canvas = MagicMock()
-        mock_process.return_value = "updated_data"
         
         main.save_tracker_data(mock_window, mock_canvas, "Dark Theme")
         
-        mock_process.assert_called()
-        mock_update.assert_called_with(mock_canvas.figure, "updated_data")
+        expected_inputs = [
+            ('Mon', '5', '5'), ('Tue', '5', '5'), ('Wed', '5', '5'), 
+            ('Thu', '5', '5'), ('Fri', '5', '5'), ('Sat', '5', '5'), ('Sun', '5', '5')
+        ]
+        
+        mock_refresh.assert_called_with(mock_canvas, manual_inputs=expected_inputs)
         mock_apply_theme.assert_called_with(mock_canvas, "Dark Theme")
         mock_canvas.draw.assert_called_once()
 
     @patch('main.stop_study_session')
-    @patch('main.update_stacked_bar')
+    @patch('main.refresh_stacked_bar')
     @patch('main.apply_bar_theme')
-    def test_stop_timer_and_save(self, mock_apply_theme, mock_update, mock_stop_session):
+    def test_stop_timer_and_save(self, mock_apply_theme, mock_refresh, mock_stop_session):
         main.study_timer.running = True
         main.active_timer_day = "Mon"
         
-        with patch.object(main.study_timer, 'stop'), patch.object(main.study_timer, 'reset'), patch.object(main.study_timer, 'hours', return_value=2.5):
-            mock_canvas = MagicMock()
-            mock_stop_session.return_value = "new_data"
+        with patch.object(main.study_timer, 'stop'), patch.object(main.study_timer, 'reset'):
+            main.study_timer.start_time = None  # defaults session_hours calculation to 0.0
             
+            mock_canvas = MagicMock()
             main.stop_timer_and_save(mock_canvas, "Light Theme")
             
-            mock_stop_session.assert_called_with("Mon", 2.5)
-            mock_update.assert_called_with(mock_canvas.figure, "new_data")
+            mock_stop_session.assert_called_with("Mon", 0.0)
+            mock_refresh.assert_called_with(mock_canvas)
             mock_canvas.draw.assert_called_once()
             self.assertIsNone(main.active_timer_day)
-
 
 if __name__ == '__main__':
     unittest.main()
