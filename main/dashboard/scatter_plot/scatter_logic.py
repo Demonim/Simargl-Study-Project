@@ -91,7 +91,7 @@ def prepare_scatter_data(hours_data, messages):
         # Classify each course into quadrant
         def classify(row):
             if row['hours'] >= med_hours and row['messages'] >= med_msg:
-                return "Active Ecosystem"
+                return "Active Course"
             elif row['hours'] < med_hours and row['messages'] >= med_msg:
                 return "Live Discussion"
             elif row['hours'] >= med_hours and row['messages'] < med_msg:

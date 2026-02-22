@@ -45,7 +45,7 @@ def generate_scatter_figure(df, medians, math_stats, color='black'):
 
         # Define colors for each quadrant type
         quadrant_colors = {
-            "Active Ecosystem": "#FF6B81",
+            "Active Course": "#FF6B81",
             "Live Discussion": "#6AB04C",  
             "Routine Lectures": "#4834D4",
             "Inactive Course": "#F0932B",  
@@ -156,9 +156,9 @@ def generate_scatter_figure(df, medians, math_stats, color='black'):
     # Set axis titles and labels
     ax.set_title('Study Intensity Matrix (Hours vs Messages)', color=color, fontsize=14, pad=5)
     ax.set_xlabel('Study Hours', color=color)
-    ax.set_ylabel('Interaction Level (Messages)', color=color)
+    ax.set_ylabel('Messages', color=color)
     ax.tick_params(colors=color)
-    
+
     # Add legend for quadrants
     legend = ax.legend(
         loc='lower right',
