@@ -4,3 +4,4 @@ main/untitled.ui
 __pycache__/
 main/.idea/dbnavigator.xml
 main/dashboard/storage/nichita.licov_study_data.json
+storage/remember_database.db

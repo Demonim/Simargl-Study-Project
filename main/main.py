@@ -1471,7 +1471,7 @@ def back_to_main(menu_window):
     remember_path = "storage/remember_database.db"
     if os.path.exists(remember_path):
         remember_database = simargl.LoginStorage("remember_database")
-        db_data = remember_database.load().fetchall()
+        db_data = remember_database.fetchall()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
         login_box.setText(db_data[0][1])
         remember_check.click()
@@ -1536,6 +1536,9 @@ def login_from_enter(main_window, remember=False):
             remember_database = simargl.LoginStorage("remember_database")
             if not remember_database.user_exists(current_login):
                 remember_database.create(current_login, password, " ")
+        if not remember:
+            if os.path.exists(remember_path):
+                os.remove(remember_path)
 
         global notes_storage
         notes_storage = simargl.NotesStorage(current_login, storage_dir=STORAGE_DIR)
@@ -1725,7 +1728,7 @@ def start_main_app(prelogin_window):
     remember_path = "storage/remember_database.db"
     if os.path.exists(remember_path):
         remember_database = simargl.LoginStorage("remember_database")
-        db_data = remember_database.load().fetchall()
+        db_data = remember_database.load()
         login_box = main_window.findChild(QLineEdit, "LoginLine")
         login_box.setText(db_data[0][1])
         remember_check.click()

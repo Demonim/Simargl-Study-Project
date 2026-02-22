@@ -168,9 +168,6 @@
      <property name="styleSheet">
       <string notr="true"/>
      </property>
-     <property name="echoMode">
-        <enum>QLineEdit::EchoMode::PasswordEchoOnEdit</enum>
-     </property>
     </widget>
    </item>
    <item>
@@ -257,7 +254,7 @@
       <string notr="true"/>
      </property>
      <property name="echoMode">
-      <enum>QLineEdit::EchoMode::Normal</enum>
+        <enum>QLineEdit::EchoMode::Password</enum>
      </property>
     </widget>
    </item>
