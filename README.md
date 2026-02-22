@@ -1,4 +1,51 @@
 
+# Simargl
+
+Simargl is a study tracker and dashboard application. This guide will help you install and run the project on your local machine.
+
+## Installation
+
+1. **Clone the repository:**
+	```bash
+	git clone https://github.com/Demonim/Simargl.git
+	cd Simargl
+	```
+
+2. **Create a virtual environment:**
+	```bash
+	python -m venv venv
+	# Activate the virtual environment:
+	# On Windows:
+	venv\Scripts\activate
+	# On macOS/Linux:
+	source venv/bin/activate
+	```
+
+3. **Install dependencies:**
+	```bash
+	pip install -r requirements.txt
+	```
+
+## Running the Project
+
+To start the application, run:
+
+```bash
+python main/main.py
+```
+
+## Project Structure
+
+- `main/` — Main application code
+- `main/UI/` — UI files (.ui)
+- `main/dashboard/` — Dashboard logic and visualizations
+- `main/storage/` — Data storage
+- `unit_tests/` — Unit tests
+
+---
+
+For any issues, please open an issue on the repository or contact the maintainer.
+
 # Simargl: A God-Like ECampus Helper
 
 Simargl is a study project aimed at enhancing and streamlining the ECampus experience for students. It provides a modern, customizable interface and powerful tools for managing digital academic routines.
