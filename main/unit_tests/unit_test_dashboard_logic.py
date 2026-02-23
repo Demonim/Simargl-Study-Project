@@ -3,7 +3,12 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import unittest
 from unittest.mock import patch, MagicMock
-from ..dashboard.dashboard_logic import *
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
+from dashboard.dashboard_logic import *
 
 class TestDashboardLogic(unittest.TestCase):
     # Unit tests for dashboard logic functions

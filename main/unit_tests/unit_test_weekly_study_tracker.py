@@ -1,8 +1,13 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
 import os
-import json
-from main.dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
+from dashboard.timer_bar.weekly_study_tracker import WeeklyStudyTracker
 
 class TestWeeklyStudyTracker(unittest.TestCase):
     # Unit tests for WeeklyStudyTracker class

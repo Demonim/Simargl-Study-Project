@@ -16,7 +16,7 @@ app = QApplication.instance()
 if not app:
     app = QApplication(sys.argv)
 
-import main  # Your main.py file
+import main     
 
 # Dummy objects for mocking
 DummyCourse = namedtuple('DummyCourse', ['course_id', 'title', 'subtitle'])
@@ -36,7 +36,7 @@ class TestMainGUIHelperFunctions(unittest.TestCase):
 
     @patch('main.QApplication.setStyleSheet')
     def test_change_theme(self, mock_set_style):
-        # We need to mock QApplication.instance() to avoid overwriting the real one's style in tests
+        # Mock QApplication.instance() to avoid overwriting the real one's style in tests
         mock_app = MagicMock()
         main.change_theme(mock_app, "Dark Theme")
         mock_app.setStyleSheet.assert_called_once()
@@ -74,7 +74,7 @@ class TestMainWindowsAndNavigation(unittest.TestCase):
     def create_mock_window(self):
         window = MagicMock()
         mock_child = MagicMock()
-        # Fixed: Provide an int return for grid.count() so range() doesn't throw a TypeError
+        # Provide an int return for grid.count() so range() doesn't throw a TypeError
         mock_child.count.return_value = 0  
         mock_child.findChild.return_value = mock_child
         window.findChild.return_value = mock_child

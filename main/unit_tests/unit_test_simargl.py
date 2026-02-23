@@ -1,9 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock, call
 import os
-import json
-import sqlite3
-import shutil
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
