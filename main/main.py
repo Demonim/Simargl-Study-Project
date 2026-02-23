@@ -693,9 +693,10 @@ def show_delete_confirm(username, refresh_callback):
 
 def open_admin(main_window):
     """
-    Opens the main administrator dashboard.
+    Opens the main administrator window.
     It provides navigation to user management sections
-    (Banned/Unbanned) and allows the admin to log out.
+    (Banned/Unbanned) and allows the admin delete users from database,
+    to log out and to continue to the second login.
     """
     admin_window = load_ui("UI/Admin.ui")
     global current_active_window
