@@ -17,7 +17,7 @@ class TestDashboardLogic(unittest.TestCase):
         fig = get_pie_chart(None)
         self.assertTrue(hasattr(fig, 'axes'))
 
-    @patch('main.dashboard.dashboard_logic.subject_hours', side_effect=Exception('fail'))
+    @patch('dashboard.dashboard_logic.subject_hours', side_effect=Exception('fail'))
     def test_get_pie_chart_exception(self, mock_subject_hours):
         # Test pie chart generation when subject_hours raises exception
         fig = get_pie_chart('dummy')
@@ -25,6 +25,9 @@ class TestDashboardLogic(unittest.TestCase):
 
     def test_get_scatter_plot_exception(self):
         # Test scatter plot generation with invalid input (should return error chart)
+        # Define subject_data to avoid NameError
+        import dashboard.dashboard_logic as dl
+        dl.subject_data = {}
         fig = get_scatter_plot([])
         self.assertTrue(hasattr(fig, 'axes'))
 
@@ -33,7 +36,7 @@ class TestDashboardLogic(unittest.TestCase):
         fig = get_heatmap(None)
         self.assertTrue(hasattr(fig, 'axes'))
 
-    @patch('main.dashboard.dashboard_logic.create_heatmap', side_effect=Exception('fail'))
+    @patch('dashboard.dashboard_logic.create_heatmap', side_effect=Exception('fail'))
     def test_get_heatmap_exception(self, mock_create_heatmap):
         # Test heatmap generation when create_heatmap raises exception
         class DummyMail:

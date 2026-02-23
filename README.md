@@ -91,7 +91,23 @@ To start the application, run:
 
 ```bash
 python main/main.py
+
 ```
+# Running Unit Tests
+
+To run a specific unit test, use the command:
+	```
+	python main/unit_tests/unit_test_simargl.py
+	```
+Similarly, for other test files:
+
+```
+	python main/unit_tests/unit_test_dashboard_logic.py
+	python main/unit_tests/unit_test_weekly_study_tracker.py
+	python main/unit_tests/unit_test_main.py
+```
+
+---
 
 ## Project Structure
 
