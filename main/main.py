@@ -526,6 +526,9 @@ def open_unbanned():
     back_button = window.findChild(QPushButton, "pushButton")
 
     def refresh_list():
+        """
+        shows new list after previous changes.
+        """
         storage = simargl.LoginStorage("users_db")
         user_list_widget.clear()
         users_data = storage.load()
@@ -564,6 +567,9 @@ def open_banned():
     back_button = window.findChild(QPushButton, "pushButton")
 
     def refresh_list():
+        """
+        shows new list after previous changes.
+        """
         storage = simargl.LoginStorage("users_db")
         user_list_widget.clear()
         users_data = storage.load()
@@ -599,6 +605,9 @@ def open_delete_list(admin_window):
     back_button = window.findChild(QPushButton, "pushButton")
 
     def refresh_list():
+        """
+        shows new list after previous changes.
+        """
         user_list_widget.clear()
         storage = simargl.LoginStorage("users_db")
         users_data = storage.load()
@@ -629,11 +638,17 @@ def show_ban_dialog(username, mode, refresh_callback):
     storage = simargl.LoginStorage("users_db")
 
     def handle_ban():
+        """
+        Changes ban status in database.
+        """
         storage.set_ban_status(username, 1)
         dialog.accept()
         refresh_callback()
 
     def handle_unban():
+        """
+        Changes ban status in database.
+        """
         storage.set_ban_status(username, 0)
         dialog.accept()
         refresh_callback()
@@ -656,6 +671,9 @@ def show_delete_confirm(username, refresh_callback):
 
     if del_btn:
         def perform_delete():
+            """
+            Deletes User from database.
+            """
             storage = simargl.LoginStorage("users_db")
             storage.delete_user(username)
 
@@ -837,6 +855,9 @@ def open_calendar(menu_window):
     month_days = list(cal.itermonthdays(year, month))
 
     def on_day_clicked(day):
+        """
+        Shows lessons for the specific day.
+        """
         clicked_date = datetime(year, month, day).date()
         weekday_code = WEEKDAY_MAP[clicked_date.weekday()]
 
@@ -998,6 +1019,9 @@ def open_Compose_Email(Email_window):
         sender_line.setText(f"{current_login}@stud.uni-goettingen.de")
 
     def handle_add_file():
+        """
+        Function to attach the file to email
+        """
         nonlocal selected_file
         file_path, _ = QFileDialog.getOpenFileName(window, "Choose File", "", "All Files (*)")
         if file_path:
@@ -1007,6 +1031,9 @@ def open_Compose_Email(Email_window):
         add_files_btn.clicked.connect(handle_add_file)
 
     def handle_send():
+        """
+        Function to send an email
+        """
         try:
             text = email_text_edit.toPlainText()
             subject = subject_line.text()
@@ -1127,6 +1154,9 @@ def open_Dashboard(menu_window):
                 reset_btn = Dashboard_window.findChild(QPushButton, "Reset_Button")
                 if reset_btn:
                     def run_reset():
+                        """
+                        Reset all the data in stacked bar diagram.
+                        """
                         try:
                             clear_all_data()
                             refresh_stacked_bar(canvas_bar)
@@ -1141,6 +1171,9 @@ def open_Dashboard(menu_window):
                 timer_label = Dashboard_window.findChild(QLabel, "Timer")
                 if start_btn:
                     def run_start():
+                        """
+                        Starts the timer in Dashboard window.
+                        """
                         try:
                             global active_timer_day
                             study_timer.start()
@@ -1155,6 +1188,9 @@ def open_Dashboard(menu_window):
                 stop_btn = Dashboard_window.findChild(QPushButton, "Stop_Button")
                 if stop_btn:
                     def run_stop():
+                        """
+                        Stops the timer in Dashboard window.
+                        """
                         stop_timer_and_save(canvas_bar, current_theme_name)
                         if timer_label:
                             timer_label.setText("<span style='font-size:10pt'>Timer stopped</span>")
@@ -1210,6 +1246,9 @@ def open_Notes(menu_window):
         notes_list.addItem(note["title"])
 
     def add_note():
+        """
+        Adds a new note to the database
+        """
         dialog = AddNoteDialog(Notes_window)
         if dialog.exec():
             title = dialog.get_name()
@@ -1222,6 +1261,9 @@ def open_Notes(menu_window):
             notes_list.addItem(title)
 
     def load_note(item):
+        """
+        Loads note from the database
+        """
         title = item.text()
         for note in notes:
             if note["title"] == title:
@@ -1229,6 +1271,9 @@ def open_Notes(menu_window):
                 break
 
     def save_note():
+        """
+        Saves changes in chosen note
+        """
         item = notes_list.currentItem()
         if not item:
             return
@@ -1263,6 +1308,9 @@ def open_Themes(menu_window):
     btn_light_mini = theme_dialog.findChild(QPushButton, "Light_mini")
 
     def apply_and_close(theme_name):
+        """
+        Opens window with chosen theme.
+        """
         change_theme(QApplication.instance(), theme_name)
         theme_dialog.accept()
 
@@ -1388,6 +1436,9 @@ def open_menu(main_window):
     message_notifications = menu_window.findChild(QLabel, "StudIP_Messages")
     with ThreadPoolExecutor(max_workers=2) as executor:
         def update_mail_label():
+            """
+            Updates the number of unread Ecampus Mail messages .
+            """
             try:
                 count = ecampusmail.mail_notifications() if ecampusmail else 0
                 mail_notifications.setText(f"ECampus Mail ({count})")
@@ -1395,6 +1446,9 @@ def open_menu(main_window):
                 mail_notifications.setText("ECampus Mail (?)")
         
         def update_studip_label():
+            """
+            Updates the number of unread Ecampus Mail messages .
+            """
             try:
                 count = studip.new_messages_counter() if studip else 0
                 message_notifications.setText(f"StudIP ({count})")
@@ -1575,6 +1629,9 @@ def open_registration(prelogin_window, storage):
     reg_window = load_ui("UI/new_user.ui")
 
     def create_user():
+        """
+        Function to create user or admin account
+        """
         admin_checkbox = reg_window.findChild(QCheckBox, "AdminCheck")
         login = reg_window.findChild(QLineEdit, "LoginLine").text().strip()
         password = reg_window.findChild(QLineEdit, "PasswordLine").text().strip()

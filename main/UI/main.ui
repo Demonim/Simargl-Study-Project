@@ -388,7 +388,7 @@
           <property name="maximumSize">
            <size>
             <width>680</width>
-            <height>60</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -473,7 +473,7 @@
           <property name="maximumSize">
            <size>
             <width>680</width>
-            <height>60</height>
+            <height>40</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -533,7 +533,7 @@
           <property name="maximumSize">
            <size>
             <width>680</width>
-            <height>60</height>
+            <height>40</height>
            </size>
           </property>
           <property name="text">
