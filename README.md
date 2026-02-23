@@ -10,13 +10,13 @@ The default ECampus interface is often overloaded, slow, and lacks customization
 # Functionalities
 
 ### Data Storage
-- Uses SQL databases to securely store local user data, calendar events from StudIP, notes, and more.
+- Uses SQL databases to securely store local user data, JSON-files to store calendar events from StudIP, notes, and more.
 - Login credentials are hashed and databases are protected for user security.
 - Supports both persistent and session-based data storage.
 
 ### User Management
-- Local user profiles store credentials for ECampusMail and StudIP accounts.
-- Users can add, switch, or delete local accounts at any time.
+- Local user profiles store credentials for ECampusMail accounts.
+- Users can switch accounts, Admin can add, switch, or delete local accounts at any time
 - Secure authentication and credential management.
 
 ### Interface
@@ -26,10 +26,10 @@ The default ECampus interface is often overloaded, slow, and lacks customization
 - UI templates and layouts designed for clarity and ease of use.
 
 ### Visualizations
-- Advanced visualizations for calendar, study statistics, and more using PySide and custom plotting modules.
+- Advanced visualizations for calendar, study statistics, and more using PySide and plotting modules.
 - Interactive graphs: heatmap, pie chart, scatter plot, timer bar, and others.
-- Flexible period selection and filtering options for all visualizations.
-- Visualization modules are extensible for future features.
+- Flexible period selection and filtering options for visualizations.
+- Dashboard for visualizations.
 
 ---
 
@@ -157,7 +157,7 @@ Week-by-week schedule:
 # Contributions
 - **Demonim:** Led backend development, including the integration with StudIP and ECampusMail, and architected the login storage system. Implemented ECampusMail notification features, database management, and core backend logic. Provided numerous code and comment fixes, wrote docstrings and unit tests for the main and simargl modules, and contributed ideas for new themes. Handled localization updates, and ensured code quality through frequent refactoring and bug fixes.
 - **Nikityu2:** Designed and implemented the full GUI interface, including UI logic, visual design, and user experience improvements. Created and organized UI templates and styles, developed storage classes (Notes and CourseDays), and contributed to login storage improvements. Integrated calendar features, managed theme switching, and optimized interface responsiveness. Developed and refined multiple windows (Admin, Email, Help, Notes, Courses, etc.), and ensured seamless integration of all UI components. Enhanced error handling and user guidance throughout the application.
-- **dibardyk:** Developed and implemented all dashboard features, being fully responsible for the dashboard’s logic, structure, and every visualization module (heatmap, pie chart, scatter plot, timer bar). Wrote unit tests for dashboard_logic and weekly_study_tracker. Designed templates and layouts for the program. Improved data handling and error management, refactored and optimized code for readability and maintainability, and added comprehensive comments and docstrings. Enhanced user interaction by refining the interface and ensuring robust connections between UI components and backend logic. Introduced new functions for timer and diagram features, and contributed to the overall improvement of data visualization and user experience in the application.
+- **dibardyk:** Developed and implemented all dashboard features, being fully responsible for the dashboard’s logic, structure, and visualization module (heatmap, pie chart, scatter plot, timer bar). Wrote unit tests for dashboard_logic and weekly_study_tracker. Designed templates and layouts for the program. Improved data handling and error management, refactored and optimized code for readability and maintainability, and added comprehensive comments and docstrings. Enhanced user interaction by refining the interface and ensuring robust connections between UI components and backend logic. Introduced new functions for timer and diagram features, and contributed to the overall improvement of data visualization and user experience in the application.
 
 ---
 
